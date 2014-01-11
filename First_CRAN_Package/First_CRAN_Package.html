@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>My first package on CRAN</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+
+
+
+
+</head>
+
+<body>
+<h1>My first package on CRAN</h1>
+
+<p>Recently, I submitted a <a href="http://works.bepress.com/john_muschelli/3/">paper</a> to the <a href="http://journal.r-project.org/">R Journal</a>.  I had a repository (&ldquo;repo&rdquo;) on GitHub for it and the editor said that R Journal tries to only accept CRAN packages.  After classes and holidays, I finally got it <a href="http://cran.r-project.org/web/packages/brainR/index.html">accepted</a>.  I&#39;ll post about that package later, but I wanted to talk about some of the ins and outs I noticed that may have been helpful.</p>
+
+<p>First things first.</p>
+
+<p><a href="http://cran.r-project.org/doc/manuals/R-exts.html">Writing R Extensions</a> is <em>THE</em> manual for doing this.  It answers almost every question you have.  Use it.  CRAN has its own <a href="http://cran.r-project.org/web/packages/policies.html">POLICIES</a>.  Read them, they are necessary.</p>
+
+<p>The CRAN team is amazing.  Granted, if you don&#39;t read the documentation, you will receive some rightfully-curt emails saying you didn&#39;t do X,Y,Z as I did.  Preparation is good before going to the show with your package.</p>
+
+<h3>Things I recommend</h3>
+
+<ul>
+<li>Use <a href="http://www.rstudio.com/">RStudio</a> and <a href="https://github.com/hadley/devtools"><code>devtools</code></a>.  They make things much easier.  Go to <code>File -&gt; New Project</code> and make a git repository.  This creates a <code>.rproj</code> file that allows you to start a separate RStudio session, that has some fun options.</li>
+<li>Use a git repository.  I&#39;d suggest either <a href="https://github.com/">GitHub</a> or <a href="https://bitbucket.org/">BitBucket</a>.  BitBucket allows private repositories for free with a .edu email, but GitHub is more popular.  Either way, you&#39;re developing software, so do some version control.  Also, and put it online so it&#39;s backed up and people can use it and install it either using <code>install_github</code> or <code>install_bitbucket</code> from <code>devtools</code>.</li>
+<li>Use <a href="http://roxygen.org/">roxygen</a> for documentation.  You have code and documentation in the same and it makes things so much easier.  Period.</li>
+</ul>
+
+<h3>Setup</h3>
+
+<p>Now you have <code>devtools</code> and a new project in RStudio, then go into your project and go to <code>Build -&gt; Configure Build Tools...</code> and add <code>--as-cran</code> to <code>Check Package</code> and check <code>Generate documentation with Roxygen</code>.  Then go to <code>Configure...</code> next to that checkbox and I&#39;d check all the boxes. </p>
+
+<p>Almost all of this is explained as well from <a href="http://www.rstudio.com/ide/docs/packages/overview">Developing Packages with RStudio</a>.  You will only see this link in the RStudio application after you set up the project though, which seems odd.  </p>
+
+<p>Also, if you created an online git repository, go to Git/SVN and make sure it&#39;s there.  Again, <a href="http://www.rstudio.com/ide/docs/version_control/overview?version=0.98.490&amp;mode=desktop">RStudio has documentation on this</a>, but this is viewable under preferences if you&#39;re not in a project.</p>
+
+<h3>Submitting to CRAN</h3>
+
+<p>Now, obviously you have to write the documentation and functions in your <code>R</code> package.  But when you submit to CRAN, here are some suggestions.</p>
+
+<p>A few notes:</p>
+
+<ul>
+<li>the <code>inconsolata</code> package was a hassle and caused warnings with the PDF See <a href="http://r.789695.n4.nabble.com/While-using-R-CMD-check-LaTex-error-File-inconsolata-sty-not-found-td4671431.html">this</a> and <a href="http://r.789695.n4.nabble.com/inconsolata-sty-is-liable-to-disappear-texinfo-5-1-td4669976.html">this</a> for better ways to fix this.
+I fixed this by using option 2, but you can fix this 1 of 2 ways (Mac/Unix):
+
+<ul>
+<li>Copy zi4.sty to inconsolata.sty in the inconsolata package.  For me, this was in &ldquo;/usr/local/texlive/2013/texmf-dist/tex/latex/inconsolata&rdquo;, which is user-dependent and which year they have MacTeX installed.  MikTeX for Windows will be in a different directory.</li>
+<li>Copy zi4.sty to inconsolata.sty and move this this in &ldquo;/usr/local/texlive/texmf-local&rdquo;. 
+The first option will work, but only for this version of TeX (which hopefully is fixed by the next iteration).  It may be preferred if you a) don&#39;t like local texmf directories, b) don&#39;t want to change your PATH to have these local directories or c) have no idea what I&#39;m talking about.</li>
+</ul></li>
+<li>Make sure you turn off HTML emails.  In Gmail, on the bottom right corner, there is a down arrow, that allows you enable &ldquo;plain text&rdquo;.  Don&#39;t send HTML emails to CRAN (they don&#39;t like that).</li>
+<li>Look here for submitting <a href="http://www.r-bloggers.com/how-to-check-your-package-with-r-devel/">http://www.r-bloggers.com/how-to-check-your-package-with-r-devel/</a>.  Download the <code>R</code>-development branch <a href="http://r.research.att.com/">http://r.research.att.com/</a> and <code>Rswitch</code> as recommended.</li>
+</ul>
+
+<p>Overall, once you get the functions and package made (hard part), you should take some time to sit and read the submission process.  It&#39;ll save you time later.  Also, setting up the build options to be like CRAN from the beginning will have you poised to field more problems.</p>
+
+<h3>Links to better tutorials:</h3>
+
+<ul>
+<li><a href="http://blog.revolutionanalytics.com/2009/08/creating-r-packages-a-tutorial-draft.html">http://blog.revolutionanalytics.com/2009/08/creating-r-packages-a-tutorial-draft.html</a></li>
+<li><a href="http://cran.r-project.org/doc/contrib/Leisch-CreatingPackages.pdf">http://cran.r-project.org/doc/contrib/Leisch-CreatingPackages.pdf</a></li>
+<li>Way step by step: <a href="http://stevemosher.wordpress.com/step-one-update-your-r-and-other-tools/">http://stevemosher.wordpress.com/step-one-update-your-r-and-other-tools/</a></li>
+</ul>
+
+</body>
+
+</html>
+

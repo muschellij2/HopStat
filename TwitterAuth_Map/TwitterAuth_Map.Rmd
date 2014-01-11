@@ -1,0 +1,187 @@
+Here was a tip for authenticating a twitter account so you can still make a [TwitterMap](http://simplystatistics.org/2011/12/21/an-r-function-to-map-your-twitter-followers/)
+
+Go to [Twitter Apps](https://dev.twitter.com/apps) and create new application - need to name it and give it a website for it, but it must be unique (to all developers, not just you).
+
+Below, (harvested from [http://davetang.org/muse/2013/04/06/using-the-r_twitter-package/](http://davetang.org/muse/2013/04/06/using-the-r_twitter-package/)) needs to be run.  The key YOULLGETTHISFROMTWITTER when you get the app made and go under my applications.  Check out [https://dev.twitter.com/apps/new](https://dev.twitter.com/apps/new) if you can't find it.
+
+```{r, eval=FALSE}
+require("ROAuth")
+require("twitteR")
+
+#necessary step for Windows
+download.file(url="http://curl.haxx.se/ca/cacert.pem", destfile="cacert.pem")
+
+#to get your consumerKey and consumerSecret see the twitteR documentation for instructions
+cred <- OAuthFactory$new(consumerKey='x8L9jCRTYiMUY6lCbQOBw',
+                         consumerSecret='CZCtKDClVSRJl0LBRpABOvLZQ5MviwY6wqp1MxTMqE',
+                         requestURL='https://api.twitter.com/oauth/request_token',
+                         accessURL='http://api.twitter.com/oauth/access_token',
+                         authURL='http://api.twitter.com/oauth/authorize')
+
+#necessary step for Windows
+cred$handshake(cainfo="cacert.pem")
+```
+
+During this spot, you need to authenticate the key by going to a website and then entering it into `R`.  Think of this as an `ask=TRUE` scenario.
+
+
+
+```{r, eval=FALSE}
+#save for later use
+save(cred, file="~/twitter_authentication.Rdata")
+```
+Now, don't re-run the code above, just save the credentials so you don't have to do again.
+
+```{r, eval=TRUE, echo=FALSE}
+require("ROAuth")
+require("twitteR")
+load(file="~/twitter_authentication.Rdata")
+```
+
+```{r, eval=TRUE}
+registerTwitterOAuth(cred)
+```
+
+
+Now, once that is done, you can go back to creating twitter maps to your heart's content:
+
+```{r}
+source("http://biostat.jhsph.edu/~jleek/code/twitterMap.R")
+```
+
+```{r, echo=FALSE}
+twitterMap <- function(userName,userLocation=NULL,nMax = 1000,plotType=c("followers","both","following")){
+     
+  # Get location data
+  cat("Getting data from Twitter, this may take a moment.\n")
+  tmp = getUser(userName)
+  if(is.null(userLocation)){
+    userLocation = location(tmp)
+    userLocation = trim(userLocation)
+    if(nchar(userLocation) < 2){stop("We can not find your location from Twitter")}
+  }
+
+  followers=tmp$getFollowers(n=nMax)
+  followersLocation = sapply(followers,function(x){location(x)})
+  following = tmp$getFriends(n=nMax)
+  followingLocation = sapply(following,function(x){location(x)})
+
+
+  # Load the geographic data
+  data(world.cities)
+  data(us.cities)
+  data(canada.cities)
+
+  # Find the latitude and longitude of the user
+  cat("Getting geographic (latitude/longitude) of Twitter users.\n")
+  userLL <- findLatLon(userLocation)$latlon
+  if(any(is.na(userLL))){stop("We can't find the latitude and longitude of your location from Twitter")}
+
+
+  # Find the latitude and longitude of each of the followers/following
+  # and calcualte the distance to the user
+  
+  followersLL = matrix(NA,nrow=length(followers),ncol=4)
+  followingLL = matrix(NA,nrow=length(following),ncol=4)
+
+  for(i in 1:length(followers)){
+    if(length(followersLocation[[i]]) > 0){
+      tmpLL = findLatLon(trim(followersLocation[[i]]))
+      if(any(!is.na(tmpLL$latlon))){
+        followersLL[i,] = c(unlist(tmpLL$latlon),distCosine(userLL,tmpLL$latlon),unlist(tmpLL$cont))
+      }
+    }
+  }
+
+   for(i in 1:length(following)){
+    if(length(followingLocation[[i]]) > 0){
+      tmpLL = findLatLon(trim(followingLocation[[i]]))
+      if(any(!is.na(tmpLL$latlon))){
+        followingLL[i,] =  c(unlist(tmpLL$latlon),distCosine(userLL,tmpLL$latlon),unlist(tmpLL$cont))
+      }
+    }
+  }
+
+  followingLL = followingLL[order(-followingLL[,3]),]
+  followersLL = followersLL[order(-followersLL[,3]),]
+
+  followingLL = followingLL[!is.na(followingLL[,1]),]
+  followersLL = followersLL[!is.na(followersLL[,1]),]
+  
+
+  cat("Plotting results.\n")
+  # Set up the colors
+  cols = brewer.pal(7,"Set2")
+
+  # Both followers and following
+  if(plotType=="both"){
+    data(worldMapEnv)
+    par(mfrow=c(2,1),mar=rep(0,4))
+    map('world',col="#191919",bg="black",fill=T,mar=rep(0,4),border=0)
+
+    mtext(paste("@",userName," Follower Map",sep=""),col="lightgrey")
+    nFollowers = dim(followersLL)[1]
+    for(i in 1:nFollowers){
+      greatC = getGreatCircle(userLL,followersLL[i,1:2])
+      lines(greatC,col=cols[followersLL[i,4]],lwd=0.8)
+    }
+    
+    legend(-180,0,legend = c(paste("Asia",sum(followersLL[,4]==1)),paste("Africa",sum(followersLL[,4]==2)),paste("N. America",sum(followersLL[,4]==3)),paste("S. America",sum(followersLL[,4]==4)),paste("Australia/N.Z.",sum(followersLL[,4]==5)),paste("Europe",sum(followersLL[,4]==6))),text.col=cols[1:6],bg="black",cex=0.75)
+    
+ 
+    map('world',col="#191919",bg="black",fill=T,mar=rep(0,4),border=0)
+    mtext(paste("@",userName," Following Map",sep=""),col="lightgrey")
+    nFollowing = dim(followingLL)[1]
+    for(i in 1:nFollowing){
+      greatC = getGreatCircle(userLL,followingLL[i,1:2])
+      lines(greatC,col=cols[followingLL[i,4]],lwd=0.8)
+    }
+    
+    legend(-180,0,legend = c(paste("Asia",sum(followingLL[,4]==1)),paste("Africa",sum(followingLL[,4]==2)),paste("N. America",sum(followingLL[,4]==3)),paste("S. America",sum(followingLL[,4]==4)),paste("Australia/N.Z.",sum(followingLL[,4]==5)),paste("Europe",sum(followingLL[,4]==6))),text.col=cols[1:6],bg="black",cex=0.75)
+
+    mtext("Created by @simplystats twitterMap",side=1,adj=1,cex=0.8,col="grey")
+  }
+
+  ## Just followers
+  if(plotType=="followers"){
+    data(worldMapEnv)
+    map('world',col="#191919",bg="black",fill=T,mar=rep(0,4),border=0)
+
+    mtext(paste("@",userName," Follower Map",sep=""),col="lightgrey")
+    nFollowers = dim(followersLL)[1]
+    for(i in 1:nFollowers){
+      greatC = getGreatCircle(userLL,followersLL[i,1:2])
+      lines(greatC,col=cols[followersLL[i,4]],lwd=0.8)
+    }
+    
+    legend(-180,0,legend = c(paste("Asia",sum(followersLL[,4]==1)),paste("Africa",sum(followersLL[,4]==2)),paste("N. America",sum(followersLL[,4]==3)),paste("S. America",sum(followersLL[,4]==4)),paste("Australia/N.Z.",sum(followersLL[,4]==5)),paste("Europe",sum(followersLL[,4]==6))),text.col=cols[1:6],bg="black",cex=0.75)
+    mtext("Created by @simplystats twitterMap",side=1,adj=1,cex=0.8,col="grey")
+ 
+  }
+
+  ## Just following
+  if(plotType=="following"){
+    data(worldMapEnv)
+    map('world',col="#191919",bg="black",fill=T,mar=rep(0,4),border=0)
+    mtext(paste("@",userName," Following Map",sep=""),col="lightgrey")
+    nFollowing = dim(followingLL)[1]
+    for(i in 1:nFollowing){
+      greatC = getGreatCircle(userLL,followingLL[i,1:2])
+      lines(greatC,col=cols[followingLL[i,4]],lwd=0.8)
+    }
+    
+    legend(-180,0,legend = c(paste("Asia",sum(followingLL[,4]==1)),paste("Africa",sum(followingLL[,4]==2)),paste("N. America",sum(followingLL[,4]==3)),paste("S. America",sum(followingLL[,4]==4)),paste("Australia/N.Z.",sum(followingLL[,4]==5)),paste("Europe",sum(followingLL[,4]==6))),text.col=cols[1:6],bg="black",cex=0.75)
+
+    mtext("Created by @simplystats twitterMap",side=1,adj=1,cex=0.8,col="grey")
+    
+  }
+  
+}
+
+```
+and see the results!
+
+```{r}
+twitterMap("strictlystat", userLocation="Baltimore", plotType="both")
+```
+

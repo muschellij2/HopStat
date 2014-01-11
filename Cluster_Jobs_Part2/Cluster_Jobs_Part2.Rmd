@@ -1,0 +1,73 @@
+# Followup on hold jobs
+<link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script>
+
+In this post I have found a way to hold a pipeline from excecuting if any of the preceding jobs have errored.  
+I created a quick `R` file, named it `test.R`.  Contents of `test.R`:
+```{r, comment="", error=TRUE, highlight=TRUE}
+print(x)
+```
+Most of you can see that this is destined to fail since `x` can't be found, which is the point.  I want it to fail.  Now I created my bash file, named it `test.sh`, with contents below:
+```{r, engine='bash', eval=FALSE, highlight=TRUE}
+#!/bin/bash 
+R --no-save < test.R
+if [ "$?" -gt "0" ]
+then
+  exit 100
+fi
+```
+This program simply says run this `R` file, then check the last exit status in `bash` saved as `$?`, see if its greater than `0`.  If this is greater than `0`, then `R` file failed.  Then just exit `bash` with exit code `100`.  Now, why use exit code `100`? If you do 
+```{r, engine='bash', eval=FALSE}
+man qsub
+```
+you'll notice that under `-hold_jid` they have noted:
+
+>If any array task of the referenced jobs exits with exit code 100, the dependent tasks of the submitted job will remain  ineligible  for  execution.
+
+so we need to tell the Sun Grid Engine (SGE) that there is an exit code of `100` if we want it to hold up our jobs.  
+
+### What happens with held jobs?
+What happens when we try something like
+```{r, engine='bash', eval=FALSE, comment="", echo=TRUE}
+#!/bin/bash 
+qsub -cwd -N test1 test.sh 
+qsub -cwd -hold_jid test1 -N test2 test.sh
+```
+and then things fail?  We get the following output:
+```
+job-ID  prior   name       user         state submit/start at     queue                          slots ja-task-ID 
+-----------------------------------------------------------------------------------------------------------------
+ 990025 0.58333 test1      XXXXXXXX     Eqw   11/19/2013 16:54:56                                    1        
+ 990026 0.00000 test2      XXXXXXXX     hqw   11/19/2013 16:54:56                                    1
+```
+the `E` denotes tthere was an error.  The `test2` job will not run and will stay held (unless you delete the `test1` job using `qdel`).  
+
+Now, the <strong>big</strong> problem with this is that it tells our cluster administrator that your job has failed, which is not really the best option.  We may work out a system where we can put a special naming convention so that the failure can be filtered out compared to true failures (such as node crashes).  
+
+### Alternative option not using exit code `100`
+
+But for now, you could do something simple like at the beginning of pipline/series of `sh` scripts:
+```{r, engine='bash', eval=FALSE}
+echo 0 > check.txt
+```
+then in each `sh` script you can do:
+```{r, engine='bash', eval=FALSE}
+while read line           
+do           
+  if [ "$line" -gt "0" ]
+  then
+	  exit 1
+	fi
+done < check.txt 
+R --no-save < test.R
+echo $? >> check.txt
+```
+so that any time you get an exit status > 0, then you can stop everything down stream.  This works and is considered somewhat of a "blackboard" approach in that jobs check a blackboard before continue running.  
+
+Potential problems: 
+  * Needing to cleanup the check.txt file
+  * Multiple jobs reading the file at the same time (race condition).  This may be mitigated if you have a pause command after the last `echo`.  
+  * You don't have a record of what file actually failed (or which array index) - you can `cat`/`echo` more to the file and then use `awk` or something else to just take the first column (exit code).
+    
+But for now, I'll just try to make sure things run smoothly interactively for a bit, maybe doing some of [this](http://xkcd.com/303/).

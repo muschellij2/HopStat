@@ -1,0 +1,10 @@
+rm(list=ls())
+curr.rate <- 1.079
+new.rate <- 1.054
+nyears <- seq(3, 10, by=0.001)
+
+rate.diff <- (curr.rate^nyears- new.rate^nyears)
+tax.rates <- c(0.10, 0.15, 0.25)
+cut.years <- sapply(tax.rates, function(tax.rate) {
+  nyears[min(which(rate.diff >= tax.rate))]})
+print(cut.years)

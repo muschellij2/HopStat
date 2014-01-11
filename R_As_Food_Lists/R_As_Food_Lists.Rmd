@@ -1,0 +1,125 @@
+In `R`, lists can be the most powerful yet most confusing objects, and specifically with respect to references.  Essentially, lists are a general type of container that can hold almost any type of `R` object.  For example, let's say we have a list of foods I ate for the day.
+
+Note: whenever I'm talking about "referencing", I'm referring to `R` extracting things (usually called elements or objects) from another thing (an `R` object).
+
+```{r knit-setup, echo=FALSE, results='hide'}
+library(knitr)
+opts_chunk$set(message=FALSE, warning=FALSE,
+               comment="")
+opts_knit$set(error = FALSE)
+```
+
+```{r}
+mylist = list(breakfast=c("eggs"),
+              lunch=c("salad", "dressing"), 
+              dinner=c("chicken"))
+```
+
+Conceptually, I will refer to a piece of tupperware as a list.  Now, if we use this figure <img src="http://dl.dropboxusercontent.com/u/600586/WordPress_Hopstat/R_As_Food_Lists/tupperware.jpg" height=250> 
+
+(source [http://3.bp.blogspot.com/-5vJn-RLtceE/UB_iAOhdw3I/AAAAAAAACPU/f9D1c4tXOE4/s1600/20120805_234940_rounded_corners.jpg](http://3.bp.blogspot.com/-5vJn-RLtceE/UB_iAOhdw3I/AAAAAAAACPU/f9D1c4tXOE4/s1600/20120805_234940_rounded_corners.jpg)), then the middle piece of tupperware would be `mylist`.
+
+Now, let's say the smaller of the two tupperwares are `breakfast` and `dinner` and the two-compartment container is `lunch`.  In this case, I threw the salad and dressing together.  Now we have:
+<img src="http://dl.dropboxusercontent.com/u/600586/WordPress_Hopstat/R_As_Food_Lists/tupperware_list.jpg" height=250>
+
+So now, to reference the object, I can say:
+```{r}
+mylist["breakfast"]
+mylist[1]
+class(mylist["breakfast"])
+```
+This is telling `R` that I want to grab the element named `breakfast` in the first line, or the first element of the list (returns the same thing because breakfast is the first element).  This returns an object of type `list`.  This would be like opening up the `mylist` tupperware, and taking out the `breakfast` tupperware.  The food for breakfast is still `eggs`, but it's in the tupperware `breakfast`.  I'm hungry, so I just want to take out the `eggs`.  I would do this by:
+```{r}
+mylist$breakfast
+mylist[["breakfast"]]
+mylist[[1]]
+class(mylist[["breakfast"]])
+```
+This tells `R` that I want you to return (aka give me) the objects in the element `breakfast`.  This is like saying, I want the food in the breakfast tupperware; give me those eggs.  This is the "double bracket" `[[` notation for referencing, and has the same behavior of using the dollar sign ($) referencing as with a `data.frame` if your list has names.  As always, you can use positional referencing by using `[[1]]` saying I want the contents of the first list element.
+
+The same applies to the other meals of the day, with the exception that `lunch` returns a vector of length 2, instead of `breakfast` and `dinner` who have length 1 (only one piece of food).  
+
+### Lists of Lists
+
+Now, let's say I don't want my salad and dressing all together in the salad, as it gets soggy by lunch time.  So I put my salad in its own tupperware container and the dressing in its own:
+
+<img src="http://dl.dropboxusercontent.com/u/600586/WordPress_Hopstat/R_As_Food_Lists/tupperware_list_list.jpg" height=250>
+
+In `R`, this would be:
+```{r}
+mylist2 = list(breakfast=c("eggs"),
+              lunch=list("salad", "dressing"), 
+              dinner=c("chicken"))
+```
+
+Now, `breakfast` and `dinner` contained in the same way, but `lunch` is different.  Now let's take out my `lunch`:
+
+```{r}
+mylist2["lunch"]
+mylist2[2]
+class(mylist2["lunch"])
+```
+Ok, this is returning a `list` as before.  Let's use the double bracket or ($) referencing:
+
+```{r}
+mylist2$lunch
+mylist2[["lunch"]]
+mylist2[[2]]
+class(mylist2[["lunch"]])
+```
+
+What gives?  I used the "$"!  Yes, this takes out the element `lunch`, but lunch is another `list`!  It's kind of like those [Matryoshka dolls](http://en.wikipedia.org/wiki/Matryoshka_doll):
+
+<img src="http://dl.dropboxusercontent.com/u/600586/WordPress_Hopstat/R_As_Food_Lists/Russian_Dolls.jpg" height=250>
+
+(source [http://en.wikipedia.org/wiki/File:Russian_Dolls.jpg](http://en.wikipedia.org/wiki/File:Russian_Dolls.jpg).
+
+Then `mylist2` is a list of $2$ vectors (`breakfast` and `dinner`), and a $2$-element `list` (`lunch`).  Now if we wanted to get the first element of `lunch`, we could run:
+
+```{r}
+mylist2$lunch[1]
+class(mylist2$lunch[1])
+mylist2$lunch[[1]]
+class(mylist2$lunch[[1]])
+```
+where we saw that `mylist2$lunch` returned a `list`, so we can handle referencing the same way we did with `mylist` from the beginning of the article.  
+
+
+### Why lists? WHYYY?
+Now, a lot of new users approach this as: "lists are complicated/dumb/useless/too confusing/whatever" and I like to use this example:
+
+```{r}
+dataset <- data.frame(outcome=rnorm(100, mean=2), x = rep(c(0, 1), each=50))
+mod = lm(outcome ~ x, data=dataset)
+smod = summary(mod)
+MSE = mean((dataset$outcome - predict(mod, newdata=dataset))^2)
+mod.results = list(model=mod, smod = smod, data=dataset, MSE=MSE)
+```
+
+The first element of the list is a model, the second element is the summary of the model. the third element is the dataset used to fit that model, and the fourth element is the [mean squared error](http://en.wikipedia.org/wiki/Mean_squared_error) (MSE) of that model.  Linear models in `R` (fit using the `lm` function) has the class `lm`, but can be thought of as a list of elements:
+
+```{r}
+names(mod)
+```
+Now let's say I wanted to get the adjusted [$R^2$](http://en.wikipedia.org/wiki/Coefficient_of_determination) and MSE from my results:
+
+```{r}
+c(mod.results$smod$adj.r.squared, mod.results$MSE)
+``` 
+
+So I can reference my large list of results, getting the summary of my model, then referencing the adjusted $R^2$ slot (aka position), and then getting the MSE that I created above.  
+
+### Label me: I want a name!
+
+The general recommendation is to use labels whenever possible.  This allows you to understand what you're extracting when seeing the code (assuming you labeled in an informative way ("element1" is NOT informative)); it is more safe, especially if you change the order of the elements; it allows you to use the ($) referencing.  
+
+### Conclusion
+
+Overall, lists are powerful, but can be confusing when you start doing referencing.  You can do single brackets `[`, which will return a list, which you would want to do if you want `mylist` without `breakfast`:
+```{r}
+mylist[c("lunch", "dinner")]
+```
+(don't skip breakfast, it's the [most important meal of the day](http://www.jhsph.edu/offices-and-services/student-affairs/_documents/Breakfast)).  Also, you can use a "$" or double bracket (`[[`) referencing when you want to get the *contents* of the elements of a list, which may be a list as well.  Complicated lists may not seem useful initially, but can be very convenient when storing results or things of many different types that don't easily "fit together".
+
+
+PS.  This is the way I think of [$\sigma$-fields](http://en.wikipedia.org/wiki/Sigma-algebra) as well, but that is a whole other topic altogether.

@@ -1,0 +1,5 @@
+
+https://github.com/amarder/stata-tutorial/blob/master/knitr.do
+So a few know that I have a set of rules that I have made over the years that are some good guidelines for my life.  Some of them are not appropriate here, but I would like to share my Rule #1: Always Have a Pen.
+
+This may seem like a silly rule, especially for Rule #1, but I feel like it has worked for me in the past.  [Dr. Charles Rohde](http://www.biostat.jhsph.edu/~crohde/personal/)

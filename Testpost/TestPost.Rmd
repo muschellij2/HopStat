@@ -1,0 +1,10 @@
+I wanted to test if `knitr` and WordPress could be friends, and so I attemped this:
+```{r, echo=TRUE}
+summary(cars)
+```
+
+```{r fig.width=7, fig.height=6, echo=TRUE}
+plot(cars)
+```
+
+and thankfully it worked!  Thanks to [Yihui's great tutorial](http://yihui.name/knitr/demo/wordpress/).  I hope this helps me make quicker, and more importantly, more posts.  Now I just need to integrate some 3D graphics, and we'll be all set!

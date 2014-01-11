@@ -1,0 +1,24 @@
+JHU Hackathon
+========================================================
+
+
+So I've been toying with the idea of organizing a [Hackathon](http://en.wikipedia.org/wiki/Hackathon) in our department for a while.  
+
+I knew we had one at [Hopkins: HopHacks](http://hophacks.com/) recently, which I was excited about but could not participate in.  After Googling recently, I found a [Baltimore Hackathon](http://matthewforr.com/baltimorehackathon/). The office of the mayor is all about getting some hackathons going on in [Baltimore](http://technical.ly/baltimore/2013/10/03/moit-hackathons-city-of-baltimore/) (I love the comment "City funds will not be used for the purchase of alcoholic beverages").  First off, I love this idea - it shows a little coding day can help in a huge way.  Secondly, awesome data is out there that may be accessed without a bunch of red tape, which I'm not going to go around cutting through. <!--put in something about "this lets me avoid that!"-->
+<!-- I'd be more concise in this paragraph, e.g., "I love this idea: a hackathon on city data will be hugely impactful, and it's a one-time chance to get access to it without government red tape!!"
+
+### HopStat Hack
+The type of hackathon I want to do is a coding event, not producing prototypes or anything "physical" like doing soldering or programming circuit boards.  While that sounds awesome, I don't want to burn down our department since I don't know what I'm doing.   Now, what <strong>exactly</strong> am I talking about with a Hackathon?  
+
+I'm talking about getting a bunch of coders in a room, a bunch of food/drinks (and later some alcoholic drinks, to take advantage of the [Ballmer Peak](http://xkcd.com/323/)), and charge them with a problem at hand and a general guideline how to solve it.  The guideline will be flexible, as unexpected problems always come up.  There may be data available to solve the problem, but the data may be scraped or hacked from somewhere.  
+
+<!-- you don't mention what HopStat Hack is, maybe say that is what you will name it (cleaner transition)-->
+
+### Goals
+Why would you need a Hackathon?  Why can't you do the normal academic route?  I would like to list some reasons:
+  * There is a deadline.  Whether it be 1 day or 3 days, there is an end, and it's soon.  In academia, that is not always common, but I feel like it helps push people in a positive way (especially if the deadline is not met there nothing terrible happens)
+  * 
+
+<!-- what is the normal academic route? --> 
+<!-- I would also add some of your project ideas (maybe someone else will hack them!  people are always looking for hacking inspiration), and mention that you want the outcome to be publishable --> 
+
