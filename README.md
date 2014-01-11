@@ -1,0 +1,1 @@
+Here are the posts of the RMD files from my website.  Hopefully it's a good idea.  So if you wnat to run anything, just tangle out the code using `knitr`.
