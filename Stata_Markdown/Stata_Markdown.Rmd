@@ -1,0 +1,194 @@
+## Abstract/Summary
+This blog post is about options for making dynamic documents in Stata using Markdown, discussing the options of [StatWeave](http://homepage.cs.uiowa.edu/~rlenth/StatWeave/) and a do file created from a user, [`knitr.do`](https://github.com/amarder/stata-tutorial).  I will discuss some the capacities of these options and show options for custom use if you know how to use RMarkdown.  
+
+## Knitr: Dynamic Documents
+If you use `R`, or even if you don't, you may have heard of the phrases "dynamic documents", "reproducible reports", "markdown", "Rmarkdown", or more specifically "knitting/knitr".  For pronunciation: according to the `knitr` documentation in `R`:
+
+> The pronunciation of knitr is similar to neater (neater than what?) or you can think of knitter (but it is single t). The name comes from knit + R (while Sweave = S + weave).
+
+Now, if you haven't heard it, well I guess now you have.  But more importantly, do [some research on knitr](http://yihui.name/knitr/).  It's awesome, and there's even a [Book from the author of `knitr`, Yihui Xie](http://www.amazon.com/gp/product/1482203537) and a corresponding [GitHub repository](https://github.com/yihui/knitr-book).  Also, you may want to read why you should [care about reproducible results](http://biostatistics.oxfordjournals.org/content/10/3/405.full).  
+
+Overall, `knitr` is a system that allows for dynamic documents, which I will define as files that contain code and prose/text/words/comments/notes.
+
+### Knitr Languages
+Why am I talking about Stata?  Well, I use Stata.  Also, if you're using SAS, Python, CoffeeScript or some other languages, then `knitr` has already incorporated these into the `R` system: [http://yihui.name/knitr/demo/engines/](http://yihui.name/knitr/demo/engines/).  
+
+Let's just list some resources for doing some knitting in Stata:
+* There is a post on the Stata list-serv:
+[http://www.stata.com/statalist/archive/2012-07/msg00323.html](http://www.stata.com/statalist/archive/2012-07/msg00323.html)
+
+* And the corresponding github repo from that post (link fixed): [https://github.com/amarder/stata-tutorial](https://github.com/amarder/stata-tutorial), which is intended to be run completely in Stata, which I will refer to as `knitr.do`.
+
+* I tried that out, and a question discussion spurned on Stack Overflow on someone who asked me about it: [http://stackoverflow.com/questions/20539177/markdown-in-other-statistics-packages-than-r/20573096](http://stackoverflow.com/questions/20539177/markdown-in-other-statistics-packages-than-r/20573096)
+
+* StatWeave (a precursor to `knitr`) is still a viable option from Russell Lenth from U Iowa [http://homepage.cs.uiowa.edu/~rlenth/StatWeave/](http://homepage.cs.uiowa.edu/~rlenth/StatWeave/). 
+
+Now, I *highly* suggest taking a look at the github repo and `knitr.do` and StatWeave.  Actually, no.  Stop reading this post and check it out.  I can wait.  Go.  I'm going to talk about how to do this within `R`.
+
+## And... We're back
+
+So these options are good and are mainly options to create a markdown document that **Stata** will run/manipulate.  This is vital for someone who doesn't know `R`.  Here are some notes I have:
+
+1.  `knitr` has a lot of good options already made and is expanding.  No inventing the wheel with respect to highlighting/parsing/etc.  Also, a large community uses it.
+2.  I want to know one syntax for markdown. OK, maybe two, one for html, the other for LaTeX. 
+2.  `knitr.do` uses parsing based on indenting from what I can see.  I like demarcating code; I feel like it's safer/robust.  This could easily be changed if the user wanted it.  StatWeave allows code demarcation by `\begin{Statacode}` and `\end{Statacode}.  
+3.  `knitr.do` didn't seem to have an inline code option.  StatWeave allows you to add inline text.  For example, stating that the dataset had 100 rows and the maximum age was 30.  StatWeave uses the Sweave syntax, but uses `Stataexpr` instead of `\Sexpr`, so that you could fill in that 30 by using `\Stataexpr{max(age)}` instead of writing 30.  This is a huge capability for truly dynamic documents.
+4.  StatWeave is maintained mainly, I believe, by one person (Russell Lenth).  This is how `knitr` started in some capacity before it became more popular, but it was built upon a community-used system `R` that had a pre-existing software that was similar (`Sweave`).  Hence, I think `knitr` has more longevity and more learning capital compared to either option.  Also, StatWeave (or its functionality) may be integrated into `knitr`.
+5.  StatWeave can only be written in LaTeX syntax (since OpenOffice bug precludes it from making odt docs).  `knitr.do` can do markdown, which can be converted to pdf, docx, html, or many other formats using [`pandoc`](http://johnmacfarlane.net/pandoc/).  
+6.  Neither option allows for automatically saving and naming plots in any system I can see.  This must be done in Stata code using normal graph saving methods, e.g. `graph export`.
+7.  `knitr.do` inherently uses logs. I can't really determine what StatWeave uses because it's written in Java. 
+
+Now, I'm going to assume how to use `knitr` and see how we could do some reporting using `knitr`.  
+
+### 99 Problems and they're Stata problems
+If you are running `knitr` from `R`, again, [Yihui](http://yihui.name/en/) has incorporated a lot of other languages to process.  What are some potential problems with processing the same way in Stata?
+
+* Stata is inherently just a command line, but when you call it, it calls a GUI if you don't have Stata(console).  More on Stata(console) that later.  
+  * You can start Stata by the command line in [Unix](http://www.stata.com/support/faqs/unix/batch-mode/) or [Windows](http://www.stata.com/support/faqs/windows/batch-mode/) with help from those links.
+* In order to use Stata from the command line, you probably need to put the path to Stata in your PATH variable: [http://www.stata.com/support/faqs/mac/advanced-topics/](http://www.stata.com/support/faqs/mac/advanced-topics/).  For example, the path `/Applications/Stata/Stata.app/Contents/MacOS/` is in my PATH, so that I can go to the Terminal and type `Stata`.  (Side note: this is the way to start multiple Stata sessions on a Mac). Let's assume you didn't do this though.  
+
+Let's just make a test .do file:
+```{r, engine='bash', eval=TRUE, comment= ""}
+  cat Stata_Markdown.do
+```
+Now how to run it?  Let's use `bash`, which is supported by `knitr`.  So I just have in my `knitr` code chunk options, `engine='bash'`.  Don't forget `comment=""` if you don't want `#` to be printed (which is the default comment character).
+
+```{r, engine='bash', eval=TRUE, echo=FALSE, results='hide', comment = ""}
+rm Stata_Markdown.log  
+```
+  
+```{r runerror, engine='bash', eval=TRUE, comment= "", error=TRUE, results='hold', echo=1:2}
+stata -b Stata_Markdown.do 
+echo $? ### print last return
+```
+  Since `echo $?` is supposed to print 0 if there is no error, there was an error.  Worse off, there was a **silent** error in the sense it didn't print a message of error as output for bash.  This error occurs because my `bash` doesn't have a `stata` or `Stata` command.  We can either make aliases in `.bash_profile` or `.bashrc` or again put `Stata` in my path, but let's just be explicit about the Stata command by using the full path: for me, it's  `/Applications/Stata/Stata.app/Contents/MacOS/stata`.  We also don't see anything from the log file, which makes sense because nothing happened. 
+  
+* But a real problem is the Stata log file is not made in a "timely" manner in this process.  Let's rerun the code with the full path for Stata:
+```{r, engine='bash', eval=TRUE, echo=FALSE, reusults='hide', comment = ""}
+rm Stata_Markdown.log  
+```
+  
+```{r, engine='bash', eval=TRUE, comment= ""}
+/Applications/Stata/Stata.app/Contents/MacOS/stata -b "Stata_Markdown.do" 
+echo $?
+cat Stata_Markdown.log
+```
+  * Success! Well, it worked by the error being 0, but not really a "success" as nothing was printed.  So what does this code for running Stata mean? 
+    - `/Applications/Stata/Stata.app/Contents/MacOS/stata` says "run stata"
+    - `-b` says I want to run in ["batch mode"](http://en.wikipedia.org/wiki/Batch_processing), which is much different than ["beast mode"](http://www.youtube.com/watch?v=xSZdntRnQVg).
+    - `Stata_Markdown.do` filename I want to run
+  Now, if there was a space in the path to Stata, it needs to be quoted with `"`.  But **IMPORTANTLY**, the Stata console came up and I had to hit "OK", INTERACTIVELY!!  Not very automated, but we'll fix this in a moment.
+
+  * But what about the `cat Stata_Markdown.log`, which is auto-generated by the Stata command? Was the log empty?
+  ```{r, engine='bash', eval=TRUE, comment= ""}
+  cat Stata_Markdown.log
+  ```  
+  **WHAT?** Running the command again gives us what we want?  Now, we can either do 2 code chunks, but if we set the `results='hold'` option in `knitr`, then things work fine.
+
+* You can get around this unwanted "interactivity" using the console version of Stata, but I didn't set it up and [Stata for Mac](http://www.stata.com/support/mac/) says:
+> Can I display graphs with Stata(console)? 
+> No. Stata(console) is a text-based application and has no graphical display capabilities. However, it can generate and save Stata graphs, which can then be viewed with Stata(GUI). Stata(console) can also convert Stata graphs to PostScript and save them as files. 
+
+Also, Stata(console) for Mac needs Stata/SE or State/MP (aka more costly Stata) according to [Section C.4 Stata(console) for Mac OS X](http://www.stata.com/manuals13/gsmc.pdf).  So for most users you'd have to buy a different Stata.  
+
+  * Another way of getting around this interaction would be having Stata auto-exit; let's do that.  Exiting Stata is possible without having interaction with a specific option when you exit, so you have `exit, clear STATA`.  Let's look at our new script `Stata_Markdown_Exit.do`:
+```{r, engine='bash', eval=TRUE, echo=FALSE, reusults='hide', comment = ""}
+  rm Stata_Markdown_Exit.log  
+```
+```{r, engine='bash', eval=TRUE, comment= ""}
+cat Stata_Markdown_Exit.do
+```
+  Now let's run it.
+```{r, engine='bash', eval=TRUE, comment= "", results='hold'}
+/Applications/Stata/Stata.app/Contents/MacOS/stata -b "Stata_Markdown_Exit.do"
+echo $?
+cat Stata_Markdown_Exit.log
+```
+  It looks the same as before with no output, but **I did not have to interact with Stata**.  Note: if you use `&` at the end of the command, the `echo $?` will come up zero, because `bash` will see it a background process.  
+
+### But I don't want to show the whole script all the time
+You may notice that I printed with `cat` the entire log that was created with Stata.  Honestly, I don't like Stata logs.  They seem like a nuisance. I have a script and can make outputs, so do I why need a log?  But here, it seems useful.  But what happens when you want to show **parts** of a script at different points?  You can obviously make a series of .do files.  Not really a good solution. 
+
+What's a better solution? Create logs in your Stata code and then `cat ` them to different code chunks.  Here's an example:
+```{r, engine='bash', eval=TRUE, comment= ""}
+cat Stata_Markdown_logs.do
+```
+
+```{r, engine='bash', eval=TRUE, comment= "", results='hold'}
+/Applications/Stata/Stata.app/Contents/MacOS/stata -b "Stata_Markdown_logs.do" 
+```
+Now, since `print_hello.log`, and `run_summ.log` were created, I can just do:
+
+```{r, engine='bash', eval=TRUE, comment= ""}
+cat print_hello.log
+```
+and then later print:
+```{r, engine='bash', eval=TRUE, comment= ""}
+cat run_summ.log
+```
+
+### No header/footer from log
+This works, but you have a header and footer, that you probably [can't delete with some simple option](http://www.stata.com/statalist/archive/2004-08/msg00177.html).  Now, obviously you can read them in `R` and do string manipulation and then print them back out, but that's a little convoluted.  Regardless, I wrote a simple function in `R` that will do it (R code):
+
+```{r, eval=TRUE, comment=""}
+catlog <- function(filename, runcat=TRUE, comment=""){
+  x = readLines(filename)
+  lenx = length(x)
+  x = x[7:(lenx-6)]
+  writeLines(x, filename)
+  if (runcat) cat(x, sep="\n")
+}
+catlog("run_summ.log")
+```
+which simply drops the first 6 and last 6 lines of the log.  Thus, you can  then print it totally using `R` or then just use the saved log file can print it using `cat` from `bash:
+```{r, engine='bash', comment=""}
+cat run_summ.log
+```
+or in `bash`, one example would be:
+```{r, engine='bash', comment=""}
+nlines=`awk 'END{print NR}' print_hello.log`
+nhead=`expr $nlines - 6`
+ntail=`expr $nlines - 12`
+head -$nhead print_hello.log | tail -$ntail
+```
+or even better, let's make a function for `bash` that will do it:
+```{r, engine='bash', comment=""}
+catlog () {
+  nlines=`awk 'END{print NR}' $1`
+  nhead=`expr $nlines - 6`
+  ntail=`expr $nlines - 12`
+  head -$nhead $1 | tail -$ntail
+}
+
+catlog print_hello.log
+```
+
+OK - I can see the allure of using StatWeave in some capacity at this point.  But still, if you use `knitr`, this may make sense or the way you want to do it without going to StatWeave.
+
+### Cleanup
+You can just do some .log clean up using:
+
+```{r, engine='bash', eval=TRUE, comment = ""}
+rm *.log  
+```
+if you want to delete all logs in your folder (assuming you never changed directories).
+
+
+### Thoughts
+You can do "markdown" in Stata.  My thoughts:
+1.  It's complicated.
+2.  The `knitr.do` file is a good start and great that's it's totally within Stata (you still need a Markdown converter), but doesn't have code demarcation.  It also doesn't do inline commands, which are a requirement for a dynamic doc, so you don't have to fill in the numbers and can do it dynamically with code
+3. StatWeave has more functionality than `knitr.do` and inline functions, but uses added software (a Java program), and can't do general markdown; the user needs to understand LaTeX.
+3.  Plotting hasn't really been integrated.  You can always do a `graph export myplot.pdf, as(pdf)` (on Mac) or whatever and then just put in `<img src="myplot.pdf">` in your html, or `\includegraphics{myplot.pdf}` in LaTeX, but that's not as integrated as it is in other systems.  
+4.  If you make it to a Markdown document, you can use the great [pandoc](http://johnmacfarlane.net/pandoc/) to potentially then just make it a Word .doc.
+5. It will likely be integrated in the future.  The question is how close is that "future"?
+
+## Conclusion
+I like both options for respective pieces but my main concern with either option is putting in a lot of time for these and then they becoming obsolete with `knitr` integration.  That's not a big problem, since I know `knitr` but something to think about for someone who doesn't.  My recommendation, if you know and want to use LaTeX or need inline numbers, go with StatWeave.  Otherwise `knitr.do` may do the trick.  Also, I've given you some directions on "growing your own", which is the most customizable for you but even worse with respect to time, reinventing the wheel, and no support from others. 
+
+Anyway, those are the current options I know about when doing Markdown with Stata.
+
+
+
+
+

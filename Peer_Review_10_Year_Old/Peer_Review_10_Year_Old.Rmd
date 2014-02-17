@@ -1,0 +1,36 @@
+## Abstract 
+I discuss my idea for another type of peer review process, where there would be a general requirement for needing to review before getting reviewed.
+
+<!-- I moved the "if this idea is not novel..." part to the end; I like the 1-sentence abstract -->
+
+## A story about when I was a 10-Year-Old
+I couldn't really sleep this morning, so naturally I started thinking about the peer review process.  I started thinking about elementary school and when teachers would make us grade each other's homework. When I had to grade my neighbors' assignments and they had to grade mine, I usually thought 3 things: 1) the teacher was too lazy to grade our homework (how wrong I was!), 2) I was happy to get feedback so quickly, and 3) the grading was generally less harsh than if the teacher had done it.
+
+## Back to Peer Review
+I was thinking about how this idea could apply to a peer-reviewed journal. I think it would be interesting if whenever you submitted your paper, then the only way you get feedback is if you reviewed another paper from that journal. I think this would be interesting for a few reasons.
+
+1.  It would encourage fast feedback from reviewers. (I'll get to how this may be a bad thing).
+2.  You'd have a large pool of reviewers.
+3.  Although many (if not most) academics reviewing papers are paying forward from getting their own papers reviewed, the pay forward here would be immediate.  Also, you wouldn't have any "[leechers](http://en.wikipedia.org/wiki/Leech_(computing))" publishing in that journal.
+4.  It would promote the idea that one aspect of research is "giving back".
+
+### How to Select Which Papers to Review
+You could select from a list of papers that are currently available to be reviewed and pick the one (or more) that you feel qualified to review.  You may have to give a reason why you feel qualified (or not). If you didn't feel qualified for any, then you can either pay a fee, or give fields you do feel qualified in and wait for the journal to respond.  Editors would still check the paper is in line with the journal's mission and can double check if they don't see a good fit for a paper reviewer.
+
+### Caching
+I like the idea that you could "cache" reviews so that if you (or a co-author) submitted to this journal (or a network of journals) and had more reviews than submissions, you could simply submit.  This would be useful because:
+
+1.  Younger academics (i.e. students) would be encouraged to get into the peer review process earlier.
+2.  You may review at any time if you think you have a submission in the future.
+3.  You know you still "gained" something from the review above and beyond what you gain from being a reviewer in the current system (new knowledge, seeing other writing styles, etc.)
+4.  Having a co-author that reviews a lot of papers may be more desirable to collaborate with (not a great reason, but still gives incentive to review).
+
+### Drawbacks
+Potential drawbacks for this system obviously exist, such as:
+1.  Quality of review.  You'd run the risk of people trying to review too quickly or reviewing papers they are not qualified for.
+2.  Using co-authors "caches" more often than giving back, so that only a few are still doing the reviews.
+3.  Competing papers might get rival authors reviewing them (could be rare, but worth considering)
+4.  Allowing people to select papers that need to be reviewed may neglect some more-complicated papers.  (You could maybe assign these).
+
+## Conclusions
+The idea may be not really hashed out, and there are probably unforeseen problems, but I think this system would be interesting to try out, if it's not being used already. (Incidentally, if you know of a place where this system is used, links/comments are welcome!).  The peer review process would be even more of a "scratch my back, I'll scratch yours" situation.  Also, it would give direct incentives for reviewing, which I believe is a good thing.

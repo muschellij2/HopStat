@@ -1,0 +1,24 @@
+--------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  /Users/muschellij2/Dropbox/Public/WordPress_Hopstat/XML_to_Stata/test.log
+  log type:  text
+ opened on:  11 Jan 2014, 14:19:24
+
+. set obs 1
+obs was 0, now 1
+
+. gen x = ""
+(1 missing value generated)
+
+. count if mi(x)
+    1
+
+. count if x == ""
+    1
+
+. log close
+      name:  <unnamed>
+       log:  /Users/muschellij2/Dropbox/Public/WordPress_Hopstat/XML_to_Stata/test.log
+  log type:  text
+ closed on:  11 Jan 2014, 14:19:24
+--------------------------------------------------------------------------------------------------------
