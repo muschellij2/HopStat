@@ -12,7 +12,7 @@ I'm talking about getting a bunch of coders in a room, a bunch of food/drinks (a
 
 ### Why do a hackathon?
 Why can't you do the project over time like other projects?  I would like to list some reasons:
-  * There is a deadline.  Whether it be 1 day or 3 days, there is an end, and it's soon.  In academia, that is not always common, but I feel like it helps push people in a positive way (especially if the deadline is not met there nothing terrible happens)
+  * There is a deadline.  Whether it be 1 day or 3 days, there is an end, and it's soon.  In academia, that is not always common, but I feel like it helps push people in a positive way (especially if the deadline is not met then nothing terrible happens)
   * People are busy.  If you ask someone to be a on a project, they will likely say no.  Asking them for one day (and providing food), they'd be more open.
   * It's hard to get a large number of people together for longer than a day.  It's sometimes hard to even get them for a 1 hour meeting.
   
