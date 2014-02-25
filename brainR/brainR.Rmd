@@ -1,0 +1,4 @@
+brainR: Put your brain on the Cloud!
+========================================================
+
+In my work, we have come across a few problems where we wanted to visualize data in 4 dimensions (4D).  The data came as brains, which are 3D and we wanted to visualize them at different time points.  We were using images that are acquired one image per visit (CT structural scans, particularly), where each patient had a maximum of 10 time points.  (The methods below have not been tested or adapted for fMRI scans that have hundreds of time points).

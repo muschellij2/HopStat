@@ -1,3 +1,6 @@
+Always Have a Pen
+========================================================
+
 So a few know that I have a set of rules that I have made over the years that are some good guidelines for my life.  Some of them are not appropriate here, but I would like to share my Rule #2: Always Have a Pen.  (Rule #1 is not relevant for discussion.)
 
 This may seem like a silly rule, but I feel like it has been useful for me in the past few years.  Amongst others, I first got this advice from [Dr. Charles Rohde](http://www.biostat.jhsph.edu/~crohde/personal/) during his class.  He simply stated that you should always have a pen (and paper) because good ideas/quotes rarely come when you expect them and it'd be a crime to forget them.  Others have good points on why to have one:
@@ -17,7 +20,7 @@ But pens don't ruin clothes only when in the wash. When you put pens in your poc
 Don't get a pocket protector.
 
 
-## Ancillary Benefits
+## Ancillary Benefits:
 
 1.  When splitting a check, you can write down the amounts on multiple credit/debit cards.  The waiter/waitress almost never brings a pen <strong>before</strong> you give your cards, which I find as a bit of an oversight, unless they don't want you to split the check.  And I have [PayPal](https://www.paypal.com/) or [Venmo](https://venmo.com/) to do things electronically when needed, but pens still are handy.
 2.  It's good when you have to write your number/email down really quick.  You can also add things to your business card (like a website or a message or Twitter handle), if you need to.
