@@ -1,0 +1,53 @@
+
+
+getslot = function(x, slot){
+	x[slot]
+}
+
+get.rundown = function(username=NULL, all.q = TRUE){
+	out = system('qstat -u "*"', intern=TRUE)
+	out = out[3:length(out)]
+	out = gsub(" +", " ", out)
+
+	### keep only ones that are running
+	ss = strsplit(out, " ")
+	running = sapply(ss, getslot, slot=5)
+	out = out[running == "r"]
+	ss = strsplit(out, " ")
+
+	### just grab username and queue
+	user.q = t(sapply(ss, getslot, slot=c(4,8)))
+	user.q = data.frame(user.q, stringsAsFactors=FALSE)
+	colnames(user.q) = c("user", "queue")
+	### don't want the node - just the queue
+	ss = strsplit(user.q$queue, split="@")
+	user.q$queue = sapply(ss, getslot, slot=1)
+
+	### taking off the trailing .q
+	user.q$queue = gsub("\\.q", "", user.q$queue)
+	### table of number of jobs by each queue
+	indiv.q = tapply(user.q$user, user.q$queue, 
+		function(x) {
+			sort(table(x), decreasing=TRUE)
+		})
+	user.table = sort(table(user.q$user), decreasing=TRUE)
+	standard = user.q[user.q$queue == "standard", ]
+
+
+	user.tab = NULL
+	if (!is.null(username)) {
+		dat = user.q
+		if (all.q) dat$queue = factor(dat$queue)
+		dat = dat[dat$user == username,]
+		if (nrow(dat) == 0)  dat[1,] = c(username, NA)
+		user.tab = table(dat$user, dat$queue, useNA='no')
+	}
+	return(list(user.q=user.q, 
+		standard = standard, 
+		q.users=indiv.q,
+		user.table = user.table,
+		user.tab = user.tab))
+}
+
+out = get.rundown(user='jmuschel')
+print(out$user.tab)
