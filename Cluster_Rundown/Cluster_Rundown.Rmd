@@ -1,5 +1,8 @@
+Cluster Rundown
 
 
+
+```{r}
 getslot = function(x, slot){
 	x[slot]
 }
@@ -51,3 +54,4 @@ get.rundown = function(username=NULL, all.q = TRUE){
 
 out = get.rundown(user='jmuschel')
 print(out$user.tab)
+```
