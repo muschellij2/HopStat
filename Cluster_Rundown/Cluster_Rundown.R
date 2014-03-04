@@ -1,13 +1,5 @@
-Cluster Rundown
-
-Recently, I have had some problems accessing our computing cluster because it was overloaded with users and batch jobs.  I discussed this with some students (current and past) and some of them had some ideas of how to get a rundown of cluster resources, so I wrote something up for some people who want to check it out.
-
-(NB: this is probably more configured for our specific cluster setup and not that general.  Also, I'm aware this can be done solely in `bash`and doesn't need to be done in `R`. Most of our users know `R` and not as many know `awk`, `sed`, etc,  and I'm not as proficient in them.  Also, some formats of the output are not so friendly of line-by-line readers)
 
 
-Here's the code:
-
-```{r, eval=TRUE}
 suppressMessages(library(zoo))
 getslot = function(x, slot){
 	x[slot]
@@ -57,13 +49,9 @@ get.rundown = function(username=NULL, all.q = TRUE){
 		user.table = user.table,
 		user.tab = user.tab))
 }
-```
 
-What does it do?  It pulls statistics for each user, looks at only running jobs (or interactice QRLOGIN sessions), extracts the username, queue and then creates a summary table for a specific user if desired.  The argument `all.q` tables the data with all possible queues showing, versus only the ones that are in use.  
 
-The output below shows my breakdown by queue (I'm just on the interactive queue, running this script). 
 
-```{r}
 out = get.rundown(user='jmuschel')
 print(out$user.tab)
 #            cegs chaklab download gwas interactive jabba mathias ozone sas
@@ -71,11 +59,9 @@ print(out$user.tab)
 #           
 #            standard stanley
 #   jmuschel        0       0
-```
 
-In addition to number of slots being used, sometimes you want to know which queues or nodes have specific amounts of memory are free.  So below I made an attempt at it.
 
-```{r}
+
 #### get resources for different queue and nodes
 get.resource = function(){
   out = system('qstat -u "*" -F', intern=TRUE)
@@ -128,22 +114,15 @@ get.resource = function(){
 		wide=wide,
 		byqueue = agg))
 }
-```
-The output is the output by node (`out`), and reshaped version depending on the quality wanted (`varwide` has node, and type of memory as "ids" in that a node, and either mem/swap/virtual define a row), (`tfwide` has node and free/used/total as the identifiers) and an aggregate summation of resources by queue (`byqueue`).
 
 
 
-Here's some example output from our standard queue (all terms are in Gb).
-
-```{r, eval=FALSE}
-x= get.resource()
-agg = x$byqueue
-agg[agg$queue == "standard", ]
-#       queue mem_free mem_total mem_used swap_free swap_total swap_used
-# 16 standard  5233.08  6564.179 1331.098  6526.928   6568.344  41.41569
-#    virtual_free virtual_total virtual_used
-# 16     11760.01      13132.52     1372.515
-```
+## x= get.resource()
+## agg = x$byqueue
+## agg[agg$queue == "standard", ]
+## #       queue mem_free mem_total mem_used swap_free swap_total swap_used
+## # 16 standard  5233.08  6564.179 1331.098  6526.928   6568.344  41.41569
+## #    virtual_free virtual_total virtual_used
+## # 16     11760.01      13132.52     1372.515
 
 
-Overall, I hope this helps you see which nodes fit your needs for the most beneficial experience for all users.
