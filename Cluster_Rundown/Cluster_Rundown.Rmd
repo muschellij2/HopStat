@@ -63,7 +63,7 @@ What does it do?  It pulls statistics for each user, looks at only running jobs 
 
 The output below shows my breakdown by queue (I'm just on the interactive queue, running this script). 
 
-```{r}
+```{r, eval=FALSE}
 out = get.rundown(user='jmuschel')
 print(out$user.tab)
 #            cegs chaklab download gwas interactive jabba mathias ozone sas

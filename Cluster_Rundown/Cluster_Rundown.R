@@ -52,13 +52,13 @@ get.rundown = function(username=NULL, all.q = TRUE){
 
 
 
-out = get.rundown(user='jmuschel')
-print(out$user.tab)
-#            cegs chaklab download gwas interactive jabba mathias ozone sas
-#   jmuschel    0       0        0    0           1     0       0     0   0
-#           
-#            standard stanley
-#   jmuschel        0       0
+## out = get.rundown(user='jmuschel')
+## print(out$user.tab)
+## #            cegs chaklab download gwas interactive jabba mathias ozone sas
+## #   jmuschel    0       0        0    0           1     0       0     0   0
+## #
+## #            standard stanley
+## #   jmuschel        0       0
 
 
 
