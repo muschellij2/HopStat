@@ -236,7 +236,7 @@ get.rundown = function(username = NULL, all.q = TRUE) {
 }
 </code></pre>
 
-<p>What does it do?  It pulls statistics for each user, looks at only running jobs (or interactive QRLOGIN sessions), extracts the username, queue and then creates a summary table for a specific user if desired.  The argument <code>all.q</code> tables the data with all possible queues showing, versus only the ones that are in use.  </p>
+<p>What does it do?  It pulls statistics for each user, looks at only running jobs (or interactice QRLOGIN sessions), extracts the username, queue and then creates a summary table for a specific user if desired.  The argument <code>all.q</code> tables the data with all possible queues showing, versus only the ones that are in use.  </p>
 
 <p>The output below shows my breakdown by queue (I&#39;m just on the interactive queue, running this script). </p>
 

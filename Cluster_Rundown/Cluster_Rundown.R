@@ -1,5 +1,8 @@
 
 
+library(reshape2)
+library(plyr)
+library(stringr)
 suppressMessages(library(zoo))
 getslot = function(x, slot){
 	x[slot]
@@ -9,6 +12,7 @@ get.rundown = function(username=NULL, all.q = TRUE){
 	out = system('qstat -u "*"', intern=TRUE)
 	out = out[3:length(out)]
 	out = gsub(" +", " ", out)
+	out = str_trim(out)
 
 	### keep only ones that are running
 	ss = strsplit(out, " ")
