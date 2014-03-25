@@ -8,15 +8,19 @@ Recently, I have had some problems accessing our computing cluster because it wa
 Here's the code:
 
 ```{r, eval=TRUE}
+library(reshape2)
+library(plyr)
+library(stringr)
 suppressMessages(library(zoo))
 getslot = function(x, slot){
-	x[slot]
+  x[slot]
 }
 
 get.rundown = function(username=NULL, all.q = TRUE){
 	out = system('qstat -u "*"', intern=TRUE)
 	out = out[3:length(out)]
 	out = gsub(" +", " ", out)
+	out = str_trim(out)
 
 	### keep only ones that are running
 	ss = strsplit(out, " ")
@@ -59,7 +63,7 @@ get.rundown = function(username=NULL, all.q = TRUE){
 }
 ```
 
-What does it do?  It pulls statistics for each user, looks at only running jobs (or interactice QRLOGIN sessions), extracts the username, queue and then creates a summary table for a specific user if desired.  The argument `all.q` tables the data with all possible queues showing, versus only the ones that are in use.  
+What does it do?  It pulls statistics for each user, looks at only running jobs (or interactive QRLOGIN sessions), extracts the username, queue and then creates a summary table for a specific user if desired.  The argument `all.q` tables the data with all possible queues showing, versus only the ones that are in use.  
 
 The output below shows my breakdown by queue (I'm just on the interactive queue, running this script). 
 
@@ -112,7 +116,7 @@ get.resource = function(){
   out$value[out$gorm == "K"] = out$value[out$gorm == "K"]/(1024*1024)
   out$gorm = out$info = NULL
 
-	varwide = dcast(out, queue + node + var ~ tf, value.var = "value")
+  varwide = dcast(out, queue + node + var ~ tf, value.var = "value")
 	tfwide = dcast(out, queue + node + tf ~ var, value.var = "value")
 	wide = dcast(out, queue + node  ~ var + tf, value.var = "value")
 

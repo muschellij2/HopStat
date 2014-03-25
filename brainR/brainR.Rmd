@@ -2,3 +2,17 @@ brainR: Put your brain on the Cloud!
 ========================================================
 
 In my work, we have come across a few problems where we wanted to visualize data in 4 dimensions (4D).  The data came as brains, which are 3D and we wanted to visualize them at different time points.  We were using images that are acquired one image per visit (CT structural scans, particularly), where each patient had a maximum of 10 time points.  (The methods below have not been tested or adapted for fMRI scans that have hundreds of time points). 
+
+As a result, we created the package `brainR` ( [CRAN package](http://cran.r-project.org/web/packages/brainR/index.html) or [gitHub package](https://github.com/muschellij2/brainR) ) to fit our needs with this.  The motivation in the package is this:
+1. Read (neuro)imaging data (usually using `oro.dicom` or `oro.nifti` packages).
+2. Have 1) a brain to plot and 2) a region of interest (ROI) in the same space as the brain
+3. Create a `scene` using `contour3d` from `misc3d` package.
+4. Write the contents of this scene into 3D objects of formats [`STL`](http://en.wikipedia.org/wiki/STL_(file_format)) or [`OBJ`](http://en.wikipedia.org/wiki/Wavefront_.obj_file) using wrappers for `writeSTL` or `writeOBJ` from `rgl package.
+5.  Use the [X ToolKit (XTK)](https://github.com/xtk/X#readme) and simple JavaScript controls to visualize these structures and switch between them.
+
+The last step is what I call 4D visualization, being able to move around space with rotation, zooming, and translation while moving through another dimension, usually different time points, ROIs, structures, etc.  The reason we went this route is a few reasons, but particularly 1) I know R, 2) `rgl` and `misc3d` already exists, 3) JavaScript is accessible and 4) going further into 4D visualization in software is essentially video game programming.  Number 4) was interesting as I tools like Blender, Paraview, or CINEMA 4D are highly powerful, they are used for much visualizing more powerful than (and not adapted so well for) biomedical data.  Most solutions, such as those for [MATLAB](http://www.mathworks.com/matlabcentral/fileexchange/41465-4d-volume-visualization), require the user either have programming experience or download software, which we found to be a large and unneccesary burden - so we use JavaScript in a browser.
+
+Now, let's rundown some of the functions:
+
+
+
