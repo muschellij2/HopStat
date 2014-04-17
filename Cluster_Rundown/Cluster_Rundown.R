@@ -8,7 +8,8 @@ getslot = function(x, slot){
 	x[slot]
 }
 
-get.rundown = function(username=NULL, all.q = TRUE){
+get.rundown = function(username=NULL, all.q = TRUE, 
+	std.name = "standard"){
 	out = system('qstat -u "*"', intern=TRUE)
 	out = out[3:length(out)]
 	out = gsub(" +", " ", out)
@@ -36,7 +37,7 @@ get.rundown = function(username=NULL, all.q = TRUE){
 			sort(table(x), decreasing=TRUE)
 		})
 	user.table = sort(table(user.q$user), decreasing=TRUE)
-	standard = user.q[user.q$queue == "standard", ]
+	standard = user.q[user.q$queue == std.name, ]
 
 
 	user.tab = NULL
@@ -67,8 +68,9 @@ get.rundown = function(username=NULL, all.q = TRUE){
 
 
 #### get resources for different queue and nodes
-get.resource = function(){
-  out = system('qstat -u "*" -F', intern=TRUE)
+get.resource = function(username=NULL){
+  if (is.null(username)) username = "*"
+  out = system(paste0('qstat -u "', username, '" -F'), intern=TRUE)
   out = out[2:length(out)]
   qs = grep("-----------", out)+1
   out = cbind(out, NA)
