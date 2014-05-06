@@ -220,10 +220,10 @@ tm1 &lt;- benchmark({
 cat(fsize, &quot;Mb\n&quot;)
 </code></pre>
 
-<pre><code>32.49 Mb
+<pre><code>32.56 Mb
 </code></pre>
 
-<p>As, we see the file is about 32 Mb. I probably don&#39;t need a file that large and that level of granularity for zooming and vectorization. </p>
+<p>As, we see the file is about 33 Mb. I probably don&#39;t need a file that large and that level of granularity for zooming and vectorization. </p>
 
 <h2>Quick scatterplot example: using multiple <code>png</code> devices</h2>
 
@@ -268,7 +268,7 @@ cat(fsize, &quot;Mb\n&quot;)
 cat(fsize, &quot;Mb\n&quot;)
 </code></pre>
 
-<pre><code>4.94 Mb
+<pre><code>5.17 Mb
 </code></pre>
 
 <p>We see that there is a significant reduction in size.  The quality of the png is <code>600</code>ppi, which has sufficient (actually good) resolution for most applications and a lot of journal requirements.  </p>
@@ -321,7 +321,7 @@ mydev.off = function(pdfname, mypattern, copts = &quot;&quot;) {
 cat(fsize, &quot;Mb\n&quot;)
 </code></pre>
 
-<pre><code>4.94 Mb
+<pre><code>5.17 Mb
 </code></pre>
 
 <p>Of note, the main difference between using this and <code>pdf</code> with respect to syntax is that <code>dev.off()</code> usually doesn&#39;t take an argument (it defaults to the current device).</p>
@@ -357,12 +357,18 @@ ratio = file.info(&quot;mypdf.pdf&quot;)$size/file.info(&quot;mypdf2.pdf&quot;)$
 print(ratio)
 </code></pre>
 
-<pre><code>[1] 6.577
+<pre><code>[1] 6.299
 </code></pre>
 
-<p>Obviously, others have created some things to make smaller PDFs.  For example, <code>tools::compactPDF</code>, which uses <code>qpdf</code> or GhostScript, compresses <strong> already-made</strong> PDFs.  Also, there are other reasons to use other formats, such as TIFF (which many journals prefer), but I&#39;m just using PNG as my preference.  JPEG, BMP, TIFF, etc should work equally as well as above.</p>
+<p>Here we see the gain in file size (and quickness of rendering) is about 6, but again that gain is traded off by speed of code.   You can see the result of <a href="https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf.pdf">using <code>pdf()</code></a> and <a href="https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf3.pdf">using <code>mypdf</code></a>.  </p>
 
-<p>BONUS! Here are some helper functions that I made to make things easier for viewing PDFs directly from <code>R</code> (calling <code>bash</code>).  Other functions exist in packages such as <code>openPDF</code> from <a href="http://svitsrv25.epfl.ch/R-doc/library/Biobase/html/openPDF.html"><code>BioBase</code></a>, but these are simple to implement.  (Note, I use <code>xpdf</code> for my pdfviewer, as <code>getOption(&quot;pdfviewer&quot;)</code> is a different viewer that failed on our cluster).  The first 3 are viewers for PDFs, PNGs, and the third tries to guess given the filename.  The 4th: <code>open.dev</code> uses the <code>fname</code> given to open the device.  This allows you to switch the filename to <code>.png</code> from <code>.pdf</code> and run the same code.  </p>
+<h2>Post-hoc compression</h2>
+
+<p>Obviously I&#39;m not the only one who has had this problem; others have created some things to make smaller PDFs.  For example, <code>tools::compactPDF</code>, which uses <code>qpdf</code> or GhostScript, compresses <strong> already-made</strong> PDFs.  Also, there are other reasons to use other formats, such as TIFF (which many journals prefer), but I&#39;m just using PNG as my preference.  JPEG, BMP, TIFF, etc should work equally as well as above.</p>
+
+<h2>BONUS!</h2>
+
+<p>Here are some helper functions that I made to make things easier for viewing PDFs directly from <code>R</code> (calling <code>bash</code>).  Other functions exist in packages such as <code>openPDF</code> from <a href="http://svitsrv25.epfl.ch/R-doc/library/Biobase/html/openPDF.html"><code>BioBase</code></a>, but these are simple to implement.  (Note, I use <code>xpdf</code> for my pdfviewer, but <code>getOption(&quot;pdfviewer&quot;)</code> is a different viewer that failed on our cluster).  The first 3 are viewers for PDFs, PNGs, and the third tries to guess given the filename.  The 4th: <code>open.dev</code> uses the <code>fname</code> given to open the device.  This allows you to switch the filename to <code>.png</code> from <code>.pdf</code> and run the same code.  </p>
 
 <pre><code class="r">view.pdf = function(fname, viewer = getOption(&quot;pdfviewer&quot;)) {
     stopifnot(length(fname) == 1)
