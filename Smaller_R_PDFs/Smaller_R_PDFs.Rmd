@@ -158,7 +158,7 @@ ratio = file.info("mypdf.pdf")$size / file.info("mypdf2.pdf")$size
 print(ratio)
 ```
 
-Here we see the gain in file size (and quickness of rendering) is about `r round(ratio)`, but again that gain is traded off by speed of code.  
+Here we see the gain in file size (and quickness of rendering) is about `r round(ratio)`, but again that gain is traded off by speed of code.   You can see the result of [using `pdf()`](https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf.pdf) and [using `mypdf`](https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf3.pdf).  
 
 ## Post-hoc compression
 
