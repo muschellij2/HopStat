@@ -50,11 +50,11 @@ cat(fsize, "Mb\n")
 ```
 
 ```
-32.49 Mb
+32.56 Mb
 ```
 
 
-As, we see the file is about 32 Mb. I probably don't need a file that large and that level of granularity for zooming and vectorization. 
+As, we see the file is about 33 Mb. I probably don't need a file that large and that level of granularity for zooming and vectorization. 
 
 ## Quick scatterplot example: using multiple `png` devices
 
@@ -102,7 +102,7 @@ cat(fsize, "Mb\n")
 ```
 
 ```
-4.94 Mb
+5.17 Mb
 ```
 
 
@@ -163,7 +163,7 @@ cat(fsize, "Mb\n")
 ```
 
 ```
-4.94 Mb
+5.17 Mb
 ```
 
 
@@ -209,15 +209,18 @@ print(ratio)
 ```
 
 ```
-[1] 6.577
+[1] 6.299
 ```
 
 
+Here we see the gain in file size (and quickness of rendering) is about 6, but again that gain is traded off by speed of code.   You can see the result of [using `pdf()`](https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf.pdf) and [using `mypdf`](https://github.com/muschellij2/HopStat/raw/master/Smaller_R_PDFs/mypdf3.pdf).  
 
-Obviously, others have created some things to make smaller PDFs.  For example, `tools::compactPDF`, which uses `qpdf` or GhostScript, compresses <strong> already-made</strong> PDFs.  Also, there are other reasons to use other formats, such as TIFF (which many journals prefer), but I'm just using PNG as my preference.  JPEG, BMP, TIFF, etc should work equally as well as above.
+## Post-hoc compression
 
+Obviously I'm not the only one who has had this problem; others have created some things to make smaller PDFs.  For example, `tools::compactPDF`, which uses `qpdf` or GhostScript, compresses <strong> already-made</strong> PDFs.  Also, there are other reasons to use other formats, such as TIFF (which many journals prefer), but I'm just using PNG as my preference.  JPEG, BMP, TIFF, etc should work equally as well as above.
 
-BONUS! Here are some helper functions that I made to make things easier for viewing PDFs directly from `R` (calling `bash`).  Other functions exist in packages such as `openPDF` from [`BioBase`](http://svitsrv25.epfl.ch/R-doc/library/Biobase/html/openPDF.html), but these are simple to implement.  (Note, I use `xpdf` for my pdfviewer, as `getOption("pdfviewer")` is a different viewer that failed on our cluster).  The first 3 are viewers for PDFs, PNGs, and the third tries to guess given the filename.  The 4th: `open.dev` uses the `fname` given to open the device.  This allows you to switch the filename to `.png` from `.pdf` and run the same code.  
+## BONUS! 
+Here are some helper functions that I made to make things easier for viewing PDFs directly from `R` (calling `bash`).  Other functions exist in packages such as `openPDF` from [`BioBase`](http://svitsrv25.epfl.ch/R-doc/library/Biobase/html/openPDF.html), but these are simple to implement.  (Note, I use `xpdf` for my pdfviewer, but `getOption("pdfviewer")` is a different viewer that failed on our cluster).  The first 3 are viewers for PDFs, PNGs, and the third tries to guess given the filename.  The 4th: `open.dev` uses the `fname` given to open the device.  This allows you to switch the filename to `.png` from `.pdf` and run the same code.  
 
 
 ```r
