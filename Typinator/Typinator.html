@@ -7,6 +7,9 @@
 
 
 
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://c328740.ssl.cf1.rackcdn.com/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
 
 
 <style type="text/css">
@@ -1061,112 +1064,50 @@ $(function() {
 </head>
 
 <body>
-<p>So day 2 of the #JHUSMARTHack was last week, but I figured this would be a good time to discuss what was accomplished.  I created some packages that are somewhat specialized and aren&#39;t fully finished yet, so I&#39;ll hold off.  What I really want to discuss though is why I like using <a href="http://www.rstudio.com/">RStudio</a> for making packages. </p>
+<p>Last year, <a href="http://aaronjfisher.github.io/">Aaron Fisher</a> spoke at a computing club about a text expander named <a href="http://www.ergonis.com/products/typinator/">Typinator</a>.  In the past year, I have used it for the majority of my LaTeX and math writing and wanted to discuss a bit why I think Typinator is useful to use.</p>
 
-<h1>What was accomplished?</h1>
+<h3>Seeing your Math symbols</h3>
 
-<p>I had spoken <a href="http://hopstat.wordpress.com/2014/05/01/smart-hackathon-day-1/">before</a> about the <a href="http://github.com/muschellij2/">repositories</a> I had worked on, and also about <a href="http://www.rstudio.com/ide/docs/packages/overview">Developing Packages in RStudio</a>.  I&#39;ll discuss the workflow I settled into for for making a package.</p>
+<p>The main reason to use Typinator is to expand text to <a href="http://en.wikipedia.org/wiki/Unicode">unicode</a> -- symbols such as \(β\) instead of writing \beta in LaTeX.  When I say &quot;expand text&quot; is I type a set string that I set in Typinator and it replaces that string with the symbol or phrase that I designated as the replacement.  I type <code>:alpha</code> and out comes an \(α\) symbol.  </p>
 
-<h2>Workflow for an <code>R</code> package</h2>
+<h3>Why should you care</h3>
 
-<p>I&#39;m assuming your <code>R</code> code is already available, presumably functions you had created during a project or analysis.  If code is not available, GREAT!  You can start your workflow for your new package or product all the same.  I&#39;ll try to put command-line equivalents in double brackets [[ ]].</p>
+<p>Writing \alpha or <code>:alpha</code> saves no time -- it&#39;s the same number of characters.  I like using unicode because I like reading <strong>in the LaTeX</strong>: 
+\[
+Y = X β + ε
+\]
+instead of </p>
 
-<p>Workflow:</p>
+<pre><code>Y = X \beta + \varepsilon
+</code></pre>
+
+<p>and &quot;the \(β\) estimate is&quot; versus &quot;the $\beta$ estimate is&quot;.  </p>
+
+<h3><code>pdflatex</code> doesn&#39;t show my characters! Use XeLaTeX</h3>
+
+<p>Running <code>pdflatex</code> on your LaTeX document will not render these symbols out of the box, depending on your encoding.  Using the package LaTeX <code>inputenc</code> with a command such as <code>\usepackage[utf8x]{inputenc}</code> can incorporate unicode (according to <a href="http://tex.stackexchange.com/questions/34604/entering-unicode-characters-in-latex">this StackExchange Post</a>), but I have not used this so I cannot confirm this.</p>
+
+<p>I use <a href="http://en.wikipedia.org/wiki/XeLaTeX">XeLaTeX</a>, which has unicode support.  I also set my font type, and in my preamble I have</p>
+
+<pre><code>\usepackage{ifxetex}
+\ifxetex
+  \usepackage{unicode-math}
+  \setmathfont{[Asana-Math]}
+\fi
+</code></pre>
+
+<p>I then run the <code>xelatex</code> command on the document and the \(α\) appears in the PDF and all is good in the world.  </p>
+
+<p>You can also incorporate <code>xelatex</code> in your <code>knitr</code> documents in RStudio by going to <code>RStudio -&gt; Preferences -&gt; Sweave Tab -&gt; Typset LaTeX into PDF using</code> and change this option to <code>XeLaTeX</code>.  Now you&#39;re ready to knit with unicode!</p>
+
+<h2>Other uses for Unicode than LaTeX</h2>
+
+<p>If you don&#39;t use LaTeX, this information is not useful but Unicode can be used in other than LaTeX.  Here are some instances where I use Unicode other than LaTeX:</p>
 
 <ol>
-<li> Start RStudio.</li>
-<li> Go to <code>File -&gt; New Project</code>.  (Save any unsaved work).</li>
-<li> Select <code>New Directory</code>.  Now this may be counterintuitive if you have work saved, but if you&#39;re creating a package choose this.  This will setup a new folder and copy over any code you have already created.</li>
-<li> Select <code>R Package</code>.  This will allow you to name your package (it will be used in the <code>library</code> statement unless changed later); let&#39;s call it <code>mypckg</code>.  You can also choose code you have to operationalize, e.g. put into a package.  Also - select you want to create a git repository.<br/></li>
-<li> Voila! The folder is created where you have the components of an <code>R</code> package, such as the documentation (<code>man</code>), extra install dir (<code>inst</code>), the <code>R</code> code (<code>R</code>), etc.  [[<code>library(devtools); create(&quot;mypckg&quot;);</code>]]</li>
+<li> Twitter.  Using β or ↑/↓ can be useful in conveying information as well as <a href="https://twitter.com/StrictlyStat/status/466317463899357184">saving characters</a> or writing things such as 𝜃̂.</li>
+<li> E-mail.  Using Gmail or with emailing class rosters (such as in CoursePlus), using symbols such as σ<sup>2</sup> versus \sigma^</li>
 </ol>
-
-<p>Now, here is one of the main reasons I like using RStudio for projects: the <code>.Rproj</code> file.  The <code>.Rproj</code> file is an RStudio project file.  It allows you to work on stuff in multiple tabs/scripts, then close the project, and pop up the other tabs/scripts you were working on before opening up that project.  If you are in RStudio, the top right should show a <code>Project: None</code> if you don&#39;t have a project loaded.  These project files allows me to segregate my workflows and scripts, and they help me organize a bit more.  I highly recommend checking out <a href="http://hilaryparker.com/2014/04/29/writing-an-r-package-from-scratch/">Hilary Parker&#39;s post</a> before continuing, especially if you&#39;re not an RStudio fan.</p>
-
-<h3>Using RStudio Build Tools</h3>
-
-<p>Now, when I say RStudio Build Tools, I essentially mean wrappers for the <a href="https://github.com/hadley/devtools"><code>devtools</code></a> package.  The package is amazing (hardly shocking since Hadley Wickham is the main author), and along with the <code>roxygen2</code> package, allow package creation to be as easy as possible. </p>
-
-<p>Now, let&#39;s set up our options for Build Tools.  In RStudio, go to <code>Build -&gt; Configure Build Tools</code> (again you must be in an RStudio project).  For <code>Check Package</code>, I recommend putting the <code>--as-cran</code> option (especially if you plan to <a href="http://cran.r-project.org/web/packages/policies.html">submit to CRAN</a>.  You should also see a checkbox saying <code>Generate documentation using Roxygen</code>. If this is not available, run <code>install.packages(&quot;roxygen2&quot;)</code>, close and reopen the project.  Check this box, and click the <code>Configure</code> button and I usually click all options.  </p>
-
-<h3>Setting up a remote git repository</h3>
-
-<p>Before, we checked for a git repository to be created.  Now, you can create a new repository in your favorite GitHub remote repository.  Mine is <a href="http://www.github.com">GitHub</a>.  You can use the GUIs such as the GitHub GUI or SourceTree, but I generally set this up using the Terminal by just <a href="https://help.github.com/articles/adding-a-remote">adding the remote</a>.  (<a href="https://help.github.com/articles/generating-ssh-keys">Here</a> is a link to create ssh keys so you don&#39;t have to type in passwords for git).  Now, if you restarted the RStudio project, go to <code>Build -&gt; Configure Build Tools</code> and you should see the remote repository if you click the <code>Git/SVN</code> tab.  </p>
-
-<p>Now that the repository is set up (even if you don&#39;t use a remote repository), you can go to <code>Tools --&gt; Commit</code> to commit to the repository.  This allows you to add and stage the changed files while adding a commit comment.  You can also see a visual history of the differences and changes as well as do much of what you would need to from the command line.  Again, I like the Terminal, but I like having this all in one program and not having to switch back and forth.  </p>
-
-<h3>DOCUMENTATION!  EXAMPLES!  VIGNETTES!</h3>
-
-<p>Now that you have everything set up, you have to do the big things that differentiate a bunch of functions from a package: documentation and examples (including vignettes).  Again, for documentation, we&#39;ll be using the <code>roxygen2</code> package.  Roxygen is essentially a format that starts with a line with <code>#&#39;</code> followed by <code>@</code> followed by a &quot;tag&quot;.  The tags can be found at <code>?rd_roclet</code>.  Now, I highly recommend vignettes, but I&#39;m not an expert on these and think we&#39;ll just stick to function docs right now.</p>
-
-<h4>Jumping to Sublime Text</h4>
-
-<p>Before we start documentation, let me again tell about MY workflow rather than Roxygen.  My workflow now jumps to <a href="http://www.sublimetext.com/3">Sublime Text</a>.  I have <a href="https://github.com/alyssafrazee/Line-by-line"><code>Line-by-line</code></a> installed (which you will need), which allows me to run a script to parse an <code>R</code> function and create the necessary Roxygen tags.  See <a href="http://alyssafrazee.com/rdocs.html">Alyssa&#39;s post</a> for the description and a more command-line workflow for <code>R</code> packages.  </p>
-
-<p>Now that we&#39;re in Sublime Text, I open the <code>.R</code> files from my packages <code>R</code> directory.  Select the function definition such as <code>x = function(z, y, l=4, ...){</code> and use <code>CMD+D</code> to create Roxygen tags!  This is like meta-programming for documentation: running scripts to make documentation (granted it&#39;s in Python).  As an aside, one powerful feature of this documentation is that if you have code as:</p>
-
-<pre><code>LFPCAg &lt;- function(
-Y,# an n x D matrix
-                   # Y is assumed to be centered by its mean function
-                   gridpoints = 1:ncol(Y),       # a vector of grid points along curves, corresponding to columns of Y 
-                   Zlist=NA,
-                   G=NA,
-                   Ivec=NA,
-                   ...){
-</code></pre>
-
-<p>this will parse the Roxygen tags as the comments for each argument/parameter (even if multi-line!):</p>
-
-<pre><code>#&#39; @title &lt;brief desc&gt;
-#&#39;
-#&#39; @description &lt;full description&gt;
-#&#39; @param Y an n x D matrix Y is assumed to be centered by its mean function
-#&#39; @param gridpoints a vector of grid points along curves corresponding to columns of Y
-#&#39; @param Zlist
-#&#39; @param G
-#&#39; @param Ivec
-#&#39; @param ... 
-#&#39; @export
-#&#39; @keywords
-#&#39; @seealso
-#&#39; @return
-#&#39; @aliases
-#&#39; @examples \dontrun{
-#&#39;
-#&#39;}
-</code></pre>
-
-<p>This also puts in your mind, even if you&#39;re only creating functions and not a package, that you&#39;ll almost have documentation ready made when using this function format from day 1.</p>
-
-<h4>Jumping Back to RStudio</h4>
-
-<p>Now, opening these Roxygen-tagged functions, I can fill in the rest in RStudio.  One thing to note is that RStudio will assume you&#39;re trying to stay in Roxygen notation with a return of line (which is great for multi-line descriptions/titles/etc).  Also, if you have <code>#&#39; @</code> starting a line, then RStudio will do tab completion of Roxygen tags.  Not leaps and bounds saved on time, but hey, I like tab completion.  </p>
-
-<p>Now you have to write your examples, the description of arguments (denoted as parameters), the overall function description and title, and  use the <code>@export</code> to allow this function accessible to the user.  One note is that if you depend on another function or package, use the <code>@import pkgname</code> or <code>@importsFrom pkgname::funcName</code> tags.  <code>R CMD check</code> will warn you if you don&#39;t have anything in <code>@keywords</code>, <code>@aliases</code>, or <code>@examples</code>, so remove these if not necessary.</p>
-
-<h3>Just let me check my functions!</h3>
-
-<p>If you&#39;re still working on the package and want to play with functions and no so much the documentation, you can use <code>Build -&gt; Load All</code> [[<code>devtools::load_all</code>]] to load the functions (even those not exported) into memory.  </p>
-
-<h3>Compile and Load</h3>
-
-<p>Now let&#39;s fast-forward to when you have created the the documentation for your functions.  While still in your project, go to <code>Build -&gt; Build and Reload</code> to get your package loaded into memory [[<code>devtools::build</code> then <code>devtools::install</code>]].  Roxygen will create the docs. FYI - if you change around function names and recompile, the <code>man</code> folder may have obsolete <code>.Rd</code> files, so you can delete old ones.  </p>
-
-<p>You should edit the <code>DESCRIPTION</code> file to change some specifications, such as <code>Depends:</code> fields for package dependencies. That&#39;s documented many places on the web to find about what goes in there.</p>
-
-<p>Now edit your functions and docs, push to the remote repository and then allow people install your package by using:</p>
-
-<pre><code>library(devtools)
-install_github(&quot;mypckg&quot;, &quot;myGitHubUserName&quot;)
-</code></pre>
-
-<p>and there you have it - you&#39;ve released software.  <code>Build -&gt; Check Package</code> is good for testing your package (will tests your examples) and make sure everything looks OK.</p>
-
-<h1>Conclusion</h1>
-
-<p><code>R</code> package creation seems like a daunting task.  You can use tools in RStudio such as <code>Code -&gt; Extract Function</code> to take loads of code to try to functional-ize it.  When you have a collection of functions, creating an RStudio project allows you to separate your package creation process from regular RStudio analysis and use, let&#39;s you have a one-stop shop for git version control, building, and checking of packages.  It let&#39;s you get over any hurdles of learning new functions in <code>devtools</code> (which may not be a good thing) and get you running in a short amount of time.  The Sublime Text plugin is not a crucial step, but can allow you to parse semi-documented functions and create a Roxygen header that&#39;s partially filled in.  This workflow allowed me to develop multiple projects and get them documented quickly at the hackathon.  </p>
-
-<p>Hopefully this helps and good luck packaging!</p>
 
 </body>
 
