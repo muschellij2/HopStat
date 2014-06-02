@@ -1,0 +1,5 @@
+tab=\t
+return=\r
+newline=\n
+:downarrow	↓
+:uparrow	↑
