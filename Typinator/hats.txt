@@ -1,0 +1,29 @@
+tab=\t
+return=\r
+newline=\n
+:hatA	Â
+:hatB	B̂
+:hatC	Ĉ
+:hatD	\nD̂
+:hatE	Ê
+:hatF	F̂
+:hatG	Ĝ
+:hatH	Ĥ
+:hatI	Î
+:hatJ	Ĵ
+:hatK	K̂
+:hatL	L̂
+:hatM	M̂
+:hatN	N̂
+:hatO	Ô
+:hatP	P̂
+:hatQ	Q̂
+:hatR	R̂
+:hatS	Ŝ
+:hatT	T̂
+:hatU	Û
+:hatV	V̂
+:hatW	Ŵ
+:hatX	X̂
+:hatY	Ŷ
+:hatZ	Ẑ
