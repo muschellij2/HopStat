@@ -38,5 +38,14 @@ You can also incorporate `xelatex` in your `knitr` documents in RStudio by going
 If you don't use LaTeX, this information is not useful but Unicode can be used in other than LaTeX.  Here are some instances where I use Unicode other than LaTeX:
 
 1.  Twitter.  Using β or ↑/↓ can be useful in conveying information as well as [saving characters](https://twitter.com/StrictlyStat/status/466317463899357184) or writing things such as 𝜃̂.
-2.  E-mail.  Using Gmail or with emailing class rosters (such as in CoursePlus), using symbols such as σ^2 versus \sigma\^
+2.  E-mail.  Using symbols such as σ versus \sigma are helpful for Gmail or with emailing class rosters (such as in CoursePlus) for conveying information **within the email** compared to attaching a LaTeX'd PDF.
+3.  Word Documents.  I don't like the Microsoft Word Equation Editor.  By don't like I mean get angry with constantly.  Inserting symbols are more straightforward, and using a text expansion is easier than clicking them on the symbol keyboard.
 
+4.  Grading. When annotating PDFs for grading assignments, many times I use the same comment- people tend to make the same errors.  I make a grading typeset where I can write a small key such as `:missCLT` for missing the Central Limit Theorem in a proof so that I type less and grade faster.  Who doesn't want to grade faster?
+
+## My Typinator sets.
+My set of Typinator keys that you can download and use are here:
+
+1.  [Math Symbols](https://github.com/muschellij2/HopStat/tree/gh-pages/Typinator/Math_Set.tyset)
+2.  [Bars](https://github.com/muschellij2/HopStat/tree/gh-pages/Typinator/bars.tyset) for making bars on letters such as 𝑥̄
+3.  [Hats](https://github.com/muschellij2/HopStat/tree/gh-pages/Typinator/hats.tyset) for making hats on letters such as 𝜃̂
