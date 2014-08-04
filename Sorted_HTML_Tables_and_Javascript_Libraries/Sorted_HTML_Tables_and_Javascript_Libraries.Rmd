@@ -1,0 +1,27 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+A few days ago [StatsInTheWild](https://twitter.com/StatsInTheWild) asked the following question
+
+<blockquote class="twitter-tweet" lang="en"><p>In the R function &quot;sortable.html.table&quot;, it&#39;s sorting 9.2 higher than 30.5 because of the leading digit. How do I fix this?</p>&mdash; SITW (@StatsInTheWild) <a href="https://twitter.com/StatsInTheWild/statuses/491771891120480257">July 23, 2014</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+So we had a few exchanges where I thought you could use `sprintf` and be done:
+<blockquote class="twitter-tweet" data-partner="tweetdeck"><p><a href="https://twitter.com/StatsInTheWild">@StatsInTheWild</a> either as.numeric (may work), but try sprint(x, &quot;%03.1f&quot;) then sort</p>&mdash; John Muschelli (@StrictlyStat) <a href="https://twitter.com/StrictlyStat/statuses/491797977648726016">July 23, 2014</a></blockquote>
+
+but it didn't seem to work
+
+<blockquote class="twitter-tweet" data-partner="tweetdeck"><p><a href="https://twitter.com/StrictlyStat">@StrictlyStat</a> It still sorts them based on the first number.  I think it&#39;s a problem in the function sortable.html.table.</p>&mdash; SITW (@StatsInTheWild) <a href="https://twitter.com/StatsInTheWild/statuses/491924367321083904">July 23, 2014</a></blockquote>
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+
+After a bit more discourse, [@StatsInTheWild shared some data with me](https://twitter.com/StatsInTheWild/status/491962427094097920), and I went down the rabbit hole of trying to find out what was going on.
+
+
+```{r maketab}
+require(SortableHTMLTables)
+myfile
+openWAR<-read.csv(, stringsAsFactors = FALSE);
+sortable.html.table(openWAR,"openWAR2014.HTML")
+@
