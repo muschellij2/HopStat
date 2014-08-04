@@ -5,19 +5,19 @@ opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment=""
 
 A few days ago [StatsInTheWild](https://twitter.com/StatsInTheWild) asked the following question
 
+
 <blockquote class="twitter-tweet" lang="en"><p>In the R function &quot;sortable.html.table&quot;, it&#39;s sorting 9.2 higher than 30.5 because of the leading digit. How do I fix this?</p>&mdash; SITW (@StatsInTheWild) <a href="https://twitter.com/StatsInTheWild/statuses/491771891120480257">July 23, 2014</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-So we had a few exchanges where I thought you could use `sprintf` and be done:
-<blockquote class="twitter-tweet" data-partner="tweetdeck"><p><a href="https://twitter.com/StatsInTheWild">@StatsInTheWild</a> either as.numeric (may work), but try sprint(x, &quot;%03.1f&quot;) then sort</p>&mdash; John Muschelli (@StrictlyStat) <a href="https://twitter.com/StrictlyStat/statuses/491797977648726016">July 23, 2014</a></blockquote>
-
-but it didn't seem to work
+So we had a few exchanges where I thought you could use `sprintf` and be done but it didn't seem to work:
 
 <blockquote class="twitter-tweet" data-partner="tweetdeck"><p><a href="https://twitter.com/StrictlyStat">@StrictlyStat</a> It still sorts them based on the first number.  I think it&#39;s a problem in the function sortable.html.table.</p>&mdash; SITW (@StatsInTheWild) <a href="https://twitter.com/StatsInTheWild/statuses/491924367321083904">July 23, 2014</a></blockquote>
-<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-After a bit more discourse, [@StatsInTheWild shared some data with me](https://twitter.com/StatsInTheWild/status/491962427094097920), and I went down the rabbit hole of trying to find out what was going on.
-
+After a bit more discourse, StatsInTheWild shared some data with me:
+<blockquote class="twitter-tweet" data-partner="tweetdeck"><p><a href="https://twitter.com/StrictlyStat">@StrictlyStat</a> Data link <a href="https://t.co/sW6II3d19A">https://t.co/sW6II3d19A</a></p>&mdash; SITW (@StatsInTheWild) <a href="https://twitter.com/StatsInTheWild/statuses/491963704628760576">July 23, 2014</a></blockquote>
+<script async src="http://platform.twitter.com/widgets.js" charset="utf-8"></script>
+and I went down the rabbit hole of trying to find out what was going on.  Here is the code to make the table:
 
 ```{r maketab}
 require(SortableHTMLTables)
@@ -27,5 +27,35 @@ if (!file.exists(myfile)) {
   }
 openWAR<-read.csv(myfile, stringsAsFactors = FALSE);
 sortable.html.table(openWAR,"openWAR2014.html")
+```
 
-@
+And as you can see [in the output table here](https://muschellij2.github.io/HopStat/Sorted_HTML_Tables_and_Javascript_Libraries/openWAR2014.html) the column `RAA.pitch` does not sort correctly. 
+
+## Attempts at, and then finding, a Solution
+I tried a few things such as changing numeric to string, seeing if missing data was a problem, trying some things where I make the numbers all positive, but the problem persisted. 
+
+As StackOverflow usually does, [it had insight into an answer](http://stackoverflow.com/questions/1459710/tablesorter-with-jquery-does-not-sort-numbers-correct).  Essentially, prior to version 2.0.5, jquery.tablesorter.js didn't sort numbers exactly correctly.  The problem is that `SortableHTMLTables` ships with version 2.0.3:
+```{r myhead, cache=TRUE, results = 'markup'}
+head(readLines(system.file("assets/jquery.tablesorter.js", package = "SortableHTMLTables"))) 
+```
+and uses this version for the table output.  Now, if you wanted to fix this, you'd have some css to your file or some other route.  Or, you can just update jquery.tablesorter.js.  I went to [http://tablesorter.com/docs/](http://tablesorter.com/docs/#Download), downloaded the new js plugin.
+
+## But I want this automatic!
+If you're using `R` and don't want to play around with JavaScript, that's the whole point of these functions.  Saying you have to edit css or something of the like defeats that purpose.  But for this fix to be ``automatically'' done, you either have to 1) copy the .js file every time you run the `sortable.html.table` command as it re-copies the files over, 2) wait for the maintainer to update (out of your control), 3) change your css, or 4) copy a new .js file with different name and edit the html file after running to make sure it uses your new js file. I'll implement 4).
+
+```{r fixtab}
+require(SortableHTMLTables)
+outfile = "openWAR2014_fixed.html"
+sortable.html.table(openWAR,outfile)
+change_js = function(f, newjs = "jquery.tablesorter_v2.0.5.js"){
+  x = readLines(f)
+  x = gsub("jquery.tablesorter.js", newjs, x, fixed=TRUE)
+  writeLines(x, con = f)
+}
+change_js(outfile)
+```
+(I named my file `jquery.tablesorter_v2.0.5.js`).  Now, you see [here](https://muschellij2.github.io/HopStat/Sorted_HTML_Tables_and_Javascript_Libraries/openWAR2014_fixed.html), the table works!  Hope this helps.
+
+
+### Maintainer
+Note, I contacted the maintainer and I'm sure he'll fix this in the next update (he does a LOT of awesome work and development).
