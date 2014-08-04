@@ -21,7 +21,11 @@ After a bit more discourse, [@StatsInTheWild shared some data with me](https://t
 
 ```{r maketab}
 require(SortableHTMLTables)
-myfile
-openWAR<-read.csv(, stringsAsFactors = FALSE);
-sortable.html.table(openWAR,"openWAR2014.HTML")
+myfile = "openWAR.csv"
+if (!file.exists(myfile)) {
+  download.file("https://dl.dropboxusercontent.com/u/35094868/openWAR.csv", myfile, method="wget")
+  }
+openWAR<-read.csv(myfile, stringsAsFactors = FALSE);
+sortable.html.table(openWAR,"openWAR2014.html")
+
 @
