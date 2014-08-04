@@ -1,0 +1,12 @@
+base
+brew
+datasets
+graphics
+grDevices
+knitr
+methods
+RWordPress
+SortableHTMLTables
+stats
+testthat
+utils
