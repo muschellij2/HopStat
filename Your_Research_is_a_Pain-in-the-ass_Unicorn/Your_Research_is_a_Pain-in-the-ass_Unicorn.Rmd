@@ -1,0 +1,44 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+I'm submitting another paper and I've come to a similar spot: I've edited and read the paper 15 times and don't even want to look at it.  Things aren't exactly the same as before: I did a lot more writing, had a better writing schedule, which involved more positive editing schedule, and I'm still **relatively** excited about the results.
+
+## Relatively
+The key word in that paragraph is relatively.  I have discussed with many students and faculty about how after you do all the analysis, the last push to write seems 10 times harder than all the analysis.  I'm sure there are names and psychological theories about why this happens and all the stuff that goes into your head.  The [How to Write A Lot](http://www.amazon.com/How-Write-Lot-Practical-Productive/dp/1591477433) book discusses many reason why we don't like writing.   But these feelings don't happen only when you're writing: it also happens when you have worked on one project for a long time and want to bash it with a hammer sometimes.  
+
+## Pain-in-the-ass Unicorn
+This is natural.  I would like to make the following analogy: your research/thesis/dissertation is a pain-in-the-ass unicorn.  Think about what would happen if you got a unicorn.
+
+> You'd be like OMFG a unicorn!! Everyone look -- it's a unicorn.  It's MY unicorn! Woo! Anything the unicorn did, you'd be excited.  Even if the unicorn took shit all over your bathroom.  It's like oh man, I've never seen unicorn poop!  You would tell everyone about it and be super excited.  After a few months, you'd still be excited to see the unicorn when you came home and take it for unicorn rides and such.  You'd mention it to new friends and they'd react like: OH MY GOD NO WAY, that's SOOOOOOO COOL! To which, you'd just shrug and say "Yeah, it's pretty cool. I like it." and "Oh, you didn't know unicorns could do that?".
+>
+> And when they came over they'd play with your unicorn and you'd sit and watch. They would then say something "I wish I had a unicorn." and it'd hit you: NO YOU DON'T.  The unicorn shit on the floor a year after you got it and you can't hide your frustration and anger.  You complain to your friends about your pain-in-the-ass unicorn.  Why do I even have this thing?
+
+I'm so glad for [this post](http://lorcadamon.com/2013/04/15/my-unicorn-is-kind-of-a-pain-in-the-ass/) I found after writing the post.  Especially this figure (no explanation needed):
+
+![](http://lorcadamon.files.wordpress.com/2013/04/unicorn-poop-shirt1.jpg?w=600&h=600)
+
+## Dealing with my unicorn
+This is what I see with a lot of my work (and observing others).  Initial excitement, lulled into complacency with the problem, thinking it's common and not novel/exciting, and frustration/complaining.  I'm not sure if this is "natural", but I would say it's common.  What I try to remind other students and myself time and time again:
+
+<font size="20">YOU HAVE A FREAKING UNICORN </font>
+
+Most of the projects you work on in grad school/academia are the cutting edge of research.  Even if it's common to you, it sure isn't common to many other people, most importantly to you 1/2/4 years ago.  If you existed then, didn't know the solution, and were excited about the solution, then so will others.  Granted, maybe not droves of people, but some.  It's your unicorn and realize it's still special and awesome.  Yeah it may shit on the couch, but it's a FREAKING UNICORN.  
+
+
+## Combatting this I-hate-my-unicorn Feeling
+I try strategies to avoid this pattern to keep me excited.  
+
+1.  This answer depends.  I like to have more than 1 project.  Too many projects can hinder progress, but a few can make you realize good aspects of each one.  Remember, your unicorns may play well with each other.  If they don't, you have 2 unicorns shitting on the floor.
+2.  Talk to new people/collaborators about your work.  Excitement in others revives excitement in yourself.  Talk to your advisor/mentor/collaborator.  Many times they reinforce why you are doing the work.
+3.  Listen to others about their unicorns.  It can help you put your research in perspective because you'll think about your unicorn that way.  Or their unicorn/data/collaborator is even worse and you will feel grateful for your unicorn.
+4.  Talk to people outside of academia about your unicorn every now and then.  This importantly includes, not downplaying (but not boasting) your research when people note that it's cool/exciting/hard/important.  They gave you a compliment, don't say "no it's not" - that's rude.
+5.  Read reddit - especially [r/futurology](http://www.reddit.com/r/Futurology/)'s summary science of the week.
+6.  Make the coolest/craziest figure you can of your research for a talk.  Something people will remember and talk about, for better or worse.  Interactive - yes; 3D boxplot - NO.  Maybe put in unicorns.
+
+We've all been there.  Ask around.  Some people have even toilet trained their unicorns.  Talk to them.  
+
+
+
+

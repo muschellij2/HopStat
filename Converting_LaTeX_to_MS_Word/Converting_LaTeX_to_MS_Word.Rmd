@@ -1,0 +1,40 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+Last year, [Elizabeth Sweeney wrote about how she converts LaTeX to Word](http://elizabethmargaretsweeney.wordpress.com/2013/08/21/from-latex-to-word/).  If you're trying all open-source solutions to this problem, visit there.  
+
+In my experience, I was writing in LaTeX as well.  I had a journal that only accepted Word documents.  I had to convert from LaTeX to Word.  
+
+## Same story, different day
+I tried a lot of the solutions from [StackExchange](http://tex.stackexchange.com/questions/4145/workflow-for-converting-latex-into-open-office-ms-word-format): latex2rtf, pandoc, TeX2Word, etc.
+
+I think the best quote there is
+> There is no pain-free way to do this. Really.
+
+And no, nothing really worked VERY well straight out of the box.  My solution was hackey as well, but it worked the best for me with a reasonable amount of formatting for me.  The biggest problems were, not surprisingly, equations.  Some garbled the text everywhere, others created image files that were included in the file.  
+
+
+## What I used
+My pipeline converted PDF to Word (.docx) using Acrobat Adobe Pro.  This is relatively cheap for our students and is a solid program, though somewhat pricey.  The conversion was similar for headings/sections to those above, but the equations were "converted".  The equations were converted to some pseudo-equations, but when highlighted in the Word doc, and then clicking Insert > Equation, and viola!  The equations looked pretty good (aka usable). 
+
+I would say, though, the conversion was not perfect.  I had some odd problems with superscripts and such, and ended up uploading the .docx to Google Drive as we were going to [try editing together](http://hopstat.wordpress.com/2013/12/03/collaboration-end-of-the-word-ms-word-that-is/), but it never worked.  I did noticed the Google Drive document fixed many formatting issues the OCR had caused from Acrobat Pro.  I downloaded it from Drive and the formatting issues were fixed...but equations were a mess again!  I ended up just copying and pasting the equations from the pre-uploaded .docx into the Google-Drive-converted .docx.  That's where I had my best results.
+
+## Someone Please Stop the Madness!
+Is this a good pipeline? No.  Did it technically "work"? Yes.  Why did I go through LaTeX in the first place.  Well, 1) I didn't know they only took Word.  This is my fault, but could have easily been my 2nd submission to a journal and the other journal accept PDF.  2) I had equations.  MS equations, even though they "accept" LaTeX - no.  3) I know how to get LaTeX to format things good enough.  
+
+I will go on 1 rant and then discuss some light in this darkness.
+
+### Rant
+Seriously journals, you only accept Word documents?  What is this bullshit.  The journal even accepted PDFs in Supplements.  Everyone can read and annotate PDFs nowadays; get rid of Word requirements.  
+I imagine this perpetuates because 1) it's easy to use Word's word count and say "that's how many words you sent", even though that's ridiculous (you included references in your word count!?), and 2) the editors/typesetters have used it for print journals, 3) some reviewers only use Word and cannot annotate PDF.  
+
+You know what - get rid of the reviewers from 3).  You're reviewing cutting edge research and didn't keep up with a technology that pretty much every journal uses for papers.  Maybe you aren't the best for that job.
+
+### Light up the Darkness
+[RStudio released the Knit to Word](http://blog.rstudio.org/2014/06/18/r-markdown-v2/) button in their new versions.  Now, many people who use pandoc as discussed before, knew how to do this on some level.  The big difference for me is that 1) I never thought to say only in R Markdown and skip LaTeX altogether, 2) It's click-button in RStudio which means more will use it, and 3) I can switch between PDF and Word with one click.  With [citation style files](http://citationstyles.org/) and [knitcitations](http://www.carlboettiger.info/2012/05/30/knitcitations.html), I think I can get close to LaTeX references and automated reporting. 
+
+Next post to follow up on this.
+
+
