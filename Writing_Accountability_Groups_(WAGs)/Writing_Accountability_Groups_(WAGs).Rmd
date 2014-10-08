@@ -1,0 +1,64 @@
+---
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+Recently, 7 other students and myself joined the first writing accountability group (WAG) for students in our biostatistics department.  Johns Hopkins has a [set of WAGs](https://www.facebook.com/HopkinsWAGs) all around campus, but we are the first student-only group.
+
+## What's a WAG?
+
+I posted before about strategies of [How to Write a Lot](http://hopstat.wordpress.com/2014/06/15/how-to-write-a-lot/) based on Paul Silvia's [Book of the same name](http://www.amazon.com/How-Write-Lot-Practical-Productive/dp/1591477433).  One of his recommendations (especially for junior faculty) was to start what he calls an "agraphia group", where you discuss goals, go on your way, and then come back and discuss if you met those goals or not.  He (and I believe in this) seemed rigorous in this regard: if you came 2 times saying "I didn't do anything"- you were out.  
+
+The WAG is the implementation of such a group.  The group consists of 3 parts:
+
+1.  15 minutes of discussing previous goals and goals for the 30 minute writing session.
+2.  30 minutes of "writing" - where writing means accomplishing the goals set in 1.
+3.  15 minutes of discussing if the goals were met from the 30 minute session and setting goals for the next week.
+
+### The WAG Makeup
+
+The group consists of 4-8 participants.  Don't have more than that - you won't have enough time in an hour and it will become unruly.  Also, it's good when you can spot in a second who is missing.  It runs for 10 weeks (it can run more), but gives a good concrete timeframe.  This inhibits participants from saying "I'll come next time".  There are only 10 sessions, show up - a maximum of 2 misses are allowed.
+
+## Why did we start the group?
+Now, **why** did we start this group - why not "just write"?
+
+1.  Peer pressure can be used for good.  No one wants to say "I've done nothing".   Even if you get 1 paragraph done as a last-ditch effort before the meetings, it's > 0 paragraphs.
+2.  Goals are hard to set; it's easier with others flushing out your ideas.
+3.  You are writing for 30 minutes even if you get nothing else done that week.
+
+## Overall Goals
+Types of overall goals are group are trying to accomplish:
+1.  Write a paper.
+2.  Edit a paper for review/submission.
+3.  Write background/significance section on a grant.
+4.  Write more in a blog
+
+## 30-minute Session Goals
+These are large and somewhat abstract. In a goal-setting session for the 30 minute writing, we have more concrete goals such as:
+1.  Write 2 paragraphs of the results section for a paper.
+2.  Make patient demographics table
+3.  Incorporate all comments from collaborator 1.
+4.  Get 1 polished paragraph for background section
+5.  Write 3 sections of blog post, post by end of day
+
+## 15-minute End Goal Creation
+Examples of these goals are:
+1.  Write 2 pages of paper 1.
+2.  Make patient demographics table and 3 figures.
+3.  Incorporate all comments from all collaborators and format for journal.
+4.  "Lock down" background section as done.
+5.  Post blog post, write second for editing next Monday.
+
+## How do I start one?
+If you are at Hopkins, please visit the WAG facebook group above.  If not, just get a few people together and follow the above setup.  Make people commit to a timeline (maybe even sign a pseudo contract so they know what they're getting into) that is short, concrete, and has a seeable end.  I recommend buying a few of the Write a Lot books (as well as others) to share and discuss.
+
+### Additional WAG-related Time
+The students in our group have also discussed that the 30 minutes in our WAG is helpful, and an additional 30 minutes would be helpful.  We are testing an additional writing "meeting" and we will try to determine its effect.  We will adapt based on our WAG (like 10 min goals, 45 mins writing, 5 end goals).
+
+
+
+
+
