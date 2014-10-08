@@ -1,0 +1,71 @@
+% $ biblatex auxiliary file $
+% $ biblatex version 2.4 $
+% Do not modify the above lines!
+%
+% This is an auxiliary file used by the 'biblatex' package.
+% This file may safely be deleted. It will be recreated as
+% required.
+%
+\begingroup
+\makeatletter
+\@ifundefined{ver@biblatex.sty}
+  {\@latex@error
+     {Missing 'biblatex' package}
+     {The bibliography requires the 'biblatex' package.}
+      \aftergroup\endinput}
+  {}
+\endgroup
+
+\entry{Dirac1953888}{article}{}
+  \name{author}{1}{}{%
+    {{}%
+     {Dirac}{D.}%
+     {P.A.M.}{P.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{DP1}
+  \strng{fullhash}{DP1}
+  \field{sortinit}{D}
+  \verb{doi}
+  \verb 10.1016/S0031-8914(53)80099-6
+  \endverb
+  \field{number}{1-–12}
+  \field{pages}{888\bibrangedash 896}
+  \field{title}{The lorentz transformation and absolute time}
+  \field{volume}{19}
+  \field{journaltitle}{Physica}
+  \field{year}{1953}
+\endentry
+
+\entry{Feynman1963118}{article}{}
+  \name{author}{2}{}{%
+    {{}%
+     {Feynman}{F.}%
+     {R.P}{R.}%
+     {}{}%
+     {}{}}%
+    {{}%
+     {{Vernon Jr.}}{V.}%
+     {F.L}{F.}%
+     {}{}%
+     {}{}}%
+  }
+  \strng{namehash}{FRVF1}
+  \strng{fullhash}{FRVF1}
+  \field{sortinit}{F}
+  \verb{doi}
+  \verb 10.1016/0003-4916(63)90068-X
+  \endverb
+  \field{pages}{118\bibrangedash 173}
+  \field{title}{The theory of a general quantum system interacting with a
+  linear dissipative system}
+  \field{volume}{24}
+  \field{journaltitle}{Annals of Physics}
+  \field{year}{1963}
+\endentry
+
+\lossort
+\endlossort
+
+\endinput

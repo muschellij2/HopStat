@@ -1,0 +1,227 @@
+---
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=TRUE, warning=TRUE, comment="")
+setwd("~/Dropbox/Public/WordPress_Hopstat/Working_with_NIfTI_images_in_R/")
+library(fslr)
+```
+
+The `oro.nifti` package is awesome for Neu`R`oimaging (couldn't help myself).  It has functions to read/write images, introduces the S4 `nifti` class, and has useful plotting functions.  There are some limitations and some gotchas that are important to discuss if you are working with these objects in `R`.  
+
+## Dataset Creation
+
+We'll read in some data (a template, example taken from `readNIfTI` in `oro.nifti`.  We have to download it as most packages aren't allowed to include data (Bioconductor has mostly remedied this for bioinformatics).
+
+```{r makedata, cache=TRUE}
+library(oro.nifti)
+URL <- "http://imaging.mrc-cbu.cam.ac.uk/downloads/Colin/colin_1mm.tgz"
+urlfile <- "colin_1mm.tgz"
+if (!file.exists(urlfile)){
+  download.file(URL, dest=urlfile, quiet=TRUE)
+  untar(urlfile)
+}
+img <- readNIfTI("colin_1mm")
+img = cal_img(img)
+```
+
+The `img` object read in is of class `nifti`, has a series of slots (remember S4 object, not S3), and the `print` method produces information about the NIfTI header.
+
+```{r printimg}
+class(img)
+print(img)
+slotNames(img)
+hist(img)
+```
+
+### Array operation
+
+Now, we can do simple operations on this object like any other array.  The problem is that certain operations do not (some rightfully so) return a `nifti` object.
+
+For example, let's get an indicator if the value is greater than 400000.  (This is an MRI and has arbitrary units).
+
+
+```{r}
+mask = img > 400000
+mask
+class(mask)
+```
+
+We see a `nifti` object is returned, with all the header information contained.  Great!  Let's get an indicator of values greater than 400000 but less than 600000.  
+
+```{r}
+mask_2 = img > 400000 & img < 600000
+class(mask_2)
+```
+
+We see that this operation returned an `array`, not a `nifti` object.  That's kind of unexpected, but probably conservative.  For example, if this had been 2 different `nifti` objects and you were performing the subsetting, which object's information should you use?
+
+We see the same behavior when multiplying (or subtracting, etc) two `nifti` objects.
+
+```{r}
+img_masked = img * mask
+class(img_masked)
+```
+
+We know the object is an `array` but we may want a `nifti` object. 
+
+### `fslr` Helper functions
+The `niftiarr` function in `fslr` inputs a `nifti` object and an `array`, and returns a `nifti` object with the array in the `@.Data` slot, copying over the image header information from the input `nifti` object.  
+
+```{r niftiarr}
+### need the development version
+# library(devtools)
+# devtools::install_github("muschellij2/fslr")
+library(fslr)
+img_masked = niftiarr(img, img * mask)
+class(img_masked)
+```
+
+### Other ways to skin the cat
+
+Another way of masking the image is to subset the values of the image that are not in the mask and setting those values to $0$ (or some other value).
+```{r masked_2}
+img_masked_2 = img
+img_masked_2[mask == 0] = 0
+class(img_masked_2)
+```
+
+We see that this correctly returns an object of class `nifti`.  One potential issue with this direction is that `cal_min` and `cal_max` slots on the resulting `nifti` object not the range of the image.  This is problematic because `orthographic` and `image.nifti` both use this slot to determine grayscale ranges for plotting and `writeNIfTI` errors if these values don't match.  The `cal_img` function in `fslr` is a simple helper function that will set these values to the respective values of the range of the data.
+
+```{r cal_img}
+range(img_masked_2)
+c(cal.min(img_masked_2), cal.max(img_masked_2))
+img_masked_2 = cal_img(img_masked_2)
+range(img_masked_2)
+```
+
+Note, sometimes `readNIfTI` sets the `cal_min` and `cal_max` slots both to $0$, which may be a result of how the `nifti` was created.
+
+#### Equivalent Operations
+We see that after these operations done 2 different ways, the resulting `nifti` objects are equivalent.
+```{r allequal}
+all.equal(img_masked, img_masked_2)
+```
+
+## Data Typing and Writing `nifti` objects
+I've worked with `oro.nifti` for some time, and I wanted to also discuss writing `nifti` objects.  Many operations preserve the data `type` of the array in the `nifti` object, such as if the data were integers, an array of integers returned.  Other times, the data type changes, such as if you smoothed an image of integers, the resulting `array` would have values that are not integers, but probably continuous values.  When plotting the data or operating with the `R` object, this is not generally an issue because any extraction of the information will take the `nifti` object's `@.Data` slot and return that array.
+
+This presents a problem when you write `nifti` objects using the `writeNIfTI` function.  
+
+## Slots `datatype` and `bitpix`
+In a `nifti` object, the [`datatype`](http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/datatype.html) and [`bitpix`](http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/bitpix.html) fields specify what type the data is and the level of precision stored in the NIfTI file.  For example, if you have binary data, the 
+`datatype` would be a value of 2 for `UINT8` (unsigned integer) and the `bitpix` would be 8 for 8 bits per voxel.  These must correspond to each other (i.e. no mismatching).  Also, storing data in a type that is what I call "over-storing" (e.g storing binary data in a `FLOAT32` format) may make files larger than necessary.  Under-storing is much more problematic, however.
+
+### Why you should care about under-storing
+If you read in data as integers, did some operations that returned continuous (decimal) objects, and then write the `nifti` object using the original header information would truncate the data in ways you wouldn't want.  In `R`, the object would look fine, but when you wrote it to disk, it would be truncated.
+
+```{r}
+img@bitpix
+img@datatype
+```
+
+Let's say we scaled the data by its maximum:
+
+```{r pct}
+pct = img / max(img)
+pct = cal_img(pct)
+pct@bitpix
+pct@datatype
+hist(pct)
+### we will explain this in the next section
+pct = drop_img_dim(pct)
+pct = zero_trans(pct)
+pct = onefile(pct)
+
+```
+
+If we write this to disk, and read the result back in, we see:
+```{r readwrite, fig.height=7, fig.width=2.3, dev='png', res = 300}
+par(mfrow=c(3,1))
+hist(pct, main="Correct Data")
+
+### Writing out pct without any datatype change - still UINT8
+tfile = tempfile()
+writeNIfTI(pct, filename = tfile, verbose=TRUE)
+pct2 = readNIfTI(paste0(tfile, ".nii.gz"))
+hist(pct2, main="Writing out with no change of datatype/bitpix")
+
+### Writing out pct with datatype change - to FLOAT32
+pct = datatype(pct, type_string = "FLOAT32")
+writeNIfTI(pct, filename = tfile)
+pct3 = readNIfTI(paste0(tfile, ".nii.gz"))
+hist(pct3, main="Writing out with changing of datatype/bitpix")
+```
+
+As you can see, you **need** to change the bitpix and datatype when writing out NIfTI files if you are changing the data type in the array of data in `R`.  We had changed integers to percentages/proportions, and we changed the output to `FLOAT32` (for floating point data).  Take a look at `convert.datatype()` and `convert.bitpix()` for examples of types.
+
+## Other functions for changinag data
+We used 3 functions in the last section which changed around `pct`: `drop_img_dim`, `zero_trans`, and `onefile`.  
+
+I want to explain what each of these steps are doing.  
+
+### Dropping dimensions
+When you read in some data (especially from SPM) into `R` using `readNIfTI`, the data can be read in as a 4-dimensional image, with one dimension only being one.  For example, if we look at the dimensions of `img`:
+```{r too_many_dim}
+dim(img)
+img@dim_
+pixdim(img)
+```
+We see that the 4th dimension is 1 and the slot `dim_` denotes it's a 4-dimensional object (4 is in the first index).  Also, we note that values in the `dim_` slot are $0$, which is not allowed when writing out:
+```{r failwrite}
+writeNIfTI(img, filename = tempfile())
+```
+In order to force it to be a 3-dimensional object, `drop_img_dim` changes all these aspects for the user.
+```{r rm_dim}
+img_3d = drop_img_dim(img)
+dim(img_3d)
+img_3d@dim_
+pixdim(img_3d)
+tfile = tempfile()
+writeNIfTI(img_3d, filename = tfile)
+```
+
+### Unscaling the data
+Many times this is not necessary, but some NIfTI files have the `scl_slope` and `scl_inter` slots defined.  These denote what to multiply and then add to the data to get it in the correct values.  `zero_trans` simply makes `scl_slope = 0` and `scl_inter = 1`.  
+
+### Changing NIfTI magic slots
+In each NIfTI image, there is a `magic` slot (see [http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/magic.html](http://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/nifti1fields_pages/magic.html)):
+```{r}
+img_3d@magic
+img_3d@vox_offset
+```
+The NIfTI documentation states:
+> "ni1" means that the image data is stored in the ".img" file corresponding
+   to the header file (starting at file offset 0).
+
+We previously wrote out the 3D image, but if we try to read it back in, `readNIfTI` fails:
+```{r}
+readNIfTI(fname = tfile)
+```
+We can change the default in `readNIfTI` to `onefile = FALSE`, but nothing changes:
+
+```{r}
+writeNIfTI(img_3d, filename = tfile, onefile = FALSE)
+readNIfTI(fname = tfile)
+```
+
+
+If we look in `oro.nifti:::.read.nifti.content` we see
+
+>     if (!onefile) {
+        if (nim@magic != "ni1") {
+            stop("This is not a two-file NIfTI format")
+        }
+
+We can change this `magic` to `n+1`, but we need to change the `vox_offset = 352` and that's exactly what `onefile()` does:
+```{r}
+img_3d = onefile(img_3d)
+writeNIfTI(img_3d, filename = tfile, onefile = FALSE)
+readNIfTI(fname = tfile)
+```
+
+Viola!  All these fun little quirks that I hope you don't have to encounter.  But if you do, I hope this page helps.
+
+
+

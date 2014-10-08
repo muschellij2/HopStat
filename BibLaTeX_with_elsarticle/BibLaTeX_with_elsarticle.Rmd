@@ -1,0 +1,47 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='markdown')
+```
+
+## Problem
+I like BibLaTeX and [StackOverflow presents some ways reasons to switch to BibLaTeX](http://tex.stackexchange.com/questions/5091/what-to-do-to-switch-to-biblatex).   I like it, if nothing else, I can have multiple bibliographies easily.  I can also use [`natbib`](http://www.ctan.org/pkg/natbib) citation style and also limit which fields are displayed in my bibliography.  One problem with BibLaTeX is that it does not work well with Elsevier articles (class `elsarticle`), since `natbib` is loaded by default.  There are some other options to induce compatibility are presented [here](http://tex.stackexchange.com/questions/110515/elsarticle-cls-and-biblatex-incompatibility) and [here](http://tex.stackexchange.com/questions/5091/what-to-do-to-switch-to-biblatex).
+
+## Solution 
+So I edited the `elsarticle.cls` file to make it work.  See the `diff` between the 2 files here:
+
+```{r, engine='bash'}
+diff elsarticle.cls elsarticle_nonatbib.cls
+```
+
+If you've never read a `diff` output, the `<` means what's written in the first file (`elsarticle.cls`) and `>` means the second file (`elsarticle_nonatbib.cls`).  The numbers correspond to the line in each file, e.g `192c193` means line 192 in file 1 and 193 in file 2.  
+Overall, I changed the type of article, commented out the `natbib` requirement, and changed the `author` field to `auth` (see below for why).  
+
+## Things you need to change
+The `\author` field conflicts with biblatex and elsarticle, so you must chagne the `\author` definitions to `\auth` instead.  This is a minor change, but important one.  You can change that field to anything you want in the `elsarticle_nonatbib.cls` file (such as `elsauthor`).  
+
+### Minimal Working Example
+
+I tried it with Elsevier's [sample manuscript](http://www.elsevier.com/__data/assets/file/0019/166141/elsarticle-template.zip), changing the `author` fields to `auth`, and adding a biblatex-type heading:
+```
+\usepackage[
+  natbib = true,
+    backend=bibtex,
+    isbn=false,
+    url=false,
+    doi=false,
+    eprint=false,
+    style=numeric,
+    sorting=nyt,
+    sortcites = true
+]{biblatex}
+\bibliography{mybibfile}
+```
+and
+```
+\printbibliography
+```
+at the end, and the manuscript came out as if using `natbib`.  
+
+## Conclusion
+You can use `elsarticle` with `biblatex`, with some minor changes.  You may have to include this `cls` with the rest of your LaTeX files for them to compile on the editors machine.
+

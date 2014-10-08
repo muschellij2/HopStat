@@ -1,0 +1,51 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=FALSE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+TL;DR - Neuroimaging-specific post.  Some files can't be converted by programs if they are encoded one way - present Matlab program to fix that.
+
+## JPEG2000 DICOM data
+Recently, I had some DICOM data that is stored in the JPEG2000 format from [OsiriX](http://www.osirix-viewer.com/datasets/).  I wanted to convert these to a NIfTI format using [dcm2nii](http://www.mccauslandcenter.sc.edu/mricro/mricron/dcm2nii.html) but it was not a fan of the compression, specifically the transfer syntax (which tells you how the data is encoded).
+
+It spit out the error:
+```
+Unsupported Transfer Syntax 1.2.840.10008.1.2.4.91 Solution: use MRIcro
+```
+
+## Using Matlab's Image Processing Toolbox
+For most of my endeavors, I try to use `R` for everything, but that's not always possible.  For example the `oro.dicom` package is great for working with DICOM data, but the JPEG2000 compression format is not supported.  Therefore, I went into Matlab, which has the [image processing toolbox](http://www.mathworks.com/products/image/).  You will need an updated version, [as described here, Matlab 2009b version will not work](http://www.mathworks.com/matlabcentral/answers/93596-why-is-dicomread-unable-to-read-my-jpeg-2000-encoded-image-using-the-image-processing-toolbox-6-4-r).  
+
+## The Code for Conversion
+Overall, the code takes a directory, lists all the files, removing directories.  .  The `for loop` goes through each DICOM file, reads in the header information with `dicominfo`, reads in the data matrix with `dicomread`.  The transfer syntax is changed using `newsyntax`, creates a new filename (within a specified output directory `outdir`) and writes the DICOM file using `dicomwrite`.  The `createmode` can either be `Create` or `Copy`.  Using `Create` is the default option and has error and missing checking.  The `Copy` mode bypasses many of these checks, but this may be required for certain DICOM files to be written.  
+
+
+```{r, eval=FALSE, echo=TRUE}
+rundir = pwd;
+updir = fileparts(rundir);
+outdir = fullfile(updir, 'Converted');
+addon = '';
+newsyntax = '1.2.840.10008.1.2';
+createmode = 'Copy'; % could be 'Create';
+x = dir(rundir);
+nodir = ~[x.isdir]';
+x = x(nodir);
+x = {x.name}';
+ifile = 1;
+for ifile = 1:length(x)
+    name = x{ifile};
+    stub = regexprep(name, '(.*)[.].*', '$1');
+    stub = [stub addon '.dcm']; %#ok<AGROW>
+    name = fullfile(rundir, name);
+    stub = fullfile(outdir, stub);
+    dinfo = dicominfo(name);
+    dinfo.TransferSyntaxUID = newsyntax;
+    X = dicomread(name);
+    dicomwrite(X, stub, dinfo, 'CreateMode', createmode);
+end
+```
+
+After this conversion, `dcm2nii` worked as usual for converting. 
+
+### Other Options
+Other options exist such as the [DICOM JPEG 2000 Module](http://dicom.offis.de/dcmjp2k.php.en), but this must be licensed and Matlab has implemented this in `imread`.  Just figured if you ran into this problem, this may help.  
