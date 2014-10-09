@@ -3,6 +3,7 @@ library(knitr)
 opts_chunk$set(echo=FALSE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
 ```
 
+<<<<<<< HEAD
 I have worked in neuroimaging for the past 4-5 years.  I work on CT scans for stroke patients, but have also worked on fMRI and some structural image analyses.  One important thing I have learned: (pre?)processing means a lot.
 
 ### Take a note from Bioinformatics
@@ -13,11 +14,24 @@ I remember a distinct conversation at a statistics conference when I spoke to a 
 
 ## An analogy to standard datasets
 To those who don't work in bioinformatics or imaging, I'll make this analogy: someone gives you dataset and one column is transformed in a non-linear way, but those giving you the data can't really tell you how it was transformed.  I think for many it'd be hard to trust and accept that data.  My biostat training has forever given me data trust issues.  It's hard for me to trust people who give me data.
+=======
+I have worked in neuroimaging for the past 4-5 years.  I work on CT scans for stroke patients, but have also worked on fMRI and some structural image analyses.  One important thing I have learned: preprocessing means a lot.
+
+### Take a note from Bioinformatics
+In some respects, Bioinformaticians had the best opportunity when sequencing became more affordable and the data exploded.  I say they had it good because they were the ones who got the raw (mostly) data and had to figure out how to analyze it.  That's not to say, in any way, it was easy to figure out correct analysis methods, develop an entire industry from the ground up, or jump into big datasets that required memory far beyond the range laptops could handle.  The reason I say they have it good is because the **expectation** for those working on the data (e.g. (bio)statisticians) to know (and usually agree) with how the data was preprocessed.
+
+## You trust that data?
+I remember a distinct conversation at a statistics conferenc when I spoke to a post-doc, trained in statistics, who worked in imaging.  I sat next to him/her and asked "how do you preprocess your data"?  The response: "Oh, I don't know, my collaborator does it and I work on the processed data."  I was confused.  "You trust that data?" I thought.  I have heard that more times since then, but increasingly hear more people involved from the collection to analysis.
+
+## An analogy to standard datasets
+To those who don't work in bioinformatics or imaging, I'll make this analogy: someone gives you dataset and one column is transformed in a non-linear way, but those giving you the data can't really tell you how it was transformed.  My biostat training has forever given me data trust issues.  It's hard for me to trust people who give me data.
+>>>>>>> 09bfdc1896be8ac4d8939962876abb78e190df0a
 
 Questions I usually rattle off rapid-fire:
 1.  How was it collected?
 2.  Why is this missing?
 3.  Why is this point really weird?
+<<<<<<< HEAD
 4.  What does -9/999/. mean?  
 5.  Where is your codebook?
 6.  Is that patient information!?  Ugh.  I'm deleting this email and you can remove that and resend.  Better yet, use DropBox.  NO - don't keep the original with the patient info in there!  
@@ -62,3 +76,38 @@ One warning: if you do know how to process data, people will want you to do it f
 
 ## Warning: Shameless Plug
 At [ENAR 2015](http://www.enar.org/meetings.cfm), [Ciprian Crainiceanu](http://www.biostat.jhsph.edu/~ccrainic/), [Ani Eloyan](http://www.biostat.jhsph.edu/~aeloyan/Home.html), [Elizabeth Sweeney](http://elizabethmargaretsweeney.wordpress.com/), [Taki Shinohara](https://www.cceb.upenn.edu/faculty/?id=1026) and [myself](http://biostat.jhsph.edu/~jmuschel/) will be presenting a 1 hour 45-minute tutorial on converting raw images, reading data into `R`, and some basic preprocessing methods.
+=======
+4.  What does -9 mean?  
+5.  Where is your codebook?
+6.  Is that patient information!?  Ugh.  I'm deleting this email and you can remove that and resend.  Better yet, use DropBox.  NO - don't keep the original with the patient info in there!  
+
+It sounds more like an investigation rather than a collaboration - I'm working on that.  But I was trained to do that because **those things are important**.  
+
+## Back to imaging
+Why do I think that this happens more often in neuroimaging? (It probably happens in bioinformatics too but I won't speak to that).  I think it's because 
+<p style="font-size: 30px;">Preprocessing is uninteresting/hard/non-rewarding/time-consuming</p>
+
+When I started my lab in fMRI, they had me preprocess data BY HAND (well by click, but you get it).  They had me go through each step so that I understood what that step did to the data.  It made me realize why and where things would go wrong and also taught me an important lesson: **decisions upstream in the processing can have tremendous effects downstream**.  I am forever grateful for that.
+
+It also taught me that preprocessing is a boring and pain-staking business.  Even after I got to scripting the preprocessing, there were still manual steps to check that are inherent.  For example, if you co-register (think matching my brain and your brain together) images, you want to make sure it works right.  There are some methods to try to estimate quality, but almost everyone has to look at the images.  
+
+Statisticians are trained to look at data, so we should be OK with this.  The problem is 1) if it works the response is "OK next" and feel like time was wasted (it wasn't) or 2) if it doesn't you have to fix it or throw away the data.  How long do you think that would take? Looking at 1-2 scans is quick, but what about 100?  What if I said 1000?  
+
+Before I discuss trusting collaborators let me make my message clear:
+<p style="font-size: 20px;">Even if you don't do the preprocessing yourself, you should know what preprocessing was done on your data. Period.</p>  In my eyes, speakers lose a lot of credibility if they can't answer a few simple questions about their data.  Now I haven't remembered every flip angle we've used, but I damn sure knew if the data was band-pass filtered.
+
+### Trusting Collaborators
+Here comes the dilemma: get in the trenches and do hours of work preprocessing the data or get the data preprocessed from collaborators.  I say a little of both.  Sit down with one of the people that do the preprocessing and watch them/go over their scripts with them.  Ask many questions -- people may ask you this later.
+
+The third option, and one I believe we strive for in our group, is to develop methods that require "light preprocessing".  That is, do things on a per-image or per-person level, derive measures, and then analyze these (usually low-dimensional) measures for groups/populations.  
+
+There are some steps that are unavoidable.  If you want population information on a spatial brain level, you'll likely have to register/warp images to a template.  But if this is the case, do some "procedure sensitivity analysis" -- try a couple different registration/warping procedures and see how sensitive your results are.  If they are highly dependent on registration, you should be sure the one you chose is "correct".  [Dr. Ani Eloyan](http://www.biostat.jhsph.edu/~aeloyan/Home.html) just had a [paper accepted on this very topic](REF).  If others are doing the processing, and you don't know how to, this can be hard to ask.  So learn.  One large fringe benefit may be that you realize you can develop methods on some aspects of processing.
+
+Moreover, ask collaborators about the data they threw out along the way.  Was it all the females? All under 5 years old?  All the people who move too much? Don't stop asking the questions about missing data and potential biases lurking in those discarded (costly) images.
+
+## Conclusion
+Learn about preprocessing.  It's part of the game with imaging.  This may scare some people -- good.  Let them leave; there'll plenty of questions and problems for the rest of us.  Looking at brain images (and showing your friends) is still pretty cool to me, that's why I'm still in the imaging game.  But I needed to learn the basics.  
+
+## Warning: Shameless Plug
+At [ENAR 2015](http://www.enar.org/meetings.cfm), [Ciprian Crainiceanu](http://www.biostat.jhsph.edu/~ccrainic/), Ani Eloyan, [Elizabeth Sweeney](http://elizabethmargaretsweeney.wordpress.com/) and myself will be presenting a 1 hour 45-minute tutorial on converting raw images, reading data into `R`, and some basic preprocessing methods.
+>>>>>>> 09bfdc1896be8ac4d8939962876abb78e190df0a
