@@ -1,0 +1,270 @@
+<p>In my <a href="http://hopstat.wordpress.com/2014/10/16/ggplot2-is-not-always-the_answer-its-not-supposed-to-be-7/">last post</a>, I discussed how <code>ggplot2</code> is not always the answer to the question &ldquo;How should I plot this&rdquo; and that base graphics were still very useful.</p>
+
+<h1>Why Do I use ggplot2 then?</h1>
+
+<p>The overall question still remains: why (do I) use <code>ggplot2</code>?</p>
+
+<h2>ggplot2 vs lattice</h2>
+
+<p>For one, <code>ggplot2</code> replaced the <code>lattice</code> package for many plot types for me.  The <code>lattice</code> package is a great system, but if you are plotting multivariate data, I believe you should choose <code>lattice</code> or <code>ggplot2</code>. I chose <code>ggplot2</code> for the syntax, added capabilities, and the philosophy behind it.  The fact <a href="http://had.co.nz/">Hadley Wickham</a> is the developer never hurts either.  </p>
+
+<h2>Having multiple versions of the same plot, with slight changes</h2>
+
+<p>Many times I want to do the same plot over and over, but vary one aspect of it, such as color of the points by a grouping variable, and then switch the color to another grouping variable.  Let me give a toy example, where we have an <code>x</code> and a <code>y</code> with two grouping variables: <code>group1</code> and <code>group2</code>. </p>
+
+[sourcecode language="r"]library(ggplot2)
+set.seed(20141016)
+data = data.frame(x = rnorm(1000, mean=6))
+data$group1 = rbinom(n = 1000, size =1 , prob =0.5)
+data$y = data$x * 5 + rnorm(1000)
+data$group2 = runif(1000) &gt; 0.2
+[/sourcecode]
+
+<p>We can construct the <code>ggplot2</code> object as follows:</p>
+
+[sourcecode language="r"]g = ggplot(data, aes(x = x, y=y)) + geom_point()
+[/sourcecode]
+
+<p>The <code>ggplot</code> command takes the <code>data.frame</code> you want to use and use the <code>aes</code> to specify which aesthetics we want to specify, here we specify the <code>x</code> and <code>y</code>.  Some aesthetics are optional depending on the plot, some are not.  I think it&#39;s safe to say you always need an <code>x</code>.  I then &ldquo;add&rdquo; (using <code>+</code>) to this object a &ldquo;layer&rdquo;: I want a geometric &ldquo;thing&rdquo;, and that thing is a set of points, hence I use <code>geom_points</code>.  I&#39;m doing a scatterplot.</p>
+
+<p>If you just call the object <code>g</code>, <code>print</code>  is called by default, which plots the object and we see our scatterplot.</p>
+
+[sourcecode language="r"]g
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/IhK1XPh.png" alt="plot of chunk print_g"/> </p>
+
+<p>I can color by a grouping variable and we can add that aesthetic:</p>
+
+[sourcecode language="r"]g + aes(colour = group1)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/4muJEUZ.png" alt="plot of chunk color_group"/> </p>
+
+[sourcecode language="r"]g + aes(colour = factor(group1))
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/yoIyNTP.png" alt="plot of chunk color_group"/> </p>
+
+[sourcecode language="r"]g + aes(colour = group2)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/LrDxPLt.png" alt="plot of chunk color_group"/> </p>
+
+<p>Note, <code>g</code> is the original plot, and I can add <code>aes</code> to this plot, which is the same as if I did <code>ggplot2(data, aes(...))</code> in the original call that generated <code>g</code>.  <strong>NOTE</strong> if the <code>aes</code> you are adding was not a column of the <code>data.frame</code> when you created the plot, you will get an error.  For example, let&#39;s add a new column to the data and then add it to <code>g</code>:</p>
+
+[sourcecode language="r"]data$newcol = rbinom(n = nrow(data), size=2, prob = 0.5)
+g + aes(colour=factor(newcol))
+[/sourcecode]
+
+[sourcecode]Error: object &#39;newcol&#39; not found
+[/sourcecode]
+
+<p>This fails because the way the <code>ggplot2</code> object was created.  If we had added this column to the data, created the plot, then added the <code>newcol</code> as an <code>aes</code>, the command would work fine.</p>
+
+[sourcecode language="r"]g2 = ggplot(data, aes(x = x, y=y)) + geom_point()
+g2 + aes(colour=factor(newcol))
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/37EARDs.png" alt="plot of chunk g2_create2"/> </p>
+
+<p>We see in the first plot with <code>colour = group1</code>, <code>ggplot2</code> sees a numeric variable <code>group1</code>, so tries a continuous mapping scheme for the color.  The default is to do a range of blue colors denoting intensity.   If we want to force it to a discrete mapping, we can turn it into a factor <code>colour = factor(group1)</code>.  We see the colors are very different and are not a continuum of blue, but colors that separate groups better.<br/>
+The third plot illustrates that when <code>ggplot2</code> takes logical vectors for mappings, it factors them, and maps the group to a discrete color.  </p>
+
+<h3>Slight Changes with additions</h3>
+
+<p>In practice, I do this iterative process many times and the addition of elements to a common template plot is very helpful for speed and reproducing the same plot with minor tweaks.  </p>
+
+<p>In addition to doing similar plots with slight grouping changes I also add different lines/fits on top of that.  In the previous example, we colored by points by different grouping variables.  In other examples, I tend to change little things, e.g. a different smoother, a different subset of points, constraining the values to a certain range, etc.  I believe in this way, <code>ggplot2</code> allows us to create plots in a more structured way, without copying and pasting the entire command or creating a user-written wrapper function as you would in base.  This should increase reproducibility by decreasing copy-and-paste errors.  I tend to have many copy-paste errors, so I want to limit them as much as possible.</p>
+
+<h2>ggplot reduces number of commands I have to do</h2>
+
+<p>One example plot I make frequently is a scatterplot with a smoother to estimate the shape of bivariate data.  </p>
+
+<p>In base, I usually have to run at least 3 commands to do this, e.g. <code>loess</code>, <code>plot</code>, and <code>lines</code>.  In <code>ggplot2</code>, <code>geom_smooth()</code> takes care of this for you.   Moreover, it does the smoothing by each different aesthetics (aka smoothing per group), which is usually what I want do as well (and takes more than 3 lines in base, usually a <code>for</code> loop or <code>apply</code> statement). </p>
+
+[sourcecode language="r"]g2 + geom_smooth()
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/xqtbTOm.png" alt="plot of chunk smooth"/> 
+By default in <code>geom_smooth</code>, it includes the standard error of the estimated relationship, but I usually only look at the estimate for a rough sketch of the relationship.  Moreover, if the data are correlated (such as in longitudinal data), the standard errors given by default methods are usually are not accurate anyway.  </p>
+
+[sourcecode language="r"]g2 + geom_smooth(se = FALSE)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/TmVWIdW.png" alt="plot of chunk smooth_no_se"/> </p>
+
+<p>Therefore, on top of the lack of copying and pasting, you can reduce the number of lines of code.  Some say &ldquo;but I can make a function that does that&rdquo; &ndash; yes you can.  Or you can use the commands already there in <code>ggplot2</code>. </p>
+
+<h3>Faceting</h3>
+
+<p>The other reason I frequently use <code>ggplot2</code> is for faceting.  You can do the same graph, conditioned on levels of a variable, which I frequently used.  Many times you want to do a graph, subset by another variable, such as treatment/control, male/female, cancer/control, etc.  </p>
+
+[sourcecode language="r"]g + facet_wrap(~ group1)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/AUQ1lzh.png" alt="plot of chunk facet_group"/> </p>
+
+[sourcecode language="r"]g + facet_wrap(~ group2)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/fKeXlxY.png" alt="plot of chunk facet_group"/> </p>
+
+[sourcecode language="r"]g + facet_wrap(group2 ~ group1)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/qy3m9jd.png" alt="plot of chunk facet_group"/> </p>
+
+[sourcecode language="r"]g + facet_wrap( ~ group2 + group1)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/TBCG199.png" alt="plot of chunk facet_group"/> </p>
+
+[sourcecode language="r"]g + facet_grid(group2 ~ group1)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/Z8IYw6e.png" alt="plot of chunk facet_group"/> </p>
+
+<h2>Spaghetti plot with Overall smoother</h2>
+
+<p>I also frequently have longitudinal data and make spaghetti plot for a per-person trajectory over time.<br/>
+For this example I took code from <a href="http://stats.stackexchange.com/questions/76999/simulating-longitudinal-lognormal-data-in-r">StackOverflow</a> to create some longitudinal data.</p>
+
+[sourcecode language="r"]library(MASS)
+library(nlme)
+
+### set number of individuals
+n &lt;- 200
+
+### average intercept and slope
+beta0 &lt;- 1.0
+beta1 &lt;- 6.0
+
+### true autocorrelation
+ar.val &lt;- .4
+
+### true error SD, intercept SD, slope SD, and intercept-slope cor
+sigma &lt;- 1.5
+tau0  &lt;- 2.5
+tau1  &lt;- 2.0
+tau01 &lt;- 0.3
+
+### maximum number of possible observations
+m &lt;- 10
+
+### simulate number of observations for each individual
+p &lt;- round(runif(n,4,m))
+
+### simulate observation moments (assume everybody has 1st obs)
+obs &lt;- unlist(sapply(p, function(x) c(1, sort(sample(2:m, x-1, replace=FALSE)))))
+
+### set up data frame
+dat &lt;- data.frame(id=rep(1:n, times=p), obs=obs)
+
+### simulate (correlated) random effects for intercepts and slopes
+mu  &lt;- c(0,0)
+S   &lt;- matrix(c(1, tau01, tau01, 1), nrow=2)
+tau &lt;- c(tau0, tau1)
+S   &lt;- diag(tau) %*% S %*% diag(tau)
+U   &lt;- mvrnorm(n, mu=mu, Sigma=S)
+
+### simulate AR(1) errors and then the actual outcomes
+dat$eij &lt;- unlist(sapply(p, function(x) arima.sim(model=list(ar=ar.val), n=x) * sqrt(1-ar.val^2) * sigma))
+dat$yij &lt;- (beta0 + rep(U[,1], times=p)) + (beta1 + rep(U[,2], times=p)) * log(dat$obs) + dat$eij
+[/sourcecode]
+
+<p>I will first add an alpha level to the plotting lines for the next plot (remember this must be done before the original plot is created).  <code>tspag</code> will be the template plot, and I will create a spaghetti plot (<code>spag</code>) where each colour represents an <code>id</code>:</p>
+
+[sourcecode language="r"]library(plyr)
+dat = ddply(dat, .(id), function(x){
+  x$alpha = ifelse(runif(n = 1) &gt; 0.9, 1, 0.1)
+  x$grouper = factor(rbinom(n=1, size =3 ,prob=0.5), levels=0:3)
+  x
+})
+tspag = ggplot(dat, aes(x=obs, y=yij)) + 
+  geom_line() + guides(colour=FALSE) + xlab(&quot;Observation Time Point&quot;) +
+  ylab(&quot;Y&quot;)
+spag = tspag + aes(colour = factor(id))
+spag
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/PmbrY8W.png" alt="plot of chunk spag"/> </p>
+
+<p>Many other times I want to group by <code>id</code> but plot just a few lines (let&#39;s say 10% of them) dark and the other light, and not colour them:</p>
+
+[sourcecode language="r"]bwspag = tspag + aes(alpha=alpha, group=factor(id)) + guides(alpha=FALSE)
+bwspag
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/Zvnbmjy.png" alt="plot of chunk unnamed-chunk-1"/> </p>
+
+<p>Overall, these 2 plots are useful when you have longitudinal data and don&#39;t want to loop over ids or use <code>lattice</code>.  The great addition is that all the faceting and such above can be used in conjunction with these plots to get spaghetti plots by subgroup.</p>
+
+[sourcecode language="r"]spag + facet_wrap(~ grouper)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/DYwdOZS.png" alt="plot of chunk spag_facet"/> </p>
+
+<h3>Spaghetti plot with overall smoother</h3>
+
+<p>If you want a smoother for the overall group in addition to the spaghetti plot, you can just add <code>geom_smooth</code>:</p>
+
+[sourcecode language="r"]sspag = spag + geom_smooth(se=FALSE, colour=&quot;black&quot;, size=2)
+sspag
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/A71yBxs.png" alt="plot of chunk spag_smooth"/> </p>
+
+[sourcecode language="r"]sspag + facet_wrap(~ grouper)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/D2A9ITX.png" alt="plot of chunk spag_smooth"/> </p>
+
+[sourcecode language="r"]bwspag + facet_wrap(~ grouper)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/GFZDA9Y.png" alt="plot of chunk spag_smooth"/> </p>
+
+<p>Note that the <code>group</code> aesthetic and <code>colour</code> aesthetic do not perform the same way for some operations.  For example, let&#39;s try to smooth <code>bwswag</code>:</p>
+
+[sourcecode language="r"]bwspag + facet_wrap(~ grouper) + geom_smooth(se=FALSE, colour=&quot;red&quot;)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/rHwOcHv.png" alt="plot of chunk spag_smooth_bad"/> </p>
+
+<p>We see that it smooths each id, which is not what we want.  We can achieve the desired result by setting the <code>group</code> aesthetic:</p>
+
+[sourcecode language="r"]bwspag + facet_wrap(~ grouper) + 
+  geom_smooth(aes(group=1), se=FALSE, colour=&quot;red&quot;, size =2)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/tJ9hpUy.png" alt="plot of chunk spag_smooth_corr"/> </p>
+
+<p>I hope that this demonstrates some of the simple yet powerful commands <code>ggplot2</code> allows users to execute.  I agree that some behavior may not seem straightforward at first glance, but becomes more understandable as one uses <code>ggplot2</code> more.  </p>
+
+<h2>Another Case this is Useful - Save Plot Twice</h2>
+
+<p>Another (non-plotting) example I want to show is how saving <code>ggplot2</code> objects can make saving duplicate plots much easier.  In many cases for making plots to show to others, I open up a PDF device using <code>pdf</code>, make a series of plots, and then close the PDF. There may be 1-2 plots that are the real punchline, and I want to make a high-res PNG of them separately.  Let me be clear, I want both &ndash; the PDF and PNG.  For example:</p>
+
+[sourcecode language="r"]pdf(tempfile())
+print({g1 = g + aes(colour = group1)})
+print({g1fac = g + aes(colour = factor(group1))})
+print({g2 = g + aes(colour = group2)})
+dev.off()
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/97whCOw.png" alt="plot of chunk pdf_and_pngs"/> </p>
+
+[sourcecode language="r"]png(tempfile(), res = 300, height =7, width= 7, units = &quot;in&quot;)
+print(g2)
+dev.off()
+[/sourcecode]
+
+<p>I am printing the objects, while assigning them.  (I have to use the <code>{</code> brackets because I use <code>=</code> for assignment and <code>print</code> would evaluate that as arguments without <code>{}</code>).  As <code>g2</code> is already saved as an object, I can close the PDF, open a <code>png</code> and then print that again.</p>
+
+<p>No copying and pasting was needed for remaking the plot, nor some weird turning off and on devices.  </p>
+
+<h2>Conclusion</h2>
+
+<p>I (and think you should) use <code>ggplot2</code> for a lot of reasons, especially the grammar and philosophy.  The plots I have used here are some powerful representations of data that are simple to execute.  I believe using this system reflects and helps the true iterative process of making figures.  The syntax may not seem intuitive to a long-time <code>R</code> user, but I believe the startup cost is worth the effort.  Let me know if you&#39;d like to see any other plots that you commonly use. </p>
+

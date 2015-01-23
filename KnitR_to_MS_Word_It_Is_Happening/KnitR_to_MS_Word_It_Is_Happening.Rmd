@@ -7,6 +7,7 @@ output:
     - stroke.csl
     - --bibliography
     - test.bib
+    fig_caption: yes
   pdf_document: default
 ---
 
@@ -40,10 +41,13 @@ pander(lm.D9)
 
 And you can embed things coefficients like we always could using the `r ` syntax.  Like the coefficient for treatment was `r lm.D9$coefficients["groupTrt"]` and the CI was ....
 
+```{r makefigcap}
+figcap.cars = "This is my caption of things"
+```
 
 You can also embed plots, for example:
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, fig.cap = figcap.cars}
 plot(cars)
 ```
 

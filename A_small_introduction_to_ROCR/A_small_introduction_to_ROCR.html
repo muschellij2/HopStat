@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>Prediction objects</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<p>I&#39;ve been doing some classification with logistic regression in brain imaging recently.  I have been using the <a href="http://cran.r-project.org/web/packages/ROCR/index.html">ROCR</a> package, which is helpful at estimating performance measures and plotting these measures over a range of cutoffs.</p>
+
+<p>The <code>prediction</code> and <code>performance</code> functions are the workhorses of most of the analyses in ROCR I&#39;ve been doing.   For those who haven&#39;t used <code>ROCR</code> before, the format of the <code>prediction</code> function is:</p>
+
+<pre><code>prediction(predictions, labels, label.ordering = NULL)
+</code></pre>
+
+<p>where <code>predictions</code> are some predicted measure (usually continuous) for the &ldquo;truth&rdquo;, which are the <code>labels</code>.  In many applications, <code>predictions</code> are estimated probabilities (or log odds) and the <code>labels</code> are  binary values.   Both arguments can take a vector, matrix, or data.frame for prediction, but <code>dim(predictions)</code> must equal <code>dim(labels)</code>.  </p>
+
+<p>In this post, I&#39;ll go through creating <code>prediction</code> and <code>performance</code> objects and extracting the results.</p>
+
+<h2>Prediction objects</h2>
+
+<h3>Simple example: one set of prediction and labels</h3>
+
+<p>Let&#39;s show a simple example from the <code>prediction</code> help file, that uses a prediction and label vector (i.e. not a matrix).  We see the data is some continuous prediction and binary label:</p>
+
+<pre><code class="r">library(ROCR)
+data(ROCR.simple)
+head(cbind(ROCR.simple$predictions, ROCR.simple$labels), 5)
+</code></pre>
+
+<pre><code>          [,1] [,2]
+[1,] 0.6125478    1
+[2,] 0.3642710    1
+[3,] 0.4321361    0
+[4,] 0.1402911    0
+[5,] 0.3848959    0
+</code></pre>
+
+<p>Now, let&#39;s makde the prediction object and show its contents:</p>
+
+<pre><code class="r">pred &lt;- prediction(ROCR.simple$predictions,ROCR.simple$labels)
+class(pred)
+</code></pre>
+
+<pre><code>[1] &quot;prediction&quot;
+attr(,&quot;package&quot;)
+[1] &quot;ROCR&quot;
+</code></pre>
+
+<pre><code class="r">slotNames(pred)
+</code></pre>
+
+<pre><code> [1] &quot;predictions&quot; &quot;labels&quot;      &quot;cutoffs&quot;     &quot;fp&quot;          &quot;tp&quot;         
+ [6] &quot;tn&quot;          &quot;fn&quot;          &quot;n.pos&quot;       &quot;n.neg&quot;       &quot;n.pos.pred&quot; 
+[11] &quot;n.neg.pred&quot; 
+</code></pre>
+
+<p>We see the the returned result of <code>prediction</code> is an object of class <code>prediction</code>, which an S4 object with a series of slots.  Let&#39;s look at the length of each slot and the class:</p>
+
+<pre><code class="r">sn = slotNames(pred)
+sapply(sn, function(x) length(slot(pred, x)))
+</code></pre>
+
+<pre><code>predictions      labels     cutoffs          fp          tp          tn 
+          1           1           1           1           1           1 
+         fn       n.pos       n.neg  n.pos.pred  n.neg.pred 
+          1           1           1           1           1 
+</code></pre>
+
+<pre><code class="r">sapply(sn, function(x) class(slot(pred, x)))
+</code></pre>
+
+<pre><code>predictions      labels     cutoffs          fp          tp          tn 
+     &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot; 
+         fn       n.pos       n.neg  n.pos.pred  n.neg.pred 
+     &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot; 
+</code></pre>
+
+<p>We see that each slot has length 1 and is a list. </p>
+
+<h3>Example: multiple sets of prediction and labels</h3>
+
+<p>Let&#39;s use the <code>ROCR.hiv</code> dataset to show how this works if more than one set of predictions and labels are supplied.  Here we pass a list of \(10\) predictions and a list of labels to the <code>prediction</code> function:</p>
+
+<pre><code class="r">data(ROCR.hiv)
+manypred = prediction(ROCR.hiv$hiv.nn$predictions, ROCR.hiv$hiv.nn$labels)
+sapply(sn, function(x) length(slot(manypred, x)))
+</code></pre>
+
+<pre><code>predictions      labels     cutoffs          fp          tp          tn 
+         10          10          10          10          10          10 
+         fn       n.pos       n.neg  n.pos.pred  n.neg.pred 
+         10          10          10          10          10 
+</code></pre>
+
+<pre><code class="r">sapply(sn, function(x) class(slot(manypred, x)))
+</code></pre>
+
+<pre><code>predictions      labels     cutoffs          fp          tp          tn 
+     &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot; 
+         fn       n.pos       n.neg  n.pos.pred  n.neg.pred 
+     &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot; 
+</code></pre>
+
+<p>We see that all the slots are still lists, but now they have length \(10\), corresponding to the \(10\) predictions/labels.   We would get the same result if the 2 arguments were matrices, but that would require all predictions and labels to have the same length.  Using a list of predictions/labels is a bit more flexible.  </p>
+
+<h2>Performance objects</h2>
+
+<p>From the help file of <code>performance</code>, the syntax for this function is:</p>
+
+<pre><code>performance(prediction.obj, measure, x.measure=&quot;cutoff&quot;, ...)
+</code></pre>
+
+<p>We see that the first argument is a <code>prediction</code> object, and the second is a <code>measure</code>.  If you run <code>?performance</code>, you can see all the performance measures implemented.  </p>
+
+<p>We will do example of some commonly estimated measures: receiver operating characteristic (ROC) curves, accuracy, area under the curve (AUC), and partial AUC (pAUC).</p>
+
+<h3>ROC Curve</h3>
+
+<h3>Simple example: one set of prediction and labels</h3>
+
+<p>We will do an <a href="http://en.wikipedia.org/wiki/Receiver_operating_characteristic">ROC curve</a>, which plots the false positive rate (FPR) on the x-axis and the true positive rate (TPR) on the y-axis:</p>
+
+<pre><code class="r">roc.perf = performance(pred, measure = &quot;tpr&quot;, x.measure = &quot;fpr&quot;)
+plot(roc.perf)
+abline(a=0, b= 1)
+</code></pre>
+
+<p><img src="http://i.imgur.com/Kjjvy2T.png" alt="plot of chunk roc_pred"/> </p>
+
+<p>At every cutoff, the TPR and FPR are calculated and plotted.  The smoother the graph, the more cutoffs the predictions have.  We also plotted a 45-degree line, which represents, on average, the performance of a Uniform(0, 1) random variable.  The further away from the diagonal line, the better.  Overall, we see that we see gains in sensitivity (true positive rate, \(> 80%\)), trading off a false positive rate (1- specificity), up until about 15% FPR.  After an FPR of 15%, we don&#39;t see significant gains in TPR for a tradeoff of increased FPR.  </p>
+
+<h3>Example: multiple sets of prediction and labels</h3>
+
+<p>The same can be done if you have many predictions and labels:</p>
+
+<pre><code class="r">many.roc.perf = performance(manypred, measure = &quot;tpr&quot;, x.measure = &quot;fpr&quot;)
+plot(many.roc.perf, col=1:10)
+abline(a=0, b= 1)
+</code></pre>
+
+<p><img src="http://i.imgur.com/ZuE7yxE.png" alt="plot of chunk roc_preds"/> </p>
+
+<p>Essentially, the <code>plot</code> function on a <code>performance</code> object with multiple predictions and labels will loop over the lists and plot the ROC for each one.</p>
+
+<p>Overall, we see the performance of each prediction is similar.  The pROC package, described in the conclusion, can test the performance between ROC curves.</p>
+
+<p><strong><em>Advanced:</em></strong> If you want to see how performance objects are plotted, use <code>getMethod(&quot;plot&quot;, signature = c(x=&quot;performance&quot;,y=&quot;missing&quot;))</code> and <code>ROCR:::.plot.performance</code>.</p>
+
+<h3>Limiting to a FPR: partial ROC curve</h3>
+
+<p>You may only want to accept a false positive rate of a certain level, let&#39;s say 10%.  The function <code>pROC</code> below will only keep values less than or equal to the FPR you set.</p>
+
+<pre><code class="r">pROC = function(pred, fpr.stop){
+    perf &lt;- performance(pred,&quot;tpr&quot;,&quot;fpr&quot;)
+    for (iperf in seq_along(perf@x.values)){
+        ind = which(perf@x.values[[iperf]] &lt;= fpr.stop)
+        perf@y.values[[iperf]] = perf@y.values[[iperf]][ind]
+        perf@x.values[[iperf]] = perf@x.values[[iperf]][ind]
+    }
+    return(perf)
+}
+</code></pre>
+
+<p>Let&#39;s use this on the simple cases and plot the partial ROC curve:</p>
+
+<pre><code class="r">proc.perf = pROC(pred, fpr.stop=0.1)
+plot(proc.perf)
+abline(a=0, b= 1)
+</code></pre>
+
+<p><img src="http://i.imgur.com/Ncr34Yj.png" alt="plot of chunk pROC"/> </p>
+
+<p>Thus, if we can only accept a FPR of 10%, the model is only giving 50% sensitivity (TPR) at 10% FPR (1-specificity).</p>
+
+<h3>Getting an &ldquo;optimal&rdquo; cut point</h3>
+
+<p>In some applications of ROC curves, you want the point closest to the TPR of \(1\) and FPR of \(0\).  This cut point is &ldquo;optimal&rdquo; in the sense it weighs both sensitivity and specificity equally.  To deterimine this cutoff, you can use the code below.  The code takes in BOTH the <code>performance</code> object and <code>prediction</code> object and gives the optimal cutoff value of your predictions:</p>
+
+<pre><code class="r">opt.cut = function(perf, pred){
+    cut.ind = mapply(FUN=function(x, y, p){
+        d = (x - 0)^2 + (y-1)^2
+        ind = which(d == min(d))
+        c(sensitivity = y[[ind]], specificity = 1-x[[ind]], 
+            cutoff = p[[ind]])
+    }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+print(opt.cut(roc.perf, pred))
+</code></pre>
+
+<pre><code>                 [,1]
+sensitivity 0.8494624
+specificity 0.8504673
+cutoff      0.5014893
+</code></pre>
+
+<p>Now, there is a <code>cost</code> measure in the ROCR package that you can use to create a <code>performance</code> object.  If you use it to find the minimum cost, then it will give you the same cutoff as <code>opt.cut</code>, but not give you the sensitivity and specificity. </p>
+
+<pre><code class="r">cost.perf = performance(pred, &quot;cost&quot;)
+pred@cutoffs[[1]][which.min(cost.perf@y.values[[1]])]
+</code></pre>
+
+<pre><code>[1] 0.5014893
+</code></pre>
+
+<h3>Different costs for FP and FN</h3>
+
+<p>The output from <code>opt.cut</code> and a <code>performance</code> object with measure <code>cost</code> are NOT equivalent if false positives and false negatives are not weighted equally.  The <code>cost.fn</code> and <code>cost.fp</code> arguments can be passed to <code>performance</code>, corresponding to the cost of a false negative and false positive, respectively.  Let&#39;s say false positives are twice as costly as false negatives, and let&#39;s get a cut point:</p>
+
+<pre><code class="r">cost.perf = performance(pred, &quot;cost&quot;, cost.fp = 2, cost.fn = 1)
+pred@cutoffs[[1]][which.min(cost.perf@y.values[[1]])]
+</code></pre>
+
+<pre><code>[1] 0.5294022
+</code></pre>
+
+<p>Thus, we have a different &ldquo;optimal&rdquo; cut point with this changed cost function.  In many real-life applications of biomarkers, the cost of a false positive and false negative are not the same.  For example, missing someone with a disease based on a test may cost a hospital $1,000,000 in lawsuits, but treating someone who did not have the disease may cost $100,000 in treatments.  In that case, the cost of a false negative is 10 times that of a false positive, strictly in monetary measures.  No cost analysis is this simple and is usually based on many factors, but most analyses do not have equal cost for a false positive versus a false negative.</p>
+
+<h2>Accuracy</h2>
+
+<h3>Simple example: one set of prediction and labels</h3>
+
+<p>Another cost measure that is popular is overall accuracy.  This measure optimizes the correct results, but may be skewed if there are many more negatives than positives, or vice versa.   Let&#39;s get the overall accuracy for the simple predictions and plot it:</p>
+
+<pre><code class="r">acc.perf = performance(pred, measure = &quot;acc&quot;)
+plot(acc.perf)
+</code></pre>
+
+<p><img src="http://i.imgur.com/qtrQOQm.png" alt="plot of chunk accc_pred"/> </p>
+
+<p>What if we actually want to extract the maximum accuracy and the cutoff corresponding to that?  In the <code>performance</code> object, we have the slot <code>x.values</code>, which corresponds to the <code>cutoff</code> in this case, and <code>y.values</code>, which corresponds to the accuracy of each cutoff.  We&#39;ll grab the index for maximum accuracy and then grab the corresponding cutoff:</p>
+
+<pre><code class="r">ind = which.max( slot(acc.perf, &quot;y.values&quot;)[[1]] )
+acc = slot(acc.perf, &quot;y.values&quot;)[[1]][ind]
+cutoff = slot(acc.perf, &quot;x.values&quot;)[[1]][ind]
+print(c(accuracy= acc, cutoff = cutoff))
+</code></pre>
+
+<pre><code> accuracy    cutoff 
+0.8500000 0.5014893 
+</code></pre>
+
+<p>Hooray! Then you can go forth and threshold your model using the <code>cutoff</code> for (in hopes) maximum accuracy in your test data.</p>
+
+<h3>Example: multiple sets of prediction and labels</h3>
+
+<p>Again, we will do the same with many predictions and labels, but must loop over the results:</p>
+
+<pre><code class="r">many.acc.perf = performance(manypred, measure = &quot;acc&quot;)
+
+mapply(function(x, y){
+  ind = which.max( y )
+  acc = y[ind]
+  cutoff = x[ind]
+  return(c(accuracy= acc, cutoff = cutoff))
+}, slot(many.acc.perf, &quot;x.values&quot;), slot(many.acc.perf, &quot;y.values&quot;))
+</code></pre>
+
+<pre><code>               [,1]         [,2]      [,3]       [,4]      [,5]       [,6]
+accuracy 0.86376812  0.881159420 0.8666667  0.8724638 0.8724638  0.8753623
+cutoff   0.02461465 -0.006091327 0.2303707 -0.1758013 0.1251976 -0.2153779
+               [,7]      [,8]      [,9]      [,10]
+accuracy  0.8753623 0.8724638 0.8637681 0.86376812
+cutoff   -0.2066697 0.1506282 0.2880392 0.06536471
+</code></pre>
+
+<h2>Area under the curve (AUC) and partial AUC (pAUC)</h2>
+
+<h3>Simple example: one set of prediction and labels</h3>
+
+<p>Let&#39;s get the area under the curve for the simple predictions:</p>
+
+<pre><code class="r">auc.perf = performance(pred, measure = &quot;auc&quot;)
+auc.perf@y.values
+</code></pre>
+
+<pre><code>[[1]]
+[1] 0.8341875
+</code></pre>
+
+<p>As you can see, the result is a scalar number, the area under the curve (AUC).  This number ranges from \(0\) to \(1\) with \(1\) indicating 100% specificity and 100% sensitivity.  </p>
+
+<p>As before, if you only want to accept a fixed FPR, we can calculate a partial AUC, using the <code>fpr.stop</code> argument:</p>
+
+<pre><code class="r">pauc.perf = performance(pred, measure = &quot;auc&quot;, fpr.stop=0.1)
+pauc.perf@y.values
+</code></pre>
+
+<pre><code>[[1]]
+[1] 0.02780625
+</code></pre>
+
+<p>Now, we see the pAUC to be much lower.  It is of note that this value can range from \(0\) to whatever <code>fpr.stop</code> is.  In order to standardize it to \(1\), you can divide it by <code>fpr.stop</code> to give a \([0, 1]\) measure:</p>
+
+<pre><code class="r">pauc.perf@y.values = lapply(pauc.perf@y.values, function(x) x / 0.1)
+pauc.perf@y.values
+</code></pre>
+
+<pre><code>[[1]]
+[1] 0.2780625
+</code></pre>
+
+<p>There is no &ldquo;one&rdquo; cutoff for this, as it measures the performance over all cutoffs.  Also, plotting functions for scalar outcome measures (such as AUC) do not work for <code>performance</code> objects. The code for the multiple predictions is the same.</p>
+
+<h2>Conclusion</h2>
+
+<p>For ROC analysis the ROCR package has good methods.  Other packages, such as the <a href="http://cran.r-project.org/web/packages/pROC/index.html">pROC</a> package, can be useful for many functions, especially testing the difference between ROC and pROC curves.  In some ways, you may want to use these packages admissibly over ROCR, especially because (when I checked Dec 18, 2014) the ROCR package was <a href="http://cran.r-project.org/src/contrib/Orphaned/README">orphaned</a>.  But if you are working in ROCR, I hope this give you some examples of how to fit the objects and extract the results.  </p>
+
+</body>
+
+</html>

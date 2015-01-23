@@ -1,0 +1,287 @@
+---
+title: ""
+author: "John Muschelli"
+date: "December 18, 2014"
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+In my [last post](http://hopstat.wordpress.com/2014/10/30/my-commonly-done-ggplot2-graphs/) I described some of my commonly done `ggplot2` graphs.  It seems as though some people are interested in these, so I was going to follow this up with other plots I make frequently.
+
+## Scatterplot colored by continuous variable
+
+The setup of the data for the scatterplots will be the same as the previous post, one `x` variable and one `y` variable.  
+
+```{r data_gen, echo=TRUE}
+library(ggplot2)
+set.seed(20141106)
+data = data.frame(x = rnorm(1000, mean=6), 
+                  batch = factor(rbinom(1000, size=4, prob = 0.5)))
+data$group1 = 1-rbeta(1000, 10, 2)
+mat = model.matrix(~ batch, data=data)
+mat = mat[, !colnames(mat) %in% "(Intercept)"]
+betas = rbinom(ncol(mat), size=20, prob = 0.5)
+data$quality = rowSums(t(t(mat) * sample(-2:2)))
+data$dec.quality = cut(data$quality, 
+                       breaks = unique(quantile(data$quality, 
+                                         probs = seq(0, 1, by=0.1))),
+                       include.lowest = TRUE)
+
+batch.effect = t(t(mat) * betas)
+batch.effect = rowSums(batch.effect)
+data$y = data$x * 5 + rnorm(1000) + batch.effect  + 
+  data$quality * rnorm(1000, sd = 2)
+
+data$group2 = runif(1000)
+```
+
+I have added 2 important new variables, `quality` and `batch`.  The motivation for these variables is akin to an RNAseq analysis set where you have a quality measure like read depth, and where the data were processed in different batches.  The `y` variable is based both on the batch effect and the quality.  
+
+We construct the `ggplot2` object for plotting `x` against `y` as follows:
+
+```{r g_create}
+g = ggplot(data, aes(x = x, y=y)) + geom_point()
+print(g)
+```
+
+## Coloring by a 3rd Variable (Discrete)
+Let's plot the `x` and `y` data by the different batches:
+
+```{r gbatch}
+print({ g + aes(colour=batch)})
+```
+
+We can see from this example how to color by another third discrete variable.  In this example, we see that the relationship is different by each batch (each are shifted).  
+
+## Coloring by a 3rd Variable (Continuous)
+
+Let's color by `quality`, which is continuous:
+
+```{r quality}
+print({ gcol = g + aes(colour=quality)})
+```
+
+The default option is to use black as a low value and blue to be a high value.  I don't always want this option, as I cannot always see differences clearly.  Let's change the gradient of low to high values using `scale_colour_gradient`:
+
+```{r qual_col}
+print({ gcol + scale_colour_gradient(low = "red", high="blue") })
+```
+
+This isn't much better.   Let's call the middle `quality` gray and see if we can see better separation:
+
+```{r qual_col_mid}
+print({ gcol_grad = gcol + 
+          scale_colour_gradient2(low = "red", mid = "gray", high="blue") })
+```
+
+## Scatterplot with Coloring by a 3rd Variable (Continuous broken into Discrete)
+Another option is to break the `quality` into deciles (before plotting) and then coloring by these as a discrete variable:
+
+```{r decqual}
+print({ gcol_dec = g + aes(colour=dec.quality) })
+```
+
+## Scatterplot with Coloring by 3rd Continuous Variable Faceted by a 4th Discrete Variable
+We can combine these to show each `batch` in different facets and coloring by `quality`:
+
+```{r decqual_batch}
+print({ gcol_grad + facet_wrap(~ batch )})
+```
+
+We can compound all these operations by passing transformations to `scale_colour_gradient` such as `scale_colour_gradient(trans = "sqrt")`.  But enough with scatterplots. 
+
+
+## Distributions! Lots of them.
+One of the gaping holes in my [last post](http://hopstat.wordpress.com/2014/10/30/my-commonly-done-ggplot2-graphs/) was that I did not do any plots of distributions/densities of data.  I ran the same code from the last post to get the longitudinal data set named `dat`.
+
+
+```{r sim_long, echo=FALSE}
+library(MASS)
+library(nlme)
+
+set.seed(20141211)
+### set number of individuals
+n <- 200
+
+### average intercept and slope
+beta0 <- 1.0
+beta1 <- 6.0
+
+### true autocorrelation
+ar.val <- .4
+
+### true error SD, intercept SD, slope SD, and intercept-slope cor
+sigma <- 1.5
+tau0  <- 2.5
+tau1  <- 2.0
+tau01 <- 0.3
+
+### maximum number of possible observations
+m <- 10
+
+### simulate number of observations for each individual
+p <- round(runif(n,4,m))
+
+### simulate observation moments (assume everybody has 1st obs)
+obs <- unlist(sapply(p, function(x) c(1, sort(sample(2:m, x-1, replace=FALSE)))))
+
+### set up data frame
+dat <- data.frame(id=rep(1:n, times=p), obs=obs)
+
+### simulate (correlated) random effects for intercepts and slopes
+mu  <- c(0,0)
+S   <- matrix(c(1, tau01, tau01, 1), nrow=2)
+tau <- c(tau0, tau1)
+S   <- diag(tau) %*% S %*% diag(tau)
+U   <- mvrnorm(n, mu=mu, Sigma=S)
+
+### simulate AR(1) errors and then the actual outcomes
+dat$eij <- unlist(sapply(p, function(x) arima.sim(model=list(ar=ar.val), n=x) * sqrt(1-ar.val^2) * sigma))
+dat$yij <- (beta0 + rep(U[,1], times=p)) + (beta1 + rep(U[,2], times=p)) * log(dat$obs) + dat$eij
+dat$group = NA
+dat$group[dat$id %in% 1:66] = 0
+dat$group[dat$id %in% 67:133] = 1
+dat$group[dat$id %in% 134:200] = 2
+dat$group = factor(dat$group)
+```
+
+## Histograms
+Let's say I want a distribution of my `yij` variable for each person across times:
+
+```{r}
+library(plyr)
+g = ggplot(data=dat, aes(x=yij, fill=factor(id))) +   guides(fill=FALSE)
+ghist = g+ geom_histogram(binwidth = 3) 
+print(ghist)
+```
+
+Hmm, that's not too informative.  By default, the histograms stack on top of each other.  We can change this by setting `position` to be `identity`:
+
+```{r ghist_ident}
+ghist = g+ geom_histogram(binwidth = 3, position ="identity") 
+print(ghist)
+```
+
+There are still too many histograms.  Let's plot a subset.
+
+### Aside: Using the %+% operator
+The `%+%` operator allows you to reset what dataset is in the `ggplot2` object.  The data must have the same components (e.g. variable names); I think this is most useful for plotting subsets of data.
+
+```{r npick}
+nobs = 10
+npick = 5
+```
+
+Let's plot the density of $`r npick`$ people people with $`r nobs`$ or more observations both using `geom_density` and `geom_line(stat = "density")`.  We will also change the binwidth:
+
+```{r sub}
+tab = table(dat$id)
+ids = names(tab)[tab >= nobs]
+ids = sample(ids, npick)
+sub = dat[ dat$id %in% ids, ]
+ghist = g+ geom_histogram(binwidth = 5, position ="identity") 
+ghist %+% sub
+```
+
+### Overlaid Histograms with Alpha Blending
+Let's alpha blend these histograms to see the differences:
+
+```{r}
+ggroup = ggplot(data=sub, aes(x=yij, fill=factor(id))) + guides(fill=FALSE)
+grouphist = ggroup+ geom_histogram(binwidth = 5, position ="identity", alpha = 0.33) 
+grouphist
+```
+
+Similarly, we can plot over the `r length(unique(dat$group))` groups in our data:
+
+```{r}
+ggroup = ggplot(data=dat, aes(x=yij, fill=factor(group))) + guides(fill=FALSE)
+grouphist = ggroup+ geom_histogram(binwidth = 5, position ="identity", alpha = 0.33) 
+grouphist
+```
+
+These histograms are something I commonly do when I want overlay the data in some way.  More commonly though, espeically with MANY distributions, I plot densities.
+
+## Densities
+We can again plot the distribution of $y_{ij}$ for each person by using kernel density estimates, filled a different color for each person:
+
+```{r gdens}
+g = ggplot(data=dat, aes(x=yij, fill=factor(id))) +   guides(fill=FALSE)
+print({gdens = g+ geom_density() })
+```
+
+As the filling overlaps a lot and blocks out other densities, we can use just different colors per person/id/group:
+
+```{r colourdens}
+g = ggplot(data=dat, aes(x=yij, colour=factor(id))) +   guides(colour=FALSE)
+print({gdens = g+ geom_density() })
+```
+
+I'm not a fan that the default for `stat_density` is that the `geom = "area"`.  This creates a line on the x-axis that closes the object.  This is very important if you want to fill the density with different colors.  Most times though, I want simply the line of the density with no bottom line.  We can achieve this with:
+
+```{r gdens2}
+print({gdens2 = g+ geom_line(stat = "density")})
+```
+
+
+What if we set the option to `fill` the lines now?  Well lines don't take fill, so it will not colour each line differently.
+
+```{r gdens3}
+gdens3 = ggplot(data=dat, aes(x=yij, fill=factor(id))) + geom_line(stat = "density") +  guides(colour=FALSE)
+print({gdens3})
+```
+
+Now, regardless of the coloring, you can't really see the difference in people since there are so many.  What if we want to do the plot with a subset of the data and the object is already constructed?  Again, use the `%+%` operator.  
+
+
+### Overlaid Densities with Alpha Blending
+Let's take just different subsets of groups, not people, and plot the densities, with alpha blending:
+
+```{r group_dens}
+print({ group_dens = ggroup+ geom_density(alpha = 0.3) })
+```
+
+That looks much better than the histogram example for groups.  Now let's show these with lines:
+
+```{r group_dens2}
+print({group_dens2 = ggroup+ geom_line(stat = "density")})
+```
+
+What happened?  Again, lines don't take `fill`, they take `colour`:
+
+```{r group_dens3}
+print({group_dens2 = ggroup+ geom_line(aes(colour=group), stat = "density")})
+```
+
+I'm a firm believer of legends begin IN plots, so let's push that in there and make it blend in:
+
+```{r group_dens_legend}
+print({
+  group_dens3 =
+  group_dens2 +  theme(legend.position = c(.75, .75),
+        legend.background = element_rect(fill="transparent"),
+        legend.key = element_rect(fill="transparent", 
+                                  color="transparent"))
+})
+```
+
+Lastly, I'll create a dataset of the means of the datasets and put vertical lines for the mean:
+
+```{r group_mean}
+gmeans = ddply(dat, .(group), summarise,
+              mean = mean(yij))
+group_dens3 + geom_vline(data=gmeans, 
+                         aes(colour = group, xintercept = mean))
+```
+
+## Conclusion
+Overall, this post should give you a few ways to play around with densities and such for plotting.  All the same changes as the previous examples with scatterplots, such as facetting, can be used with these distribution plots.  Many times, you want to look at the data in very different ways.  Histograms can allow you to see outliers in some ways that densities do not because they smooth over the data.  Either way, the mixture of alpha blending, coloring, and filling (though less useful for many distributions) can give you a nice description of what's going on a distributional level in your data.
+
+### PS: Boxplots
+You can also do boxplots for each group, but these tend to separate well and colour relatively well using defaults, so I wil not discuss them here.  My only note is that you can (and should) overlay points on the boxplot rather than just plot the histogram.  You may need to jitter the points, alpha blend them, subsample the number of points, or clean it up a bit, but I try to display more DATA whenever possible.
+
+

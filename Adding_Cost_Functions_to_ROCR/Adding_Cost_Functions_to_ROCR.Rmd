@@ -1,0 +1,353 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="")
+```
+
+In my [last post](https://hopstat.wordpress.com/2014/12/19/a-small-introduction-to-the-rocr-package/), I gave an introduction of the ROCR package and how to use it for ROC analysis.
+
+
+In the [ROCR reference manual](http://cran.r-project.org/web/packages/ROCR/ROCR.pdf), it states "new performance measures can be added using a standard interface", but I have not found that to be so.  I may have missed some crucial step, but others have tried to adapt new performance measures.  [One example I came across](https://gist.github.com/hammady/9046168) had "patched" the performance code to use a new performance measure `wss` (Work Saved over Sampling).  I liked some parts of what they did, but wanted to add my own measure and allow for a user to pass a new measure into a function without having to re-copy all the code.
+
+## Dice
+I wanted to add an overlap measure known as the [Dice coefficient](http://en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient), aka Dice Similarity Index (DSI), or Sorensen-Dice Coefficient.  Let's define TP to be the number of true positives, TN to be true negatives, FP to be false positives, and FN to be false negatives, and RN/RP to be row negatives/positives and CN/CP be column negatives/positives.  Then our 2-by-2 table of predictions vs. true values is:
+
+```{r, echo=FALSE, results='asis'}
+library(xtable)
+mat = matrix(c("TN", "FN", "CN", 
+               "FP", "TP", "CP", 
+               "RN", "RP", "N"), ncol=3)
+
+colnames(mat) = rownames(mat)= c(0, 1, "Total")
+print(xtable(mat), type="html")
+```
+
+Let's say rows are predictions and columns are true values, but these are interchangeable.  
+
+The Dice coefficient is defined in terms of these values as:
+$$
+\frac{2 \times TP}{2\times TP + FP + FN} = \frac{2 \times TP}{RP + CP}
+$$
+
+In every `prediction` object, there are slots for `tp`, `tn`, `fp`, and `fn` (see `?"prediction-class"` for more).  Therefore, I can simply take these slots to make my Dice coefficient. Here's how I did it:
+
+```{r dice}
+dice <- function(prediction.obj){
+    if (class(prediction.obj) != "prediction") {
+        stop(paste("Wrong argument types: First argument must be of type", 
+            "'prediction'"))    
+    }
+    argnames <- c()
+    x.values <- list()
+    y.values <- list()
+    for (i in 1:length(prediction.obj@predictions)) {
+      fp = prediction.obj@fp[[i]] 
+        tp = prediction.obj@tp[[i]]
+        fn = prediction.obj@fn[[i]]
+        tn = prediction.obj@tn[[i]]
+		cutoffs = prediction.obj@cutoffs[[i]]
+		meas_dice = 2 * tp / (2*tp + fp + fn)
+		x.values <- c(x.values, list(cutoffs))
+        y.values <- c(y.values, list(meas_dice))
+    }
+    if (!(length(x.values) == 0 || length(x.values) == length(y.values))) {
+        stop("Consistency error.")
+    }
+    return(new("performance", x.name = "cutoff", 
+        y.name = "dice", 
+        alpha.name = "none", 
+        x.values = x.values, y.values = y.values, 
+        alpha.values = list())
+    )
+}
+```
+
+Essentially, I copied the `performance` function from `ROCR`, made some adjustments and put in my calculation (into the object `meas_dice`) in there.  That's great!  Now I have this handy function to use when I want.
+
+## A more general solution
+Although this solved my current problem, I thought more about how to add more cost functions in a more general way.  
+
+Here is my solution:
+
+```{r myperf}
+# copied from original function
+myperformance <- function (prediction.obj, measure, 
+    x.measure = "cutoff", ...)
+{
+    envir.list <- my.define.environments(...)
+    long.unit.names <- envir.list$long.unit.names
+    function.names <- envir.list$function.names
+    obligatory.x.axis <- envir.list$obligatory.x.axis
+    optional.arguments <- envir.list$optional.arguments
+    default.values <- envir.list$default.values
+    if (class(prediction.obj) != "prediction"){
+              stop(paste("Wrong argument types: First argument must be of type",
+            "'prediction'"))
+    }
+    if (!exists(measure,  where = long.unit.names, inherits = FALSE)){
+      stop(paste("Measure", measure, "not found"))
+    }
+    if (!exists(x.measure,  where = long.unit.names, inherits = FALSE)){
+      stop(paste("Measure", measure, "not found"))
+    }    
+    if (exists(x.measure, where = obligatory.x.axis, inherits = FALSE)) {
+        message <- paste("The performance measure", x.measure,
+            "can only be used as 'measure', because it has",
+            "the following obligatory 'x.measure':\n", get(x.measure,
+                envir = obligatory.x.axis))
+        stop(message)
+    }
+    if (exists(measure, where = obligatory.x.axis, inherits = FALSE)) {
+        x.measure <- get(measure, envir = obligatory.x.axis)
+    }
+    if (x.measure == "cutoff" || exists(measure, where = obligatory.x.axis,
+        inherits = FALSE)) {
+        optional.args <- list(...)
+        argnames <- c()
+        if (exists(measure, where = optional.arguments, inherits = FALSE)) {
+            argnames <- get(measure, envir = optional.arguments)
+            default.arglist <- list()
+            for (i in 1:length(argnames)) {
+                default.arglist <- c(default.arglist, get(paste(measure,
+                  ":", argnames[i], sep = ""), envir = default.values,
+                  inherits = FALSE))
+            }
+            names(default.arglist) <- argnames
+            for (i in 1:length(argnames)) {
+                templist <- list(optional.args, default.arglist[[i]])
+                names(templist) <- c("arglist", argnames[i])
+                optional.args <- do.call(".farg", templist)
+            }
+        }
+        optional.args <- .select.args(optional.args, argnames)
+        function.name <- get(measure, envir = function.names)
+        x.values <- list()
+        y.values <- list()
+        for (i in 1:length(prediction.obj@predictions)) {
+            argumentlist <- .sarg(optional.args, predictions = prediction.obj@predictions[[i]],
+                labels = prediction.obj@labels[[i]], cutoffs = prediction.obj@cutoffs[[i]],
+                fp = prediction.obj@fp[[i]], tp = prediction.obj@tp[[i]],
+                fn = prediction.obj@fn[[i]], tn = prediction.obj@tn[[i]],
+                n.pos = prediction.obj@n.pos[[i]], n.neg = prediction.obj@n.neg[[i]],
+                n.pos.pred = prediction.obj@n.pos.pred[[i]],
+                n.neg.pred = prediction.obj@n.neg.pred[[i]])
+            ans <- do.call(function.name, argumentlist)
+            if (!is.null(ans[[1]]))
+                x.values <- c(x.values, list(ans[[1]]))
+            y.values <- c(y.values, list(ans[[2]]))
+        }
+        if (!(length(x.values) == 0 || length(x.values) == length(y.values))) {
+            stop("Consistency error.")
+        }
+        return(new("performance", x.name = get(x.measure, envir = long.unit.names),
+            y.name = get(measure, envir = long.unit.names), alpha.name = "none",
+            x.values = x.values, y.values = y.values, alpha.values = list()))
+    }
+    else {
+        perf.obj.1 <- myperformance(prediction.obj, measure = x.measure,
+            ...)
+        perf.obj.2 <- myperformance(prediction.obj, measure = measure,
+            ...)
+        return(.combine.performance.objects(perf.obj.1, perf.obj.2))
+    }
+}
+```
+
+
+### What is all this code?
+First off, `myperformance` is **exactly** the code from the `performance` function in `ROCR`, except the first line is:
+
+```{r, eval=FALSE}
+envir.list <- my.define.environments(...)
+```
+
+instead of this line from `ROCR::performance`
+
+```{r, eval=FALSE}
+envir.list <- .define.environments()
+```
+
+Note that `my.define.environments` takes arguments, whereas `.define.environments` does not.  This is a crucial difference; this is where you put your measure's code.
+
+#### New Environments
+If you look at the code for `.define.environments`:
+
+```{r}
+library(ROCR)
+head(.define.environments)
+```
+
+we see the code `new.env()` being executed.  In the beginning of the function, it defines the `long.unit.names` environment as well as other environments.  So every time `ROCR::performance` is called, it creates a **new** environment with the names of the measures and functions ROCR uses.  This is important since we cannot assign new names and objects to an existing, fixed environment or namespace like we could in other scenarios.  Hence why I created `my.define.environments`:
+
+
+```{r}
+my.define.environments <- function(funnames = NULL, # name of measure
+    longnames = NULL, # name of actual thing
+    exprs = NULL, # list of 2 character vectors to be expressed
+    optargs, # list
+    default.vals,
+    xaxis
+    )
+{
+  # get original environments
+  envir.list <- ROCR::.define.environments()
+  long.unit.names = envir.list$long.unit.names
+  function.names = envir.list$function.names   
+  obligatory.x.axis = envir.list$obligatory.x.axis
+  optional.arguments = envir.list$optional.arguments         
+  default.values = envir.list$default.values
+
+    .performance.dice <- function (predictions, labels, cutoffs, fp, 
+        tp, fn, tn, n.pos, 
+        n.neg, n.pos.pred, n.neg.pred) {
+        list(cutoffs, 2 * tp / (2*tp + fp + fn))
+         
+    }  
+
+    assign("dice", .performance.dice, 
+        envir=function.names)
+
+    assign("dice", "Sorensen-Dice coefficient", 
+        envir=long.unit.names)    
+
+    #######################################
+    # Allow for general adding
+    #######################################
+    if (!is.null(funnames)){
+        stopifnot(
+            length(funnames) == length(longnames) &&
+            length(funnames) == length(exprs)
+            )
+        if (!missing(optargs)){
+          stopifnot(length(optargs) == length(funnames))
+        }
+        if (!missing(optargs)){
+          stopifnot(length(default.vals) == length(funnames))
+        } 
+        if (!missing(xaxis)){
+          stopifnot(length(xaxis) == length(funnames))
+        }       
+        
+        for (iname in seq_along(funnames)){  
+          ie1 = exprs[[iname]][[1]]
+          ie2 = exprs[[iname]][[2]]
+          funcname = paste0("func <- function (predictions, labels, 
+                            cutoffs, fp, 
+                            tp, fn, tn, n.pos, 
+                            n.neg, n.pos.pred, n.neg.pred) {
+            list(", ie1, ", ", ie2, ") }")
+          eval(parse(text=funcname))
+
+
+            assign(funnames[iname], func, 
+                envir=function.names)
+            assign(funnames[iname], longnames[iname],
+                envir=long.unit.names)
+            
+            #############
+            # optional arguments
+            #############
+            if (!missing(optargs)){
+              oargs = optargs[[iname]]
+              for (ioarg in seq_along(oargs)){
+                assign(oargs[[ioarg]][[1]], oargs[[ioarg]][[2]],
+                  envir=optional.arguments)
+              }
+            }
+
+            #############
+            # Default values
+            #############
+            if (!missing(default.vals)){
+              oargs = default.vals[[iname]]
+              for (ioarg in seq_along(oargs)){
+                assign(oargs[[ioarg]][[1]], oargs[[ioarg]][[2]],
+                  envir=default.values)
+              }
+            }
+
+            if (!missing(default.vals)){
+              oargs = default.vals[[iname]]
+              for (ioarg in seq_along(oargs)){
+                assign(oargs[[ioarg]][[1]], oargs[[ioarg]][[2]],
+                  envir=obligatory.x.axis)
+              }
+            }            
+
+
+        }
+    } # is is.null
+
+  list(
+    long.unit.names = long.unit.names,
+    function.names = function.names,
+    obligatory.x.axis = obligatory.x.axis,
+    optional.arguments = optional.arguments,
+    default.values = default.values
+  )
+}
+```
+
+We see that `my.define.environments` creates **new** environments too though!  Yes, `my.define.environments` essentially does the same thing,  but I can add my `dice` functiont inside `my.define.environments` and this measure can then be used in future work in other projects by using the same code.  Moreover, the fact that arguments can be passed into `my.define.environments` allows you to create a measure on-the-fly.   
+
+Below is an example of how you can use custom measures based on the code above.
+
+## Example
+Here I will plot the [Jaccard Index](http://en.wikipedia.org/wiki/Jaccard_index), which is not implemented in the `performance` function.  The Jaccard index formula is similar to dice and is represented as:
+
+$$
+\frac{TP}{TP + FP + FN} 
+$$
+
+We can implement this cost function by supplying our measure, which must match our function name in `funnames`, the human-readable name in `longnames` and a list of 2-element character vectors in `exprs`.  For scalar measures, the first element is `"cutoffs"` and the second element is the expression (to be evaluated by `R`) of the measure to be used.  
+
+
+```{r}
+data(ROCR.simple)
+pred <- prediction(ROCR.simple$predictions,ROCR.simple$labels)
+perf.jaccard = myperformance(pred, 
+                             measure = "jaccard", 
+              funnames = "jaccard", 
+              longnames="Jaccard Index", 
+              exprs = list(c("cutoffs", "tp / (tp + fp + fn)")))
+plot(perf.jaccard)
+```
+
+Viola! We now have a way to create any cost function (that can be formulated in the terms of the objects of a `prediction` object).  
+
+Here is the example with using Dice:
+
+```{r}
+perf.dice = myperformance(pred, measure = "dice")
+plot(perf.dice)
+````
+
+As we already added `.performance.dice` to `my.define.environments`, we can simply call it as a measure.
+
+
+### Passing in 2 new measures:
+The length of `funnames` must be the same as that of `longnames` and `exprs` (`exprs` must be a list).  You can pass in vectors of `funnames` and `longnames` and a list of `exprs` so that you define multiple measures.
+And we can pass in 2 new measures and get a `performance` object of them.  In these cases, you will likely only want to pass in a maximum of 2 measures as a performance object will only compute 2 outputs for the `x.values` and `y.values` slots.
+
+```{r}
+perf.both = myperformance(pred, x.measure = "dice", 
+                             measure = "jaccard", 
+                             funnames = c("dice", "jaccard"), 
+                            longnames=c("Dice Index", "Jaccard Index"), 
+              exprs = list(c("cutoffs", "2 * tp / (2*tp + fp + fn)"),
+                           c("cutoffs", "tp / (tp + fp + fn)")))
+
+plot(perf.both)
+```
+
+If you look closely, you'll see there is some odd plotting in the upper right tail of the function.  The functions may not be monotonic when you get them out of the performance object, so you may want to sort by the x measure first for plotting purposes:
+
+```{r}
+both = data.frame(cbind(x= perf.both@x.values[[1]], y = perf.both@y.values[[1]]))
+both = both[ order(both$x), ]
+colnames(both) = c(perf.both@x.name, perf.both@y.name)
+plot(both, type="l")
+```
+
+
+## Conclusion
+Overall, you can add new measures to the `performance` object in R using the code above.  It's a shame that the package is orphaned; I like using it for many ROC functions and measure computations.  Then again, I'm not volunteering to maintain it.  Although the package says new performance measures can be added using a standard interface", I could not find a way to do so.  Hopefully the code above allows you to implement a new measure if you ever choose to do so.  Have fun ROC'ing around the Christmas tree! Boom! - You just got punned.

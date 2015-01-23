@@ -14,12 +14,12 @@ diff elsarticle.cls elsarticle_nonatbib.cls
 ```
 
 If you've never read a `diff` output, the `<` means what's written in the first file (`elsarticle.cls`) and `>` means the second file (`elsarticle_nonatbib.cls`).  The numbers correspond to the line in each file, e.g `192c193` means line 192 in file 1 and 193 in file 2.  
-Overall, I changed the type of article, commented out the `natbib` requirement, and changed the `author` field to `auth` (see below for why).  
+Overall, I changed the type of article, commented out the `natbib` requirement, and changed the `author` field to `auth` (see below for why).  The edited `cls` is located [here](https://raw.githubusercontent.com/muschellij2/HopStat/gh-pages/BibLaTeX_with_elsarticle/elsarticle_nonatbib.cls).
 
 ## Things you need to change
 The `\author` field conflicts with biblatex and elsarticle, so you must chagne the `\author` definitions to `\auth` instead.  This is a minor change, but important one.  You can change that field to anything you want in the `elsarticle_nonatbib.cls` file (such as `elsauthor`).  
 
-### Minimal Working Example
+### Minimal Working Example (MWE)
 
 I tried it with Elsevier's [sample manuscript](http://www.elsevier.com/__data/assets/file/0019/166141/elsarticle-template.zip), changing the `author` fields to `auth`, and adding a biblatex-type heading:
 ```
@@ -40,8 +40,8 @@ and
 ```
 \printbibliography
 ```
-at the end, and the manuscript came out as if using `natbib`.  
+at the end, and the manuscript came out as if using `natbib`.  The MWE is located [here](https://raw.githubusercontent.com/muschellij2/HopStat/gh-pages/BibLaTeX_with_elsarticle/elsarticle-template/elsarticle-template.tex) and output PDF is located [here](https://github.com/muschellij2/HopStat/raw/gh-pages/BibLaTeX_with_elsarticle/elsarticle-template/elsarticle-template.pdf).
 
 ## Conclusion
-You can use `elsarticle` with `biblatex`, with some minor changes.  You may have to include this `cls` with the rest of your LaTeX files for them to compile on the editors machine.
+You can use `elsarticle` with `biblatex`, with some minor changes.  You may have to include this `cls` with the rest of your LaTeX files for them to compile on the editors machine.  Maybe Elsevier will change the LaTeX for more flexibility, but the StackOverflow question was asked 3 years ago and not much seems to have changed, so I like my solution.
 

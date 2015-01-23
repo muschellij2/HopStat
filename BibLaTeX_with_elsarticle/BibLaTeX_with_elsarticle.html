@@ -86,13 +86,13 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 &lt; \RequirePackage[\@biboptions]{natbib}
 ---
 &gt; %\RequirePackage[\@biboptions]{natbib}</code></pre>
-<p>If you’ve never read a <code>diff</code> output, the <code>&lt;</code> means what’s written in the first file (<code>elsarticle.cls</code>) and <code>&gt;</code> means the second file (<code>elsarticle_nonatbib.cls</code>).<br />I changed the type of article, commented out the <code>natbib</code> requirement, and changed the <code>author</code> field to <code>auth</code> (see below for why).</p>
+<p>If you’ve never read a <code>diff</code> output, the <code>&lt;</code> means what’s written in the first file (<code>elsarticle.cls</code>) and <code>&gt;</code> means the second file (<code>elsarticle_nonatbib.cls</code>). The numbers correspond to the line in each file, e.g <code>192c193</code> means line 192 in file 1 and 193 in file 2.<br />Overall, I changed the type of article, commented out the <code>natbib</code> requirement, and changed the <code>author</code> field to <code>auth</code> (see below for why). The edited <code>cls</code> is located <a href="https://raw.githubusercontent.com/muschellij2/HopStat/gh-pages/BibLaTeX_with_elsarticle/elsarticle_nonatbib.cls">here</a>.</p>
 </div>
 <div id="things-you-need-to-change" class="section level2">
 <h2>Things you need to change</h2>
 <p>The <code>\author</code> field conflicts with biblatex and elsarticle, so you must chagne the <code>\author</code> definitions to <code>\auth</code> instead. This is a minor change, but important one. You can change that field to anything you want in the <code>elsarticle_nonatbib.cls</code> file (such as <code>elsauthor</code>).</p>
-<div id="minimal-working-example" class="section level3">
-<h3>Minimal Working Example</h3>
+<div id="minimal-working-example-mwe" class="section level3">
+<h3>Minimal Working Example (MWE)</h3>
 <p>I tried it with Elsevier’s <a href="http://www.elsevier.com/__data/assets/file/0019/166141/elsarticle-template.zip">sample manuscript</a>, changing the <code>author</code> fields to <code>auth</code>, and adding a biblatex-type heading:</p>
 <pre><code>\usepackage[
   natbib = true,
@@ -108,8 +108,12 @@ if (window.hljs && document.readyState && document.readyState === "complete") {
 \bibliography{mybibfile}</code></pre>
 <p>and</p>
 <pre><code>\printbibliography</code></pre>
-<p>at the end, and the manuscript came out as if using <code>natbib</code>.</p>
+<p>at the end, and the manuscript came out as if using <code>natbib</code>. The MWE is located <a href="https://raw.githubusercontent.com/muschellij2/HopStat/gh-pages/BibLaTeX_with_elsarticle/elsarticle-template/elsarticle-template.tex">here</a> and output PDF is located <a href="https://github.com/muschellij2/HopStat/raw/gh-pages/BibLaTeX_with_elsarticle/elsarticle-template/elsarticle-template.pdf">here</a>.</p>
 </div>
+</div>
+<div id="conclusion" class="section level2">
+<h2>Conclusion</h2>
+<p>You can use <code>elsarticle</code> with <code>biblatex</code>, with some minor changes. You may have to include this <code>cls</code> with the rest of your LaTeX files for them to compile on the editors machine. Maybe Elsevier will change the LaTeX for more flexibility, but the StackOverflow question was asked 3 years ago and not much seems to have changed, so I like my solution.</p>
 </div>
 
 

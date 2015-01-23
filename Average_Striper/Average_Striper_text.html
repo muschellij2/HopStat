@@ -1,0 +1,185 @@
+<p>Recently, my colleague and fellow blogger <a href="http://alyssafrazee.com">Alyssa Frazee</a> accepted a job at <a href="https://stripe.com">Stripe</a>.  All of us at <a href="http://www.jhsph.edu/departments/biostatistics/">JHU Biostat</a> are happy for her, yet sad to see her go.  </p>
+
+<p>While perusing Stripe's website, I found the <a href="https://stripe.com/about">About page</a>, where each employee has a photo of themselves.  I've been playing around with some PCA and decompositions, so I figured I'd play around with these photos and make some principal components/<a href="http://en.wikipedia.org/wiki/Eigenface">eigenfaces</a>.  (I think it's funny when people use the SVD/Eigenvalue decomposition in a new field and name the new thing the eigen-whatever.)</p>
+
+<h2>Extracting the HTML</h2>
+
+<p>In order to get the images, I had to scrape the about page for links.</p>
+
+<p>Let's note that stripe uses <code>https</code> and not <code>http</code> for their website (not surprisingly as they do secure payment systems).  </p>
+
+[sourcecode language="r"]library(RCurl)
+library('httr')
+library('XML')
+
+url.stub = 'https://stripe.com/'
+[/sourcecode]
+
+<p>As they use <code>https</code>, you cannot simply read the data into <code>R</code> using <code>readLines</code> or other functions.  For this, I used curl in the <code>RCurl</code> package.  I defined my certification, got the page, extracted the content as a character vector (imaginatively named <code>x</code>), then parsed the HTML using the <code>XML</code> pagckage.</p>
+
+[sourcecode language="r"]cafile <- system.file('CurlSSL', 'cacert.pem', package = 'RCurl')
+# Read page
+page <- GET(
+  url.stub, 
+  path='about', 
+  config(cainfo = cafile)
+)
+
+x <- content(page, as='text')
+
+#########################
+# Parse HTML
+#########################
+doc <- htmlTreeParse(x, asText=TRUE, useInternal=TRUE)
+[/sourcecode]
+
+<h3>Extracting Image Links</h3>
+
+<p>Now that I have parsed the HTML document, I can use <a href="http://www.w3schools.com/xpath/"><code>XPath</code></a>.  If you look at the source of the HTML, there is a <code>div</code> with the <code>id</code> of <code>about</code>, which contains all the links. The <code>xpathSApply</code> function takes the document, the XPath query, which says I want to go to that <code>div</code>, grab all <code>img</code> tags and then get the <code>src</code>.  </p>
+
+[sourcecode language="r"]#########################
+# Get face URLs
+#########################
+stub = '//div[@id = 'about']'
+urls = xpathSApply(doc, 
+  path=paste0(stub, '//img'), 
+    xmlGetAttr, 'src')
+[/sourcecode]
+
+<p>I then created an output directory <code>imgdir</code> where I'll store the images (stored as pngs).   Below is just some checking to see if I have already downloaded (in case I had to re-run the code) and only downloads images I don't already have. </p>
+
+[sourcecode language="r"]img.urls = paste0(url.stub, urls)
+out.imgs = file.path(imgdir, basename(img.urls))
+
+stopifnot(!any(duplicated(img.urls)))
+have = file.exists(out.imgs)
+img.urls = img.urls[!have]
+out.imgs = out.imgs[!have]
+###########
+# Download images
+##########
+for (iimg in seq_along(img.urls)){
+    download.file(url=img.urls[iimg], destfile = out.imgs[iimg], 
+        method='curl')
+}
+[/sourcecode]
+
+<p>Again, since Stripe uses <code>https</code>, we cannot just use <code>download.file</code> with the default method.  I again used <code>curl</code> to get the images.  I (manually) downloaded and cropped the image from <a href="http://www.biostat.jhsph.edu/people/student/frazee.shtml">Alyssa's biostat page</a> to add her to the Stripe set.</p>
+
+<h2>Analyze the Images</h2>
+
+<p>I now take all the images, read them in using <code>readPNG</code>.  <code>readPNG</code> returns an array, and the first 3 dimensions are the <a href="http://en.wikipedia.org/wiki/RGB_color_model">RGB</a> if the image is color; they are not 3D arrays if the images are grayscale, but none in this set are.  The 4th dimension is the alpha level if there is opacity, but this information is discarded in the <code>readPNG(img.f)[, , 1:3]</code> statement.</p>
+
+[sourcecode language="r"]library(png)
+library(pixmap)
+library(matrixStats)
+imgs = list.files(imgdir, pattern='.png$', full.names = TRUE)
+n_imgs = length(imgs)
+
+img.list = vector(mode= 'list', length = n_imgs)
+iimg = 2
+for ( iimg in seq(n_imgs)){
+  img.f = imgs[iimg]
+    img.list[[iimg]] = readPNG(img.f)[, , 1:3]
+}
+[/sourcecode]
+
+<h3>Same Image Size</h3>
+
+<p>To make things easier, I only kept images that were 200 pixels by 200 pixels, so each image was the same size.  If you had images of different sizes, you may want to do interpolation to get the same size and resolution.</p>
+
+[sourcecode language="r"]dims = lapply(img.list, dim)
+
+################################
+# Don't feel like interpolating - only keeping 200x200x3
+################################
+dimg = c(200, 200, 3)
+
+keep = sapply(dims, function(x) all(x == dimg))
+img.list = img.list[keep]
+imgs = imgs[keep]
+dims = dims[keep]
+[/sourcecode]
+
+<p>We then make a matrix of 12000 by N (N = 167), where the rows are the concatenated values from the red, green, and blue values.  </p>
+
+[sourcecode language="r"]################################
+# Making Matrix: P x N
+################################
+mat = t(sapply(img.list, c))
+cmeans = colMeans(mat)
+sds = colSds(mat)
+[/sourcecode]
+
+<h2>Mean Image</h2>
+
+<p>A small function <code>makeimg</code> takes in a vector/matrix, creates an array of $latex 200\times200\times3$ and plots the image using <code>pixmapRGB</code> from the <code>pixmap</code> package.  Here we plot the &ldquo;Average Striper&rdquo;.  </p>
+
+[sourcecode language="r"]makeimg = function(x, trunc = FALSE, ...){
+  x = array(x, dim = dimg)
+  if (trunc){
+    x[x < 0] = 0
+        x[x &gt; 1] = 1
+    }
+    plot(pixmapRGB(x), ...)
+}
+makeimg(cmeans, main = 'Average Striper')
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/igRvogB.png" alt="plot of chunk unnamed-chunk-9"/> </p>
+
+<h2>PCA</h2>
+
+<p>Although this is what's in common for Stripe pictures, let's do a quick <a href="http://en.wikipedia.org/wiki/Principal_component_analysis">PCA</a> (or equivalently <a href="http://en.wikipedia.org/wiki/Singular_value_decomposition">SVD</a>) to get the principal components after centering and scaling our data to see what's different:</p>
+
+[sourcecode language="r"]# #############
+# # Centering and scaling matrix
+# #############
+X = t(t(mat) - cmeans)
+X = t(t(X) / sds)
+pca = prcomp(X, center=FALSE)
+[/sourcecode]
+
+<p>We can get the percent variance explained from standardized eigenvalues (proportional to the squared deviances), or just use <code>screeplot</code>:</p>
+
+[sourcecode language="r"]devs = pca$sdev^2 / sum(pca$sdev^2)
+plot(1-devs, main='Percent Variance Explained', type='l')
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/AvTy5wH.png" alt="plot of chunk unnamed-chunk-11"/> </p>
+
+[sourcecode language="r"]screeplot(pca)
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/qJkjZQg.png" alt="plot of chunk unnamed-chunk-11"/> </p>
+
+<h3>Plot the PCs</h3>
+
+<p>Although we would need about 3 components to recover a large percent of the variance of the data.  For illustration, we plot the mean image and the first 9 principal components (PCs).  </p>
+
+[sourcecode language="r"]V <- pca$rotation #sample PCs from PCA
+################################
+# Plotting Mean Image and PCs
+################################
+
+par(mfrow=c(2, 5))
+par(oma = rep(2, 4), mar=c(0, 0, 3, 0))
+makeimg(cmeans, main = 'Average Striper')
+
+for (i in 1:9){
+    makeimg(V[,i],main = paste0('PC ', i))  #PCs from sample data
+}
+[/sourcecode]
+
+<p><img src="http://i.imgur.com/Udro3rE.png" alt="plot of chunk unnamed-chunk-12"/> </p>
+
+<h2>Conclusion</h2>
+
+<p>This post was more about congratulating Alyssa with some analysis, but I still want to discuss the results.</p>
+
+<p>We can see some pattern in the data from the PCs, but you need many PCs to explain a larger percent of the variance in the data.  That is not surprising; this data is not standardized in the way people took the pictures, such as front-facing, with different backgrounds, and I'm using the color information rather than black and white.  </p>
+
+<p>We would likely also have more interpretable results if we registered images.  In neuroimaging, we register brains to each other and average them to make a template image.  We could do that in this analysis and should do so if this was a real project and not a post.  </p>
+
+<p>Moreover, we are doing a PCA on non-negative values bounded between 0 and 1.  I think this is one of the most interesting aspects of the data.  In many analyses using PCA we actually always have positive values. For example people's food choices is one example where non-negative matrix factorization is used; you can't eat negative calories&hellip;if only. I think this is something to look into for people who are doing PCA on strictly positive values. Although you demean and scale the data and make values negative, you can re-construct data from this components and their scores to get non-interpretable values such as those outside [0, 1].  I'm looking into the <a href="http://cran.r-project.org/web/packages/nsprcomp/index.html"><code>nsprcomp</code> package</a> for non-negative PCA for future research work.  </p>
+

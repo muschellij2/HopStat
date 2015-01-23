@@ -1,0 +1,18 @@
+\documentclass{article}
+\usepackage{float}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\usepackage{onimage}
+\usepackage[active, tightpage]{preview}
+\PreviewEnvironment{tabular}
+\begin{document}
+% Define block styles
+\begin{tabular}{cc}
+\begin{tikzonimage}[trim=2.75cm 2cm 2cm 2cm, clip=TRUE]{Toy_Study1.pdf}
+%    \draw [orange, line width=1pt] (0.5,0.25) rectangle (1, 0.3);
+\end{tikzonimage} & 
+\begin{tikzonimage}[trim=4.8cm 2cm 4cm 2cm, clip=TRUE]{Toy_Study2.pdf}
+%    \draw [green, line width=1pt] (0.4,0.25) rectangle (0.7, 0.3);
+\end{tikzonimage}
+\end{tabular}
+\end{document}
