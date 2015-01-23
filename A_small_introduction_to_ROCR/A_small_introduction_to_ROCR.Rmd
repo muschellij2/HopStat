@@ -1,0 +1,252 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="")
+```
+
+I've been doing some classification with logistic regression in brain imaging recently.  I have been using the [ROCR](http://cran.r-project.org/web/packages/ROCR/index.html) package, which is helpful at estimating performance measures and plotting these measures over a range of cutoffs.
+
+The `prediction` and `performance` functions are the workhorses of most of the analyses in ROCR I've been doing.   For those who haven't used `ROCR` before, the format of the `prediction` function is:
+
+```
+prediction(predictions, labels, label.ordering = NULL)
+```
+
+where `predictions` are some predicted measure (usually continuous) for the "truth", which are the `labels`.  In many applications, `predictions` are estimated probabilities (or log odds) and the `labels` are  binary values.   Both arguments can take a vector, matrix, or data.frame for prediction, but `dim(predictions)` must equal `dim(labels)`.  
+
+In this post, I'll go through creating `prediction` and `performance` objects and extracting the results.
+
+
+## Prediction objects
+### Simple example: one set of prediction and labels
+
+Let's show a simple example from the `prediction` help file, that uses a prediction and label vector (i.e. not a matrix).  We see the data is some continuous prediction and binary label:
+
+```{r pred}
+library(ROCR)
+data(ROCR.simple)
+head(cbind(ROCR.simple$predictions, ROCR.simple$labels), 5)
+```
+
+Now, let's makde the prediction object and show its contents:
+
+```{r, pred2}
+pred <- prediction(ROCR.simple$predictions,ROCR.simple$labels)
+class(pred)
+slotNames(pred)
+```
+
+We see the the returned result of `prediction` is an object of class `prediction`, which an S4 object with a series of slots.  Let's look at the length of each slot and the class:
+
+```{r slotlength}
+sn = slotNames(pred)
+sapply(sn, function(x) length(slot(pred, x)))
+sapply(sn, function(x) class(slot(pred, x)))
+```
+
+We see that each slot has length 1 and is a list. 
+
+### Example: multiple sets of prediction and labels
+```{r, echo=FALSE, results='hide'}
+data(ROCR.hiv)
+L = length(ROCR.hiv$hiv.nn$predictions)
+```
+Let's use the `ROCR.hiv` dataset to show how this works if more than one set of predictions and labels are supplied.  Here we pass a list of $`r L`$ predictions and a list of labels to the `prediction` function:
+
+```{r}
+data(ROCR.hiv)
+manypred = prediction(ROCR.hiv$hiv.nn$predictions, ROCR.hiv$hiv.nn$labels)
+sapply(sn, function(x) length(slot(manypred, x)))
+sapply(sn, function(x) class(slot(manypred, x)))
+```
+
+We see that all the slots are still lists, but now they have length $`r L`$, corresponding to the $`r L`$ predictions/labels.   We would get the same result if the 2 arguments were matrices, but that would require all predictions and labels to have the same length.  Using a list of predictions/labels is a bit more flexible.  
+
+## Performance objects 
+
+
+From the help file of `performance`, the syntax for this function is:
+
+```
+performance(prediction.obj, measure, x.measure="cutoff", ...)
+```
+
+We see that the first argument is a `prediction` object, and the second is a `measure`.  If you run `?performance`, you can see all the performance measures implemented.  
+
+We will do example of some commonly estimated measures: receiver operating characteristic (ROC) curves, accuracy, area under the curve (AUC), and partial AUC (pAUC).
+
+### ROC Curve
+### Simple example: one set of prediction and labels
+
+We will do an [ROC curve](http://en.wikipedia.org/wiki/Receiver_operating_characteristic), which plots the false positive rate (FPR) on the x-axis and the true positive rate (TPR) on the y-axis:
+
+```{r roc_pred}
+roc.perf = performance(pred, measure = "tpr", x.measure = "fpr")
+plot(roc.perf)
+abline(a=0, b= 1)
+```
+
+At every cutoff, the TPR and FPR are calculated and plotted.  The smoother the graph, the more cutoffs the predictions have.  We also plotted a 45-degree line, which represents, on average, the performance of a Uniform(0, 1) random variable.  The further away from the diagonal line, the better.  Overall, we see that we see gains in sensitivity (true positive rate, $> 80%$), trading off a false positive rate (1- specificity), up until about 15% FPR.  After an FPR of 15%, we don't see significant gains in TPR for a tradeoff of increased FPR.  
+
+### Example: multiple sets of prediction and labels
+
+The same can be done if you have many predictions and labels:
+
+```{r roc_preds}
+many.roc.perf = performance(manypred, measure = "tpr", x.measure = "fpr")
+plot(many.roc.perf, col=1:10)
+abline(a=0, b= 1)
+```
+
+Essentially, the `plot` function on a `performance` object with multiple predictions and labels will loop over the lists and plot the ROC for each one.
+
+Overall, we see the performance of each prediction is similar.  The pROC package, described in the conclusion, can test the performance between ROC curves.
+
+***Advanced:*** If you want to see how performance objects are plotted, use `getMethod("plot", signature = c(x="performance",y="missing"))` and `ROCR:::.plot.performance`.
+
+
+### Limiting to a FPR: partial ROC curve
+You may only want to accept a false positive rate of a certain level, let's say 10%.  The function `pROC` below will only keep values less than or equal to the FPR you set.
+
+```{r limit_pauc}
+pROC = function(pred, fpr.stop){
+    perf <- performance(pred,"tpr","fpr")
+    for (iperf in seq_along(perf@x.values)){
+        ind = which(perf@x.values[[iperf]] <= fpr.stop)
+        perf@y.values[[iperf]] = perf@y.values[[iperf]][ind]
+        perf@x.values[[iperf]] = perf@x.values[[iperf]][ind]
+    }
+    return(perf)
+}
+```
+
+Let's use this on the simple cases and plot the partial ROC curve:
+
+```{r pROC}
+proc.perf = pROC(pred, fpr.stop=0.1)
+plot(proc.perf)
+abline(a=0, b= 1)
+```
+
+Thus, if we can only accept a FPR of 10%, the model is only giving 50% sensitivity (TPR) at 10% FPR (1-specificity).
+
+
+### Getting an "optimal" cut point
+In some applications of ROC curves, you want the point closest to the TPR of $1$ and FPR of $0$.  This cut point is "optimal" in the sense it weighs both sensitivity and specificity equally.  To deterimine this cutoff, you can use the code below.  The code takes in BOTH the `performance` object and `prediction` object and gives the optimal cutoff value of your predictions:
+
+```{r optcut}
+opt.cut = function(perf, pred){
+    cut.ind = mapply(FUN=function(x, y, p){
+        d = (x - 0)^2 + (y-1)^2
+        ind = which(d == min(d))
+        c(sensitivity = y[[ind]], specificity = 1-x[[ind]], 
+            cutoff = p[[ind]])
+    }, perf@x.values, perf@y.values, pred@cutoffs)
+}
+print(opt.cut(roc.perf, pred))
+```
+
+Now, there is a `cost` measure in the ROCR package that you can use to create a `performance` object.  If you use it to find the minimum cost, then it will give you the same cutoff as `opt.cut`, but not give you the sensitivity and specificity. 
+
+```{r cost}
+cost.perf = performance(pred, "cost")
+pred@cutoffs[[1]][which.min(cost.perf@y.values[[1]])]
+```
+
+### Different costs for FP and FN
+The output from `opt.cut` and a `performance` object with measure `cost` are NOT equivalent if false positives and false negatives are not weighted equally.  The `cost.fn` and `cost.fp` arguments can be passed to `performance`, corresponding to the cost of a false negative and false positive, respectively.  Let's say false positives are twice as costly as false negatives, and let's get a cut point:
+
+```{r cost_2}
+cost.perf = performance(pred, "cost", cost.fp = 2, cost.fn = 1)
+pred@cutoffs[[1]][which.min(cost.perf@y.values[[1]])]
+```
+
+Thus, we have a different "optimal" cut point with this changed cost function.  In many real-life applications of biomarkers, the cost of a false positive and false negative are not the same.  For example, missing someone with a disease based on a test may cost a hospital $1,000,000 in lawsuits, but treating someone who did not have the disease may cost $100,000 in treatments.  In that case, the cost of a false negative is 10 times that of a false positive, strictly in monetary measures.  No cost analysis is this simple and is usually based on many factors, but most analyses do not have equal cost for a false positive versus a false negative.
+
+The code is the same for the optimal cutoff for the multiple prediction data:
+```{r manycost}
+print(opt.cut(many.roc.perf, manypred))
+```
+
+## Accuracy
+### Simple example: one set of prediction and labels
+
+Another cost measure that is popular is overall accuracy.  This measure optimizes the correct results, but may be skewed if there are many more negatives than positives, or vice versa.   Let's get the overall accuracy for the simple predictions and plot it:
+
+```{r accc_pred}
+acc.perf = performance(pred, measure = "acc")
+plot(acc.perf)
+```
+
+What if we actually want to extract the maximum accuracy and the cutoff corresponding to that?  In the `performance` object, we have the slot `x.values`, which corresponds to the `cutoff` in this case, and `y.values`, which corresponds to the accuracy of each cutoff.  We'll grab the index for maximum accuracy and then grab the corresponding cutoff:
+
+```{r acc_pred_res}
+ind = which.max( slot(acc.perf, "y.values")[[1]] )
+acc = slot(acc.perf, "y.values")[[1]][ind]
+cutoff = slot(acc.perf, "x.values")[[1]][ind]
+print(c(accuracy= acc, cutoff = cutoff))
+```
+
+Hooray! Then you can go forth and threshold your model using the `cutoff` for (in hopes) maximum accuracy in your test data.
+
+### Example: multiple sets of prediction and labels
+
+Again, we will do the same with many predictions and labels, but must iterate over the results (using a `mapply` statement):
+
+```{r acc_preds}
+many.acc.perf = performance(manypred, measure = "acc")
+sapply(manypred@labels, function(x) mean(x == 1))
+
+mapply(function(x, y){
+  ind = which.max( y )
+  acc = y[ind]
+  cutoff = x[ind]
+  return(c(accuracy= acc, cutoff = cutoff))
+}, slot(many.acc.perf, "x.values"), slot(many.acc.perf, "y.values"))
+```
+
+We see that these cutoffs are not the same as those using the `opt.cut` from above.  This is due to the the fact that the proportion of positive cases is much less than 50%.  
+
+
+
+
+
+## Area under the curve (AUC) and partial AUC (pAUC)
+### Simple example: one set of prediction and labels
+
+The area under curve summarizes the ROC curve just by taking the area between the curve and the x-axis.   the Let's get the area under the curve for the simple predictions:
+
+```{r auc_pred}
+auc.perf = performance(pred, measure = "auc")
+auc.perf@y.values
+```
+
+As you can see, the result is a scalar number, the area under the curve (AUC).  This number ranges from $0$ to $1$ with $1$ indicating 100% specificity and 100% sensitivity.  
+
+
+As before, if you only want to accept a fixed FPR, we can calculate a partial AUC, using the `fpr.stop` argument:
+
+```{r pauc_pred}
+pauc.perf = performance(pred, measure = "auc", fpr.stop=0.1)
+pauc.perf@y.values
+```
+
+Now, we see the pAUC to be **much** lower.  It is of note that this value can range from $0$ to whatever `fpr.stop` is.  In order to standardize it to $1$, you can divide it by `fpr.stop` to give a $[0, 1]$ measure:
+
+```{r stand_pauc}
+pauc.perf@y.values = lapply(pauc.perf@y.values, function(x) x / 0.1)
+pauc.perf@y.values
+```
+
+Although this measure is more comparable to the full AUC measure, it is still low.   Note, there is no "one" cutoff for AUC or pAUC, as it measures the performance over all cutoffs.  Also, plotting functions for scalar outcome measures (such as AUC) do not work for `performance` objects. The code for the multiple predictions is the same.
+
+```{r pauc_manypred}
+manypauc.perf = performance(manypred, measure = "auc", fpr.stop=0.1)
+manypauc.perf@y.values = lapply(manypauc.perf@y.values, function(x) x / 0.1)
+manypauc.perf@y.values
+```
+
+Note, use `sapply` instead of `lapply` if you want the result to be a vector.
+
+## Conclusion
+
+For ROC analysis the ROCR package has good methods and many built in measures.  Other packages, such as the [pROC](http://cran.r-project.org/web/packages/pROC/index.html) package, can be useful for many functions and analyses, especially testing the difference between ROC and pROC curves.  In some ways, you may want to use `proc` admissibly over ROCR, especially because (when I checked Dec 18, 2014) the ROCR package was [orphaned](http://cran.r-project.org/src/contrib/Orphaned/README).  But if you are working in ROCR, I hope this give you some examples of how to fit the objects and extract the results.  

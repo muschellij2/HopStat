@@ -1,0 +1,218 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+opts_knit$set(error=TRUE)
+```
+
+In my [last post](http://hopstat.wordpress.com/2014/10/16/ggplot2-is-not-always-the_answer-its-not-supposed-to-be-7/), I discussed how `ggplot2` is not always the answer to the question "How should I plot this" and that base graphics were still very useful.
+
+# Why Do I use ggplot2 then?
+The overall question still remains: why (do I) use `ggplot2`?
+
+## ggplot2 vs lattice
+
+For one, `ggplot2` replaced the `lattice` package for many plot types for me.  The `lattice` package is a great system, but if you are plotting multivariate data, I believe you should choose `lattice` or `ggplot2`. I chose `ggplot2` for the syntax, added capabilities, and the philosophy behind it.  The fact [Hadley Wickham](http://had.co.nz/) is the developer never hurts either.  
+
+## Having multiple versions of the same plot, with slight changes
+Many times I want to do the same plot over and over, but vary one aspect of it, such as color of the points by a grouping variable, and then switch the color to another grouping variable.  Let me give a toy example, where we have an `x` and a `y` with two grouping variables: `group1` and `group2`. 
+
+```{r data_gen}
+library(ggplot2)
+set.seed(20141016)
+data = data.frame(x = rnorm(1000, mean=6))
+data$group1 = rbinom(n = 1000, size =1 , prob =0.5)
+data$y = data$x * 5 + rnorm(1000)
+data$group2 = runif(1000) > 0.2
+```
+
+We can construct the `ggplot2` object as follows:
+```{r g_create}
+g = ggplot(data, aes(x = x, y=y)) + geom_point()
+```
+
+The `ggplot` command takes the `data.frame` you want to use and use the `aes` to specify which aesthetics we want to specify, here we specify the `x` and `y`.  Some aesthetics are optional depending on the plot, some are not.  I think it's safe to say you always need an `x`.  I then "add" (using `+`) to this object a "layer": I want a geometric "thing", and that thing is a set of points, hence I use `geom_points`.  I'm doing a scatterplot.
+
+If you just call the object `g`, `print`  is called by default, which plots the object and we see our scatterplot.
+```{r print_g, cache=TRUE}
+g
+```
+
+I can color by a grouping variable and we can add that aesthetic:
+```{r color_group, cache=TRUE}
+g + aes(colour = group1)
+g + aes(colour = factor(group1))
+g + aes(colour = group2)
+```
+
+Note, `g` is the original plot, and I can add `aes` to this plot, which is the same as if I did `ggplot2(data, aes(...))` in the original call that generated `g`.  **NOTE** if the `aes` you are adding was not a column of the `data.frame` when you created the plot, you will get an error.  For example, let's add a new column to the data and then add it to `g`:
+
+```{r g2_create}
+data$newcol = rbinom(n = nrow(data), size=2, prob = 0.5)
+g + aes(colour=factor(newcol))
+```
+
+This fails because the way the `ggplot2` object was created.  If we had added this column to the data, created the plot, then added the `newcol` as an `aes`, the command would work fine.
+
+```{r g2_create2}
+g2 = ggplot(data, aes(x = x, y=y)) + geom_point()
+g2 + aes(colour=factor(newcol))
+```
+
+
+
+We see in the first plot with `colour = group1`, `ggplot2` sees a numeric variable `group1`, so tries a continuous mapping scheme for the color.  The default is to do a range of blue colors denoting intensity.   If we want to force it to a discrete mapping, we can turn it into a factor `colour = factor(group1)`.  We see the colors are very different and are not a continuum of blue, but colors that separate groups better.  
+The third plot illustrates that when `ggplot2` takes logical vectors for mappings, it factors them, and maps the group to a discrete color.  
+
+### Slight Changes with additions
+In practice, I do this iterative process many times and the addition of elements to a common template plot is very helpful for speed and reproducing the same plot with minor tweaks.  
+
+In addition to doing similar plots with slight grouping changes I also add different lines/fits on top of that.  In the previous example, we colored by points by different grouping variables.  In other examples, I tend to change little things, e.g. a different smoother, a different subset of points, constraining the values to a certain range, etc.  I believe in this way, `ggplot2` allows us to create plots in a more structured way, without copying and pasting the entire command or creating a user-written wrapper function as you would in base.  This should increase reproducibility by decreasing copy-and-paste errors.  I tend to have many copy-paste errors, so I want to limit them as much as possible.
+
+## ggplot reduces number of commands I have to do
+One example plot I make frequently is a scatterplot with a smoother to estimate the shape of bivariate data.  
+
+In base, I usually have to run at least 3 commands to do this, e.g. `loess`, `plot`, and `lines`.  In `ggplot2`, `geom_smooth()` takes care of this for you.   Moreover, it does the smoothing by each different aesthetics (aka smoothing per group), which is usually what I want do as well (and takes more than 3 lines in base, usually a `for` loop or `apply` statement). 
+
+```{r smooth}
+g2 + geom_smooth()
+```
+By default in `geom_smooth`, it includes the standard error of the estimated relationship, but I usually only look at the estimate for a rough sketch of the relationship.  Moreover, if the data are correlated (such as in longitudinal data), the standard errors given by default methods are usually are not accurate anyway.  
+
+```{r smooth_no_se}
+g2 + geom_smooth(se = FALSE)
+```
+
+Therefore, on top of the lack of copying and pasting, you can reduce the number of lines of code.  Some say "but I can make a function that does that" -- yes you can.  Or you can use the commands already there in `ggplot2`. 
+
+### Faceting
+The other reason I frequently use `ggplot2` is for faceting.  You can do the same graph, conditioned on levels of a variable, which I frequently used.  Many times you want to do a graph, subset by another variable, such as treatment/control, male/female, cancer/control, etc.  
+```{r facet_group, cache=TRUE}
+g + facet_wrap(~ group1)
+g + facet_wrap(~ group2)
+g + facet_wrap(group2 ~ group1)
+g + facet_wrap( ~ group2 + group1)
+g + facet_grid(group2 ~ group1)
+```
+
+
+## Spaghetti plot with Overall smoother
+I also frequently have longitudinal data and make spaghetti plot for a per-person trajectory over time.  
+For this example I took code from [StackOverflow](http://stats.stackexchange.com/questions/76999/simulating-longitudinal-lognormal-data-in-r) to create some longitudinal data.
+
+
+```{r sim_long}
+library(MASS)
+library(nlme)
+
+### set number of individuals
+n <- 200
+
+### average intercept and slope
+beta0 <- 1.0
+beta1 <- 6.0
+
+### true autocorrelation
+ar.val <- .4
+
+### true error SD, intercept SD, slope SD, and intercept-slope cor
+sigma <- 1.5
+tau0  <- 2.5
+tau1  <- 2.0
+tau01 <- 0.3
+
+### maximum number of possible observations
+m <- 10
+
+### simulate number of observations for each individual
+p <- round(runif(n,4,m))
+
+### simulate observation moments (assume everybody has 1st obs)
+obs <- unlist(sapply(p, function(x) c(1, sort(sample(2:m, x-1, replace=FALSE)))))
+
+### set up data frame
+dat <- data.frame(id=rep(1:n, times=p), obs=obs)
+
+### simulate (correlated) random effects for intercepts and slopes
+mu  <- c(0,0)
+S   <- matrix(c(1, tau01, tau01, 1), nrow=2)
+tau <- c(tau0, tau1)
+S   <- diag(tau) %*% S %*% diag(tau)
+U   <- mvrnorm(n, mu=mu, Sigma=S)
+
+### simulate AR(1) errors and then the actual outcomes
+dat$eij <- unlist(sapply(p, function(x) arima.sim(model=list(ar=ar.val), n=x) * sqrt(1-ar.val^2) * sigma))
+dat$yij <- (beta0 + rep(U[,1], times=p)) + (beta1 + rep(U[,2], times=p)) * log(dat$obs) + dat$eij
+```
+
+I will first add an alpha level to the plotting lines for the next plot (remember this must be done before the original plot is created).  `tspag` will be the template plot, and I will create a spaghetti plot (`spag`) where each colour represents an `id`:
+```{r spag, cache=TRUE}
+library(plyr)
+dat = ddply(dat, .(id), function(x){
+  x$alpha = ifelse(runif(n = 1) > 0.9, 1, 0.1)
+  x$grouper = factor(rbinom(n=1, size =3 ,prob=0.5), levels=0:3)
+  x
+})
+tspag = ggplot(dat, aes(x=obs, y=yij)) + 
+  geom_line() + guides(colour=FALSE) + xlab("Observation Time Point") +
+  ylab("Y")
+spag = tspag + aes(colour = factor(id))
+spag
+```
+
+Many other times I want to group by `id` but plot just a few lines (let's say 10% of them) dark and the other light, and not colour them:
+
+```{r, cache=TRUE}
+bwspag = tspag + aes(alpha=alpha, group=factor(id)) + guides(alpha=FALSE)
+bwspag
+```
+
+Overall, these 2 plots are useful when you have longitudinal data and don't want to loop over ids or use `lattice`.  The great addition is that all the faceting and such above can be used in conjunction with these plots to get spaghetti plots by subgroup.
+
+```{r spag_facet, cache=TRUE}
+spag + facet_wrap(~ grouper)
+```
+
+### Spaghetti plot with overall smoother
+If you want a smoother for the overall group in addition to the spaghetti plot, you can just add `geom_smooth`:
+```{r spag_smooth, cache=TRUE}
+sspag = spag + geom_smooth(se=FALSE, colour="black", size=2)
+sspag
+sspag + facet_wrap(~ grouper)
+bwspag + facet_wrap(~ grouper)
+```
+
+Note that the `group` aesthetic and `colour` aesthetic do not perform the same way for some operations.  For example, let's try to smooth `bwswag`:
+
+```{r spag_smooth_bad, cache=TRUE}
+bwspag + facet_wrap(~ grouper) + geom_smooth(se=FALSE, colour="red")
+```
+
+We see that it smooths each id, which is not what we want.  We can achieve the desired result by setting the `group` aesthetic:
+```{r spag_smooth_corr, cache=TRUE}
+bwspag + facet_wrap(~ grouper) + 
+  geom_smooth(aes(group=1), se=FALSE, colour="red", size =2)
+```
+
+I hope that this demonstrates some of the simple yet powerful commands `ggplot2` allows users to execute.  I agree that some behavior may not seem straightforward at first glance, but becomes more understandable as one uses `ggplot2` more.  
+
+## Another Case this is Useful - Save Plot Twice
+Another (non-plotting) example I want to show is how saving `ggplot2` objects can make saving duplicate plots much easier.  In many cases for making plots to show to others, I open up a PDF device using `pdf`, make a series of plots, and then close the PDF. There may be 1-2 plots that are the real punchline, and I want to make a high-res PNG of them separately.  Let me be clear, I want both -- the PDF and PNG.  For example:
+
+```{r pdf_and_pngs}
+pdf(tempfile())
+print({g1 = g + aes(colour = group1)})
+print({g1fac = g + aes(colour = factor(group1))})
+print({g2 = g + aes(colour = group2)})
+dev.off()
+png(tempfile(), res = 300, height =7, width= 7, units = "in")
+print(g2)
+dev.off()
+```
+
+I am printing the objects, while assigning them.  (I have to use the `{` brackets because I use `=` for assignment and `print` would evaluate that as arguments without `{}`).  As `g2` is already saved as an object, I can close the PDF, open a `png` and then print that again.
+
+No copying and pasting was needed for remaking the plot, nor some weird turning off and on devices.  
+
+
+## Conclusion
+I (and think you should) use `ggplot2` for a lot of reasons, especially the grammar and philosophy.  The plots I have used here are some powerful representations of data that are simple to execute.  I believe using this system reflects and helps the true iterative process of making figures.  The syntax may not seem intuitive to a long-time `R` user, but I believe the startup cost is worth the effort.  Let me know if you'd like to see any other plots that you commonly use. 
