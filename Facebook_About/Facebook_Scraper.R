@@ -69,6 +69,9 @@ library(wordcloud)
   corpus <- tm_map(corpus, content_transformer(tolower))
   corpus <- tm_map(corpus, function(x) removeWords(x, stopwords("english")))
 
+  addstopwords = c("use")
+  corpus <- tm_map(corpus, function(x) 
+    removeWords(x, addstopwords))
   
   tdm <- TermDocumentMatrix(corpus)
   m <- as.matrix(tdm)
@@ -79,10 +82,36 @@ library(wordcloud)
   pal <- pal[-(1:4)]
   
 
-	pngname = file.path(datadir, "Facebook_About.png")
-  png(pngname)
+  pngname = file.path(datadir, "Facebook_About.png")
+  png(pngname, height=7, width=7, units = 'in', res=600)
   wordcloud(words = d$word, freq = d$freq, 
             min.freq = 1, max.words = Inf,
             random.order = FALSE, colors = pal,
             vfont=c("sans serif","plain"))
   dev.off()
+
+  fb.names= rownames(abouts)
+  library(googleCite)
+  fb.names = sapply(fb.names, function(x){
+  	print(x)
+  	searchCite(x, gCite = FALSE)
+  })
+
+  drop = sapply(fb.names, function(x){
+  	any(x == "No Author found")
+  })
+
+  run.fb.names = fb.names[!drop]
+
+  sapply(run.fb.names, function(x){
+  	auth = x$names[[1]]
+  	auth = gsub(" ", "_", auth)
+
+  	pngname = file.path(datadir, paste0(auth, ".png"))
+  	if (!file.exists(pngname)){
+	  	png(pngname, height=7, width=7, units = 'in', res=600)
+	  		googleCite(x$url, plotIt=TRUE)
+	  	dev.off()
+	 }
+  	print(auth)
+    })
