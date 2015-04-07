@@ -1,0 +1,387 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+gd = getwd()
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=TRUE, warning=TRUE, comment="", cache = TRUE)
+```
+
+The data for this post is located at [https://github.com/muschellij2/FSLR_data](https://github.com/muschellij2/FSLR_data), and was graciously allowed by our colleagues who collected it at the NIH.  
+
+# Goal of the post
+The overall goal of this post is to present a complete preprocessing pipeline for structural magnetic resonance imaging (sMRI) data "completely" within `R`.  
+
+## Required packages
+This package will rely mainly on 4 packages:
+
+- oro.nifti: read/write data, the nifti object
+- fslr: process data (need FSL for most of the functionality)
+- ANTsR: process data (need cmake to install)
+- extrantsr: extends and wraps ANTsR functions (need ANTsR)
+
+## Install these packages
+
+```{r, eval=FALSE}
+install.packages("oro.nifti")
+install.packages("devtools")
+devtools::install_github("stnava/ANTsR") # takes a long time
+devtools::install_github("muschellij2/extrantsr")
+devtools::install_github("muschellij2/fslr")
+```
+
+
+### fslr setup
+For interactive sessions, you must set the `fsl.path` to the path to FSL.  This allows fslr to execute FSL commands.  You can also set `fsl.outputtype`, which specifies the output type for images.
+
+```{r fslr_setup, cache=FALSE}
+library(fslr)
+options(fsl.path="/usr/local/fsl")
+options(fsl.outputtype = "NIFTI_GZ")
+```
+
+
+## Files
+
+The dataset is multi-sequence MRI data where the sequences are:  
+
+- 4 sequences: T1, T2, PD, FLAIR
+- 2 time points Baseline and Follow-up
+
+```{r, echo=FALSE}
+files = c(base_t1="01-Baseline_T1.nii.gz", 
+          base_t2="01-Baseline_T2.nii.gz",
+          base_pd="01-Baseline_PD.nii.gz", 
+          base_flair="01-Baseline_FLAIR.nii.gz", 
+          f_t1= "01-Followup_T1.nii.gz", 
+          f_t2= "01-Followup_T2.nii.gz", 
+          f_pd = "01-Followup_PD.nii.gz", 
+          f_flair="01-Followup_FLAIR.nii.gz")
+```
+
+```{r}
+files
+```
+
+```{r data_setup, echo=FALSE, cache=FALSE}
+fn = names(files)
+homedir = path.expand("~/Dropbox/Presentations/structural_talk/")
+files = file.path(homedir, files)
+names(files) = fn
+# setwd(homedir)
+```
+
+## Read in the Files!
+
+Let's read in the baseline T1.  The `readNIfTI` function from the `oro.nifti` package is the workhorse:
+```{r read_t1, message=FALSE}
+library(oro.nifti)
+base_t1 = readNIfTI(files["base_t1"])
+```
+
+## Bias Field Correction
+
+We can do bias field correction from the `ANTsR` package.  The `bias_correct` function can perform the correction on either `nifti` objects or filenames and the user can pass in either `"N3"` or `"N4"` as an argument.  Here we will do N4 bias field correction.
+
+```{r bias_correct, cache=TRUE}
+library(ANTsR)
+library(extrantsr)
+n4_t1 = bias_correct(file = base_t1, correction = "N4", retimg=TRUE)
+```
+
+## Skull Stripping
+We will use FSL's BET for the corrected T1 image to skull strip the image:
+
+```{r bet_eval, cache=TRUE, echo = FALSE}
+ss_t1 = fslbet(n4_t1, retimg = TRUE, opts = "-v", 
+               betcmd = "bet2", 
+               outfile = file.path(homedir, "SS_Image"))
+fslbin(file = file.path(homedir, "SS_Image"), 
+       outfile = file.path(homedir, "Brain_Mask"))
+```
+
+```{r bet, eval=FALSE}
+ss_t1 = fslbet(n4_t1, retimg = TRUE, opts = "-v", 
+               betcmd = "bet2", outfile = "SS_Image")
+fslbin(file = "SS_Image", outfile = "Brain_Mask")
+```
+
+- `fslbet` - the command
+- `retimg` - Return an image
+- `opts` - options of bash `bet` command
+- `betcmd` - can use `bet2` or `bet` (wrapper for `bet2`)
+
+## Image processing
+
+`extrantsr::preprocess_mri_within` will do N3/N4 Correction, skull strip (or mask), and register to the first scan.
+
+```{r proc_eval, echo=FALSE, eval=TRUE, cache = TRUE}
+outfiles = gsub("[.]nii", "_N4_reg.nii", files)
+ofiles = outfiles[c("base_t1", "base_t2", "base_pd", "base_flair")]
+if (!all(file.exists(ofiles))){
+  proc_images = preprocess_mri_within(
+    files = files[c("base_t1", "base_t2", "base_pd", "base_flair")],
+    outfiles = ofiles,
+    correct = TRUE,
+    correction = "N4",
+    retimg = TRUE, maskfile = file.path(homedir, "Brain_Mask.nii.gz"))
+}
+```
+
+```{r proc, eval=FALSE}
+outfiles = gsub("[.]nii", "_N4_reg.nii", files)
+proc_images = preprocess_mri_within(
+  files = files[c("base_t1", "base_t2", "base_pd", "base_flair")],
+  outfiles = outfiles[c("base_t1", "base_t2", "base_pd", "base_flair")],
+  correct = TRUE,
+  correction = "N4",
+  retimg = TRUE, maskfile = "Brain_Mask.nii.gz")
+```
+
+## Intensity Normalization
+
+```{r whitestripe_eval, eval=TRUE, echo=FALSE, cache=TRUE}
+wsfiles = gsub("[.]nii", "_N4_reg_whitestripe.nii", files)
+wsfiles = wsfiles[c("base_t1", "base_t2", "base_pd", "base_flair")]
+ws.outfile = file.path(homedir, "WS_Mask.nii.gz")
+if (!all(file.exists(c(wsfiles, ws.outfile)))){
+  results = reg_whitestripe(t1 = outfiles["base_t1"], 
+                  register = TRUE, 
+                  native = TRUE,
+                  t1.outfile = wsfiles["base_t1"],
+                  other.files = outfiles[c("base_t2", 
+                                           "base_pd", "base_flair")],
+                  other.outfiles = wsfiles[c("base_t2", 
+                                             "base_pd", "base_flair")],
+                  ws.outfile = ws.outfile,
+                  mask = file.path(homedir, "Brain_Mask.nii.gz"))
+}
+```
+
+```{r whitestripe, eval=FALSE}
+wsfiles = gsub("[.]nii", "_N4_reg_whitestripe.nii", files)
+results = reg_whitestripe(t1 = outfiles["base_t1"], 
+                register = TRUE, 
+                native = TRUE,
+                t1.outfile = wsfiles["base_t1"],
+                other.files = outfiles[c("base_t2", 
+                                         "base_pd", "base_flair")],
+                other.outfiles = wsfiles[c("base_t2", 
+                                            "base_pd", "base_flair")],
+                ws.outfile = "WS_Mask.nii.gz",
+                mask = "Brain_Mask.nii.gz")
+```
+
+
+
+
+## Skull Stripping
+We will use FSL's BET for the corrected T1 image to skull strip the image:
+
+```{r f_bet_eval, cache=TRUE, echo = FALSE}
+f_t1 = readNIfTI(files["f_t1"])
+n4_t1 = bias_correct(file = f_t1, correction = "N4", retimg=TRUE)
+f_ss_t1 = fslbet(n4_t1, retimg = TRUE, opts = "-v", 
+               betcmd = "bet2", outfile = file.path(homedir, "F_SS_Image"))
+fslbin(file = file.path(homedir, "F_SS_Image"), outfile = file.path(homedir, "F_Brain_Mask"))
+```
+
+## Image processing
+
+`extrantsr::preprocess_mri_within` will do N3/N4 Correction, skull strip (or mask), and register to the first scan.
+
+```{r f_proc_eval, echo=FALSE, eval=TRUE, cache = TRUE}
+outfiles = gsub("[.]nii", "_N4_reg.nii", files)
+infiles = files[c("f_t1", "f_t2", "f_pd", "f_flair")]
+ofiles = outfiles[c("f_t1", "f_t2", "f_pd", "f_flair")]
+if (!all(file.exists(ofiles))){
+  proc_images = preprocess_mri_within(
+    files = infiles,
+    outfiles = ofiles,
+    correct = TRUE,
+    correction = "N4",
+    retimg = TRUE, maskfile = file.path(homedir, "F_Brain_Mask.nii.gz"))
+}
+```
+
+
+## Intensity Normalization
+
+```{r f_whitestripe_eval, eval=TRUE, echo=FALSE, cache=TRUE}
+wsfiles = gsub("[.]nii", "_N4_reg_whitestripe.nii", files)
+f_wsfiles = wsfiles[c("f_t1", "f_t2", "f_pd", "f_flair")]
+ws.outfile = file.path(homedir, "F_WS_Mask.nii.gz")
+if (!all(file.exists(c(wsfiles, ws.outfile)))){
+  results = reg_whitestripe(t1 = outfiles["f_t1"], 
+                            register = TRUE, 
+                            native = TRUE,
+                            t1.outfile = f_wsfiles["f_t1"],
+                            other.files = outfiles[c("f_t2", 
+                                                     "f_pd", "f_flair")],
+                            other.outfiles = wsfiles[c("f_t2", 
+                                                       "f_pd", "f_flair")],
+                            ws.outfile = ws.outfile,
+                            mask = file.path(homedir, "F_Brain_Mask.nii.gz"))
+  }
+```
+
+
+```{r coreg, eval=TRUE, echo=FALSE, cache=TRUE}
+outfiles = gsub("[.]nii", "_N4_reg.nii", files)
+wsfiles = gsub("[.]nii", "_N4_reg_whitestripe.nii", files)
+f_ws.mask = file.path(homedir, "F_WS_Mask.nii.gz")
+f_ws.maskout = file.path(homedir, "F_WS_Mask_tobase.nii.gz")
+f_wsfiles = wsfiles[c("f_t1", "f_t2", "f_pd", "f_flair")]
+f_wsfiles.out = gsub("[.]nii", "_tobase.nii", f_wsfiles)
+f_outfiles = outfiles[c("f_t1", "f_t2", "f_pd", "f_flair")]
+f_outfiles.out = gsub("[.]nii", "_tobase.nii", f_outfiles)
+if (!all(file.exists(c(f_wsfiles.out, f_outfiles.out, f_ws.maskout)))){
+  res = ants_regwrite(filename = outfiles["f_t1"], 
+              outfile = NULL,
+              template.file = outfiles["base_t1"], 
+              typeofTransform = "Rigid",
+              interpolator = "LanczosWindowedSinc",
+              other.files = c(f_wsfiles, 
+                              f_outfiles, f_ws.mask),
+              other.outfiles = c(f_wsfiles.out, 
+                                 f_outfiles.out, f_ws.maskout), 
+              skull_strip = FALSE, 
+              correct = FALSE, 
+              retimg = TRUE,
+              remove.warp = TRUE)
+}
+fslthresh(file = f_ws.maskout, outfile = f_ws.maskout, 
+          thresh = 0.5)
+fslbin(file = f_ws.maskout, outfile = f_ws.maskout)
+```
+
+```{r joint_norm, eval=TRUE, echo=FALSE, cache=TRUE}
+library(WhiteStripe)
+joint = file.path(homedir, "Joint_WS_Mask.nii.gz")
+ws.base = file.path(homedir, "WS_Mask.nii.gz")
+ws.fup = file.path(homedir, "F_WS_Mask_tobase.nii.gz")
+joint = fslmask(file = ws.base, 
+                mask = ws.fup, 
+                outfile = joint, retimg = TRUE)
+indices = which(joint > 0)
+
+wsfiles = gsub("[.]nii", "_N4_reg_whitestripe.nii", files)
+wsfiles[c("f_t1", "f_t2", "f_pd", "f_flair")] = gsub("[.]nii", "_tobase.nii", wsfiles[c("f_t1", "f_t2", "f_pd", "f_flair")])
+joint.ws = gsub("[.]nii", "_joint.nii", wsfiles)
+runfiles = outfiles
+runfiles[c("f_t1", "f_t2", "f_pd", "f_flair")] = f_outfiles.out
+brainmask = readNIfTI(file.path(homedir, "Brain_Mask.nii.gz"),
+                      reorient=FALSE)
+dtype = function(img){
+  img = drop_img_dim(img)
+  img = datatyper(img, 
+                 datatype= convert.datatype()$FLOAT32,
+                 bitpix= convert.bitpix()$FLOAT32)
+  img = cal_img(img)
+  return(img)
+}
+ifile = 1
+for (ifile in seq_along(runfiles)){
+  if (!file.exists(joint.ws[ifile])){
+    img = readNIfTI(runfiles[ifile], reorient = FALSE)
+    img = whitestripe_norm(img, indices)
+    img = mask_img(img, brainmask)
+    img = dtype(img)
+    writeNIfTI(nim = img, filename = nii.stub(joint.ws[ifile]))
+  }
+  print(ifile)
+}
+```
+
+
+```{r diffs, eval=TRUE, echo=FALSE, cache=TRUE}
+df = data.frame(type = c("t1", "t2", "pd", "flair"), stringsAsFactors = FALSE)
+df$base = joint.ws[paste0("base_", df$type)]
+df$f = joint.ws[paste0("f_", df$type)]
+rownames(df) = df$type
+df$type = NULL
+brainmask = readNIfTI(file.path(homedir, "Brain_Mask.nii.gz"),
+                      reorient=FALSE)
+brainmask[brainmask == 0] = NA
+itype = "t2"
+base = readNIfTI(df[itype, "base"], reorient = FALSE)
+f = readNIfTI(df[itype, "f"], reorient = FALSE)
+ddf = data.frame(base = c(base), fup = c(f))
+ddf = ddf[ brainmask %in% 1, ]
+samp = ddf[ sample(nrow(ddf), size=1e5), ]
+d = niftiarr(base, base - f)
+d = mask_img(d, mask = brainmask)
+```
+
+```{r tryout, eval = TRUE}
+outfiles = gsub("[.]nii", "_N4_reg.nii", files)
+f_outfiles = outfiles[c("f_t1", "f_t2", "f_pd", "f_flair")]
+f_outfiles = gsub("[.]nii", "_tobase.nii", f_outfiles)
+b_outfiles = outfiles[c("base_t1", "base_t2", "base_pd", "base_flair")]
+df = data.frame(type = c("t1", "t2", "pd", "flair"), stringsAsFactors = FALSE)
+df$base = b_outfiles[paste0("base_", df$type)]
+df$f = f_outfiles[paste0("f_", df$type)]
+rownames(df) = df$type
+df$type = NULL
+brainmask = readNIfTI(file.path(homedir, "Brain_Mask.nii.gz"),
+                      reorient=FALSE)
+itype = "t2"
+base = readNIfTI(df[itype, "base"], reorient = FALSE)
+base = zscore_img(base, mask = brainmask, margin = NULL)
+f = readNIfTI(df[itype, "f"], reorient = FALSE)
+f = zscore_img(f, mask = brainmask, margin = NULL)
+ddf = data.frame(base = c(base), fup = c(f))
+ddf = ddf[ brainmask %in% 1, ]
+samp = ddf[ sample(nrow(ddf), size=1e5), ]
+d = niftiarr(base, base - f)
+d = mask_img(d, mask = brainmask)
+ortho2(d)
+```
+
+
+## Other useful functions from fslr
+
+- `window_img` - set min and max values of image (good for plotting)
+- `drop_img_dim` - drop dimension if is dimension is 1, especially if you have the error `Error: all dim elements > dim[1] must be 1 dim/pixdim mismatch`
+- `mask_img` - mask image with an array/nifti object
+- `robust_window` - quantile the image then use `window_img` (take out large values)
+- `fslhd` and `fslval` can get information from an image without having to read it in
+- `checkimg` - checks if an image is character, writes `nifti` to tempfile, returns character
+- `check_nifti` - checks if an image is `nifti`, reads filename, returns `nifti`
+
+## Overview
+
+1. `oro.nifti` - reading/writing nifti objects 
+2. `ANTsR`
+    + bias field corrrection
+    + registration: linear, non-linear (symmetric)
+3. `fslr`
+    + can perform image operations from FSL
+    + has helper functions for `nifti` objects
+4. extrantsr - helper functions for ANTsR
+    + wrapper functions for preprocessing
+
+```{r, echo=FALSE}
+setwd(gd)
+```
+
+
+
+```{r whitestripe_t2_eval, eval=TRUE, echo=FALSE, cache=TRUE}
+t2wsfiles = gsub("[.]nii", "_N4_reg_whitestripe_t2.nii", files)
+t2wsfiles = t2wsfiles[c("base_t1", "base_t2", "base_pd", "base_flair")]
+t2ws.outfile = file.path(homedir, "T2_WS_Mask.nii.gz")
+if (!all(file.exists(c(t2wsfiles, t2ws.outfile)))){
+  results = reg_whitestripe(
+    t1 = outfiles["base_t1"],
+                            type = "T2",
+                            t1.outfile = tempfile(fileext = ".nii.gz"),
+                            t2 = outfiles["base_t2"], 
+                            register = TRUE, 
+                            native = TRUE,
+                            t2.outfile = t2wsfiles["base_t2"],
+                            other.files = outfiles[c("base_t1", 
+                                                     "base_pd", "base_flair")],
+                            other.outfiles = t2wsfiles[c("base_t1", 
+                                                         "base_pd", "base_flair")],
+                            ws.outfile = t2ws.outfile,
+                            mask = file.path(homedir, "Brain_Mask.nii.gz"))
+}
+```
