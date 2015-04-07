@@ -109,7 +109,7 @@ library(wordcloud)
 
   	pngname = file.path(datadir, paste0(auth, ".png"))
   	if (!file.exists(pngname)) {
-	  	png(pngname, height=7, width=7, units = 'in', res=600)
+	  	png(pngname, height=3, width=7, units = 'in', res=600)
 	  		googleCite(x$url, plotIt=TRUE)
 	  	dev.off()
 	 }

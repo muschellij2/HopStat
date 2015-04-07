@@ -148,7 +148,7 @@ pct2 = readNIfTI(paste0(tfile, ".nii.gz"))
 hist(pct2, main="Writing out with no change of datatype/bitpix")
 
 ### Writing out pct with datatype change - to FLOAT32
-pct = datatype(pct, type_string = "FLOAT32")
+pct = datatyper(pct, type_string = "FLOAT32")
 writeNIfTI(pct, filename = tfile)
 pct3 = readNIfTI(paste0(tfile, ".nii.gz"))
 hist(pct3, main="Writing out with changing of datatype/bitpix")

@@ -1,0 +1,401 @@
+<p>This is the first post I've written in a while.  I have been somewhat radio silent on social media, but I'm jumping back in.  </p>
+
+<p>Now, I work with brain images, which can have millions of elements (referred to as voxels).  Many of these elements are zero (for background).  We want to calculate basic statistics on the data usually and I wanted to describe how you can speed up operations or reduce memory requirements if you want to calculate many statistics on a <em>large</em> vector with integer values by using summary tables.</p>
+
+<h2>Why to use Tables</h2>
+
+<p>Tables are relatively computationally expensive to calculate.  They must operate over the entire vector, find the unique values, and bin the data into these values.  Let $latex n$ be the length of the vector.  For integer vectors (i.e. whole number), the number of unique values is much less than $latex n$.  Therefore, the table is stored much more efficiently than the entire vector.  </p>
+
+<h3>Tables are sufficient statistics</h3>
+
+<p>You can think of the frequencies and bins as summary statistics for the entire distribution of the data.  I will not discuss a formal proof here, but you can easily re-create the entire vector using the table (see <code>epitools::expand.table</code> for a function to do this), and thus the table is a sufficient (but not likely a minimal) statistic.</p>
+
+<p>As a sufficient statistic, we can create any statistic that we'd like relatively easy.  Now, <code>R</code> has very efficient functions for many statistics, such as the median and quantiles, so it may not make sense why we'd want to rewrite some of these functions using tables.  </p>
+
+<p>I can think of 2 reasons: 1) you want to calculate <em>many</em> statistics on the data and don't want to pass the vector in multiple times, and 2) you want to preprocess the data to summarize the data into tables to only use these in memory versus the entire vector.</p>
+
+<p>Here are some examples when this question has been asked on stackoverflow: <a href="http://stackoverflow.com/questions/22644481/r-computing-mean-median-variance-from-file-with-frequency-distribution">1</a>, <a href="http://stackoverflow.com/questions/14465004/median-of-a-frequency-distribution">2</a>  and the R list-serv: <a href="https://stat.ethz.ch/pipermail/r-help/2007-December/148809.html">1</a>.  What we're going to do is show some basic operations on tables to get summary statistics and show they agree.</p>
+
+<h2>R Implementation</h2>
+
+<p>Let's make a large vector:</p>
+
+[sourcecode language="r"]set.seed(20150301)
+vec = sample(-10:100, size= 1e7, replace = TRUE)
+[/sourcecode]
+
+<h3>Quantile function for tables</h3>
+
+<p>I implemented a quantile function for tables (of only type 1).  The code takes in a table, creates the cumulative sum, extracts the unique values of the table, then computes and returns the quantiles.</p>
+
+[sourcecode language="r"]quantile.table = function(tab, probs = c(0, 0.25, 0.5, 0.75, 1)){
+  n = sum(tab)
+  #### get CDF
+  cs = cumsum(tab)
+  ### get values (x)
+  uvals = unique(as.numeric(names(tab)))
+
+  #  can add different types of quantile, but using default
+  m = 0
+  qs = sapply(probs, function(prob){
+    np = n * prob
+    j = floor(np) + m
+    g = np + m - j
+    # type == 1
+    gamma = as.numeric(g != 0)
+    cs <= j
+    quant = uvals[min(which(cs >= j))]
+    return(quant)
+  })
+  dig <- max(2L, getOption("digits"))
+  names(qs) <- paste0(if (length(probs) < 100) 
+    formatC(100 * probs, format = "fg", width = 1, digits = dig)
+    else format(100 * probs, trim = TRUE, digits = dig), 
+    "%")
+  return(qs) 
+}
+[/sourcecode]
+
+<h3>Quantile Benchmarks</h3>
+
+<p>Let's benchmark the quantile functions: 1) creating the table and then getting the quantiles, 2) creating an empircal CDF function then creating the quantiles, 3) creating the quantiles on the original data.</p>
+
+[sourcecode language="r"]library(microbenchmark)
+options(microbenchmark.unit='relative')
+qtab = function(vec){
+  tab = table(vec)
+  quantile.table(tab)
+}
+qcdf = function(vec){
+  cdf = ecdf(vec)
+  quantile(cdf, type=1)
+}
+# quantile(vec, type = 1)
+microbenchmark(qtab(vec), qcdf(vec), quantile(vec, type = 1), times = 10L)
+[/sourcecode]
+
+[sourcecode]Unit: relative
+                    expr       min        lq     mean    median       uq
+               qtab(vec) 12.495569 12.052644 9.109178 11.589662 7.499691
+               qcdf(vec)  5.407606  5.802752 4.375459  5.553492 3.708795
+ quantile(vec, type = 1)  1.000000  1.000000 1.000000  1.000000 1.000000
+      max neval cld
+ 5.481202    10   c
+ 2.653728    10  b 
+ 1.000000    10 a  
+[/sourcecode]
+
+<h3>More realistic benchmarks</h3>
+
+<p>Not surprisingly, simply running <code>quantile</code> on the vector beats the other 2 methods, <strong>by far</strong>.  So computational speed may not be beneficial for using a table.  But if tables or CDFs are already created in a previous processing step, we should compare that procedure:</p>
+
+[sourcecode language="r"]options(microbenchmark.unit="relative")
+tab = table(vec)
+cdf = ecdf(vec)
+all.equal(quantile.table(tab), quantile(cdf, type=1))
+[/sourcecode]
+
+[sourcecode][1] TRUE
+[/sourcecode]
+
+[sourcecode language="r"]all.equal(quantile.table(tab), quantile(vec, type=1))
+[/sourcecode]
+
+[sourcecode][1] TRUE
+[/sourcecode]
+
+[sourcecode language="r"]microbenchmark(quantile.table(tab), quantile(cdf, type=1), quantile(vec, type = 1), times = 10L)
+[/sourcecode]
+
+[sourcecode]Unit: relative
+                    expr      min       lq     mean   median       uq
+     quantile.table(tab)    1.000    1.000   1.0000    1.000   1.0000
+ quantile(cdf, type = 1)  774.885 1016.172 596.3217 1144.063 868.8105
+ quantile(vec, type = 1) 1029.696 1122.550 653.2146 1199.143 910.3743
+      max neval cld
+   1.0000    10  a 
+ 198.1590    10   b
+ 206.5936    10   b
+[/sourcecode]
+
+<p>As we can see, if you had already computed tables, then you get the same quantiles as performing the operation on the vector, and also <strong>much</strong> faster results.  Using <code>quantile</code> on a <code>ecdf</code> object is not much better, which mainly is due to the fact that the <code>quantile</code> function remakes the factor and then calculate quantiles:</p>
+
+[sourcecode language="r"]stats:::quantile.ecdf
+[/sourcecode]
+
+[sourcecode]function (x, ...) 
+quantile(evalq(rep.int(x, diff(c(0, round(nobs * y)))), environment(x)), 
+    ...)
+<bytecode: 0x107493e28>
+<environment: namespace:stats>
+[/sourcecode]
+
+<h3>Median for tables</h3>
+
+<p>Above we show the <code>quantile.table</code> function, so the median function is trivial where <code>probs = 0.5</code>:</p>
+
+[sourcecode language="r"]median.table = function(tab){
+  quantile.table(tab, probs = 0.5)
+}
+[/sourcecode]
+
+<h2>Mean of a table</h2>
+
+<p>Other functions can be used to calculate statstics on the table, such as the mean:</p>
+
+[sourcecode language="r"]mean.table = function(tab){
+  uvals = unique(as.numeric(names(tab)))
+  sum(uvals * tab)/sum(tab)
+}
+mean.table(tab)
+[/sourcecode]
+
+[sourcecode][1] 44.98991
+[/sourcecode]
+
+[sourcecode language="r"]mean(tab)
+[/sourcecode]
+
+[sourcecode][1] 44.98991
+[/sourcecode]
+
+[sourcecode language="r"]mean(cdf)
+[/sourcecode]
+
+[sourcecode]Warning in mean.default(cdf): argument is not numeric or logical:
+returning NA
+[/sourcecode]
+
+[sourcecode][1] NA
+[/sourcecode]
+
+<p>As we see, we can simply use <code>mean</code> and do not need to define a new function for tables.</p>
+
+[sourcecode language="r"]mean(vec)
+[/sourcecode]
+
+[sourcecode][1] 44.98991
+[/sourcecode]
+
+[sourcecode language="r"]all.equal(mean(tab), mean(vec))
+[/sourcecode]
+
+[sourcecode][1] TRUE
+[/sourcecode]
+
+<h3>Subsetting tables</h3>
+
+<p>One problem with using <code>mean</code> vs. <code>mean.table</code> is when you subset the table or perform an operation that causes it to lose the attribute of the class of <code>table</code>.  For example, let's say I want to estimate the mean of the data for values $latex > 0$:</p>
+
+[sourcecode language="r"]mean(vec[vec > 0])
+[/sourcecode]
+
+[sourcecode][1] 50.50371
+[/sourcecode]
+
+[sourcecode language="r"]over0 = tab[as.numeric(names(tab)) > 0]
+mean(over0)
+[/sourcecode]
+
+[sourcecode][1] 90065.98
+[/sourcecode]
+
+[sourcecode language="r"]mean.table(over0)
+[/sourcecode]
+
+[sourcecode][1] 50.50371
+[/sourcecode]
+
+[sourcecode language="r"]class(over0)
+[/sourcecode]
+
+[sourcecode][1] "array"
+[/sourcecode]
+
+<p>We see that after subsetting, <code>over0</code> is an <code>array</code> and not a <code>table</code>, so <code>mean</code> computes the mean using the <code>array</code> method, treating the frequences as data and the estimated mean is not correct.  <code>mean.table</code> calculates the correct value, as it does not depend on the class of <code>tab</code>.  Another way to circumvent this is to reassign a class of <code>table</code> to <code>over0</code>:</p>
+
+[sourcecode language="r"]class(over0) = "table"
+mean(over0)
+[/sourcecode]
+
+[sourcecode][1] 50.50371
+[/sourcecode]
+
+<p>This process requires the user to know what the class is of the object passed to <code>mean</code>, and may not be correct if the user changes the class of the object.</p>
+
+<h3>Aside on NA values</h3>
+
+<p>Let's see what happens when there are <code>NA</code>s in the vector.  We'll put in 20 <code>NA</code> values:</p>
+
+[sourcecode language="r"]navec = vec
+navec[sample(length(navec), 20)] = NA
+natab = table(navec, useNA="ifany")
+nacdf = ecdf(navec)
+mean(navec)
+[/sourcecode]
+
+[sourcecode][1] NA
+[/sourcecode]
+
+[sourcecode language="r"]mean(natab)
+[/sourcecode]
+
+[sourcecode][1] NA
+[/sourcecode]
+
+[sourcecode language="r"]# mean(nacdf)
+[/sourcecode]
+
+<p>We see that if we <code>table</code> the data with <code>NA</code> being a category, then any operation that returns <code>NA</code> if <code>NA</code> are present will return <code>NA</code>.  For example, if we do a table on the data with the <code>table</code> option <code>useNA="always"</code>, then the mean will be <code>NA</code> even though no <code>NA</code> are present in the original vector.  Also, <code>ecdf</code> objects do not keep track of <code>NA</code> values after they are computed.</p>
+
+[sourcecode language="r"]tab2 = table(vec, useNA="always")
+mean(tab2)
+[/sourcecode]
+
+[sourcecode][1] NA
+[/sourcecode]
+
+[sourcecode language="r"]nonatab = table(navec, useNA="no")
+mean(nonatab)
+[/sourcecode]
+
+[sourcecode][1] 44.98993
+[/sourcecode]
+
+[sourcecode language="r"]mean(navec, na.rm=TRUE)
+[/sourcecode]
+
+[sourcecode][1] 44.98993
+[/sourcecode]
+
+<p>If you are using tables for statistics, the equivalent of <code>na.rm=FALSE</code> is <code>table(..., useNA="ifany")</code> and <code>na.rm=TRUE</code> is <code>table(..., useNA="no")</code>.  We also see that an object of <code>ecdf</code> do not ever show NAs.  Although we said tables are sufficient statistics, that may not be entirely correct if depending on how you make the table when the data have missing data.</p>
+
+<h3>Mean benchmark</h3>
+
+<p>Let's benchmark the mean function, assuming we have pre-computed the table:</p>
+
+[sourcecode language="r"]options(microbenchmark.unit="relative")
+microbenchmark(mean(tab), mean(vec), times = 10L)
+[/sourcecode]
+
+[sourcecode]Unit: relative
+      expr      min       lq     mean   median       uq      max neval cld
+ mean(tab)   1.0000   1.0000   1.0000   1.0000   1.0000  1.00000    10  a 
+ mean(vec) 374.0648 132.3851 111.2533 104.7355 112.7517 75.21185    10   b
+[/sourcecode]
+
+<p>Again, if we have the table pre-computed, then estimating means is much faster using the table.</p>
+
+<h2>Getting standard deviation</h2>
+
+<p>The <code>mean</code> example may be misleading when we try <code>sd</code> on the table:</p>
+
+[sourcecode language="r"]sd(vec)
+[/sourcecode]
+
+[sourcecode][1] 32.04476
+[/sourcecode]
+
+[sourcecode language="r"]sd(tab)
+[/sourcecode]
+
+[sourcecode][1] 302.4951
+[/sourcecode]
+
+<p>This are not even remotely close.  This is because <code>sd</code> is operating on the table as if it were a <code>vector</code> and not a frequency table.  </p>
+
+<p>Note, we cannot calculate <code>sd</code> from the <code>ecdf</code> object:</p>
+
+[sourcecode language="r"]sd(cdf)
+[/sourcecode]
+
+[sourcecode]Error in as.double(x): cannot coerce type 'closure' to vector of type 'double'
+[/sourcecode]
+
+<h2>SD and Variance for frequency table</h2>
+
+<p>We will create a function to run <code>sd</code> on a table:</p>
+
+[sourcecode language="r"]var.table = function(tab){
+  m = mean(tab)
+  uvals = unique(as.numeric(names(tab)))
+  n = sum(tab)
+  sq = (uvals - m)^2
+  ## sum of squared terms
+  var = sum(sq * tab) / (n-1)
+  return(var)
+}
+sd.table = function(tab){
+  sqrt(var.table(tab))
+}
+sd.table(tab)
+[/sourcecode]
+
+[sourcecode][1] 32.04476
+[/sourcecode]
+
+<p>We create the mean, get the squared differences, and sum these up (<code>sum(sq * tab)</code>) , divide by <code>n-1</code> to get the variance and the <code>sd</code> is the square root of the variance.</p>
+
+<h3>Benchmarking SD</h3>
+
+<p>Let's similarly benchmark the data for <code>sd</code>:</p>
+
+[sourcecode language="r"]options(microbenchmark.unit="relative")
+microbenchmark(sd.table(tab), sd(vec), times = 10L)
+[/sourcecode]
+
+[sourcecode]Unit: relative
+          expr      min       lq    mean   median       uq      max neval
+ sd.table(tab)   1.0000   1.0000   1.000    1.000   1.0000   1.0000    10
+       sd(vec) 851.8676 952.7785 847.225 1142.225 732.3427 736.2757    10
+ cld
+  a 
+   b
+[/sourcecode]
+
+<h2>Mode of distribution</h2>
+
+<p>Another statistic we may want for tabular data is the mode.  We can simply find the maximum frequency in the table.  The <code>multiple</code> option returns multiple values if there is a tie for the maximum frequency.  </p>
+
+[sourcecode language="r"]mode.table = function(tab, multiple = TRUE){
+  uvals = unique(as.numeric(names(tab)))
+  ind = which.max(tab)
+  if (multiple){
+    ind = which(tab == max(tab))
+  }
+  uvals[ind]
+}
+mode.table(tab)
+[/sourcecode]
+
+[sourcecode][1] 36
+[/sourcecode]
+
+<h2>Memory of each object</h2>
+
+<p>We wish to simply show the memory profile for using a <code>table</code> verus the entire vector:</p>
+
+[sourcecode language="r"]format(object.size(vec), "Kb")
+[/sourcecode]
+
+[sourcecode][1] "39062.5 Kb"
+[/sourcecode]
+
+[sourcecode language="r"]format(object.size(tab), "Kb")
+[/sourcecode]
+
+[sourcecode][1] "7.3 Kb"
+[/sourcecode]
+
+[sourcecode language="r"]round(as.numeric(object.size(vec) / object.size(tab)))
+[/sourcecode]
+
+[sourcecode][1] 5348
+[/sourcecode]
+
+<p>We see that the table <strong>much</strong> smaller than the vector.  Therefore, computing and storing summary tables for integer data can be much more efficient.</p>
+
+<h1>Conclusion</h1>
+
+<p>Tables are computationally expensive.  If tables are pre-computed for integer data, however, then statistics can be calculated quickly and accurately, even if <code>NA</code>s are present.  These tables are also much smaller in memory so that they can be stored with less space.  This may be an important thing to think about computing and storage of large vectors in the future.</p>
+
