@@ -1,0 +1,78 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+In my research, I primarily use `R`, but I try to use existing code if available.  In neuroimaging and other areas, that means calling MATLAB code.  There are some existing solutions for the problem of `R` to MATLAB: namely the [`R.matlab`](http://cran.r-project.org/web/packages/R.matlab/index.html) package and the [RMatlab](http://www.omegahat.org/RMatlab/) package (which can call `R` from MATLAB as well).  I do not use thse solutions usually though.  
+
+Previously, [Mandy Mejia wrote "THREE WAYS TO USE MATLAB FROM R"](https://mandymejia.wordpress.com/2014/08/18/three-ways-to-use-matlab-from-r/).  Option 2 is about how to use `R.matlab`, and Mandy gives and example with some cod.  She also describes in Options 1 and 3 how to use the `system` command to call MATLAB commands.  
+
+I like this strategy options because:
+
+1. I didn't take the time to learn `R.matlab`.
+2. It worked for me.
+3. I wrote a package to wrap the options Mandy described: `matlabr`.
+
+## matlabr: Wrapping together system calls to MATLAB
+
+The [`matlabr`](https://github.com/muschellij2/matlabr) package is located in GitHub and you can install it with the following command:
+
+```{r, eval=FALSE}
+devtools::install_github("muschellij2/matlabr")
+```
+
+It has a very small set of functions and I will go through each function and describe what they do:
+
+1.  `get_matlab`: Mostly internal command that will return a character string that will be passed to `system`.  If `matlab` is in your PATH (bash variable), and you are using R based on the terminal, the command would return `"matlab"`.  If MATLAB is not in your PATH or using a GUI-based system like RStudio, you must set `options(matlab.path='/your/path/to/matlab')`.
+2.  `have_matlab`: Wrapper for `get_matlab` to return a logical if `matlab` is found.
+3. `run_matlab_script`: This will pass a `.m` file to MATLAB.  It also wraps the command in a [try-catch](http://www.mathworks.com/help/matlab/ref/try.html) statement in MATLAB so that if it fails, it will print the error message.  Without this try-catch, if MATLAB errors, then running the command will remain in MATLAB and not return to `R`.
+4.  `run_matlab_code`: This takes a character vector of MATLAB code, ends lines with `;`, writes it to a temporary `.m` file, and then runs `run_matlab_script` on the temporary `.m` file.
+5.  `rvec_to_matlab`: Takes in a numeric `R` vector and creates a MATLAB column matrix.
+6.  `rvec_to_matlabclist`: Takes in a vector from `R` (usually a character vector) and quotes these strings with single quotes and places them in a MATLAB cell using curly braces: `{` and `}`.  It then stacks these cells into a "matrix" of cells.
+
+## Setting up `matlabr`
+
+Let's set up the `matlab.path` as I'm running in RStudio:
+
+```{r readin}
+library(matlabr)
+options(matlab.path = "/Applications/MATLAB_R2014b.app/bin")
+have_matlab()
+```
+
+The result from `have_matlab()` indicates that the `matlab` command can be called.
+
+### Let's write some code to test it
+
+Here we will create some code to take a value for `x`, `y`, `z` (scalars) and a matrix named `a` and then save `x`, `a`, `z` to a text file:
+
+```{r code, results='markup', message=TRUE}
+code = c("x = 10", 
+         "y=20;", 
+         "z=x+y", 
+         "a = [1 2 3; 4 5 6; 7 8 10]",
+         "save('test.txt', 'x', 'a', 'z', '-ascii')")
+res = run_matlab_code(code)
+```
+
+### Output
+First off, we see that `test.txt` indeed was written to disk.  
+
+```{r, results='markup'}
+file.exists("test.txt")
+```
+
+We can read in the `test.txt` from using `readLines`:
+```{r, results='markup'}
+output = readLines(con = "test.txt")
+print(output)
+```
+
+
+## Conclusions
+`matlabr` isn't fancy and most likely has some drawbacks as using `system` can have some quirks.  However, these functions have been helpful for me to use some [SPM](http://www.fil.ion.ucl.ac.uk/spm/) routines and other MATLAB commands while remaining "within `R`".  `R.matlab` has a better framework, but it may not be as straightforward for batch processing.  Also `matlabr` has some wrappers that will do a try-catch so that you don't get stuck in MATLAB after calling `system`.
+
+Let me know if this was helpful or if you have ideas on how to make this better.  Or better yet, give a [pull request](https://github.com/muschellij2/matlabr/pulls).  
+
+
+

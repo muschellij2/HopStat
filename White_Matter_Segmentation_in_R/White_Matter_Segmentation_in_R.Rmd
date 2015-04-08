@@ -66,6 +66,10 @@ The first step in most MRI analysis is performing inhomogeneity correction.  The
 ```{r biascorrection, cache=TRUE}
 n4img = bias_correct( img.name, correction = "N4", 
                       outfile = paste0(img.stub, "_N4.nii.gz") )
+```
+
+
+```{r biascorrection_plot, cache=FALSE}
 ortho2(n4img)
 ```
 
@@ -94,7 +98,7 @@ bet = fslbet_robust(img = n4img,
 
 The results look good - the brain tissue is kept (in red) only.  Not much brain tissue is discarded nor non-brain-tissue is included.
 
-```{r bet_plot, dependson="bet"}
+```{r bet_plot, dependson="bet", cache=FALSE}
 ortho2(n4img, bet > 0, 
        col.y=alpha("red", 0.5))
 ```
@@ -113,7 +117,7 @@ fast = fast(file = bet,
 
 By default, FAST assumes 3 tissue classes, generally white matter, gray matter, and CSF.  These are generally ordered by the mean intensity of the class.  For T1-weighted images, white matter is the highest intensity, and assigned class `3`.  Let's see the results:
 
-```{r fast_plot, dependson="fast"}
+```{r fast_plot, dependson="fast", cache=FALSE}
 ortho2(bet, fast == 3, 
        col.y=alpha("red", 0.5))
 ```
@@ -123,7 +127,7 @@ ortho2(bet, fast == 3,
 
 We can also visualize the classes for `1` and `2` for CSF and gray matter, respectively.  
 
-```{r fast_plot_csf_gm, dependson="fast"}
+```{r fast_plot_csf_gm, dependson="fast", cache=FALSE}
 ortho2(bet, fast == 1, col.y=alpha("red", 0.5), text="CSF Results")
 ortho2(bet, fast == 2, col.y=alpha("red", 0.5), text="Gray Matter\nResults")
 ```
@@ -135,7 +139,7 @@ list.files(pattern=paste0(img.stub, "_BET_FAST"))
 ```
 
 # Conclusions
-It's a exciting time to be working in neuroimaging in `R`.  The `fslr` and `ANTsR` packages provide functionality to perform operations for neuroimaging processing.  I will be doing a series on some of the options for analysis in the coming weeks.   The code 
+It's a exciting time to be working in neuroimaging in `R`.  The `fslr` and `ANTsR` packages provide functionality to perform operations for neuroimaging processing.  I will be doing a series on some of the options for analysis in the coming weeks.   The code for this analysis (and the data) is located at [https://github.com/muschellij2/HopStat/blob/gh-pages/White_Matter_Segmentation_in_R/](https://github.com/muschellij2/HopStat/blob/gh-pages/White_Matter_Segmentation_in_R/)
 
 
 
