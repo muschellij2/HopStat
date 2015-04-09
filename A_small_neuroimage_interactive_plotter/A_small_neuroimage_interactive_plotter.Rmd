@@ -12,7 +12,7 @@ library(manipulate)
 ```
 
 # fslr package
-I'm calling the `fslr` package because I know that if you have it installed, you have `fsl` and have a 1mm T1 template from MNI in a specific location.  It also loads the `oro.nifti` package so that `readNIfTI` is accessible after loading `fslr`.  
+I'm calling the `fslr` package because I know that if you have it installed, you will likely have FSL and have a 1mm T1 template from MNI in a specific location.  `fslr` also loads the `oro.nifti` package so that `readNIfTI` is accessible after loading `fslr`.  You can download a test NIfTI image [here](http://www.bic.mni.mcgill.ca/ServicesAtlases/ICBM152NLin2009) if you don't have access to any and don't have FSL downlaoded.
 
 Here I will read in the template image:
 ```{r}
@@ -20,40 +20,63 @@ library(fslr)
 options(fsl.path='/usr/local/fsl')
 template = file.path(fsldir(), "data/standard", 
                      "MNI152_T1_1mm_brain.nii.gz")
-img = readNIfTI("~/Desktop/scratch/100-318_20070723_0957_CT_3_CT_Head-.nii.gz")
+img = readNIfTI(template)
 ```
 
 # The iplot function
 
-The `iplot` function defined below takes in a `nifti` object, the specific plane to be plotted and additional options to be passed to `oro.nifti::image`.  
+The `iplot` function defined below takes in a `nifti` object, the specific plane to be plotted and additional options to be passed to `oro.nifti::image`.  The function is located [on my GitHub here](https://raw.githubusercontent.com/muschellij2/HopStat/gh-pages/A_small_neuroimage_interactive_plotter/A_small_neuroimage_interactive_plotter.R).
 
 ```{r}
 iplot = function(img, plane = c("axial", 
                                 "coronal", "sagittal"), ...){
+  ## pick the plane
   plane = match.arg(plane, c("axial", 
                              "coronal", "sagittal"))
+  # Get the max number of slices in that plane for the slider
   ns=  switch(plane,
               "axial"=dim(img)[3],
               "coronal"=dim(img)[2],
               "sagittal"=dim(img)[1])
+  ## run the manipulate command
   manipulate({
     image(img, z = z, plot.type= "single", plane = plane, ...)
+    # this will return mouse clicks (future experimental work)
     pos <- manipulatorMouseClick()
     if (!is.null(pos)) {
       print(pos)
     }
   },
+  ## make the slider
   z = slider(1, ns, step=1, initial = ceiling(ns/2))
   )
 }
 ```
 
-The result will be a plotted image and the 
 
 # Example plots
 
-```{r}
+Here are some examples of how this `iplot` function would be used:
+```{r, eval=FALSE}
 iplot(img)
 iplot(img, plane = "coronal")
 iplot(img, plane = "sagittal")
 ```
+
+The result will be a plotted image of the slice with a slider.  This is most useful if you run it within RStudio.  
+
+Below are 2 example outputs of what you see in RStudio:
+
+Slice 91:
+![Slice 1](http://i.imgur.com/rYkQ0TH.png)
+
+Slice 145:
+
+![Slice 2](http://i.imgur.com/cqDXL0C.png)
+
+
+# Conclusions
+The `iplot` function allows users to interactively explore neuroimages.  The plotting is not as fast as I'd like, I may try to speed up the `oro.nifti::image` command or implement some subsampling.  It does however show a proof of concept how interactive neuroimaging visualization can be done in `R`.  
+
+## Note
+`manipulate` must be run in RStudio for manipulation.  The `fslr` function `fslview` will call FSLView from FSL for interactive visualization.  This is an option of interactive neuroimaging "in `R`", but not a real or satisfactory implementation for me (even though I use it frequently).  If anyone has implemented such a solution in `R`, I'd love to hear about it.
