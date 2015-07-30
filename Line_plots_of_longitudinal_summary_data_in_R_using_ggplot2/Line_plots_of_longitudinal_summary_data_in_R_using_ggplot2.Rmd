@@ -1,0 +1,259 @@
+---
+title: "Line plots of longitudinal summary data in R using ggplot2"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="",  results='markup', fig.path='figure/')
+```
+
+I recently had an email for a colleague asking me to make a figure like this in `ggplot2` or `trellis` in `R`:
+
+```{r final_plot, echo = FALSE, results='hide'}
+library(ggplot2)
+library(reshape2)
+library(plyr)
+library(grid)
+N <- 30
+id <- as.character(1:N)
+sexes = c("male", "female")
+sex <- sample(sexes, size = N/2, replace = TRUE)
+diseases = c("low", "med", "high")
+disease <- rep(diseases, each=N/3)
+times = c("Pre", "0", "30", "60")
+time <- rep(times, times = 30)
+t <- 0:3
+y1 <- c(replicate(15, rnorm(4, mean=10+2*t)), replicate(15, rnorm(4, mean=10+4*t)))
+y2 <- c(replicate(15, rnorm(4, mean=10-2*t)), replicate(15, rnorm(4, mean=10-4*t)))
+y3 <- c(replicate(15, rnorm(4, mean=10+t^2)), replicate(15, rnorm(4, mean=10-t^2)))
+
+data <- data.frame(id=rep(id, each=4), sex=rep(sex, each=4), 
+                   severity=rep(disease, each=4), time=time, 
+                   Y1=c(y1), Y2=c(y2), Y3=c(y3))
+data$sex = factor(data$sex, levels = sexes)
+data$time = factor(data$time, levels = times)
+data$severity = factor(data$severity, levels = diseases)
+
+long = melt(data, measure.vars = c("Y1", "Y2", "Y3") )
+
+pre_data = long[ long$time == "Pre", ]
+data = long[ long$time != "Pre", ]
+
+agg = ddply(long, .(severity, sex, variable, time), function(x){
+  # c(mean=mean(x$value), se = sd(x$value)/nrow(x))
+  c(mean=mean(x$value), se = sd(x$value))
+})
+
+agg$num_time = as.numeric(as.character(agg$time))
+agg$num_time[ is.na(agg$num_time) ] = -1
+agg$lower = agg$mean + agg$se
+agg$upper = agg$mean - agg$se
+
+agg$new_time = as.numeric(agg$time)
+
+
+pd <- position_dodge(width = 0.2) # move them .05 to the left and right
+
+sub_no_pre = agg[ agg$time != "Pre",]
+g_final = ggplot(agg, aes(y=mean, colour=severity)) + 
+  geom_errorbar(aes(x=new_time, ymin=lower, ymax=upper), width=.3, position=pd) +
+  geom_line(data = sub_no_pre, position=pd, 
+            aes(x = new_time, y=mean, colour=severity)) +
+  geom_point(aes(x=new_time), position=pd) + facet_grid(variable ~ sex) + 
+  scale_x_continuous(breaks=c(1:4), labels=c("Pre", "0", "30", "60"))
+g_final = g_final + theme(panel.margin.x = unit(1, "lines"), 
+                          panel.margin.y = unit(0.25, "lines"))
+print(g_final)
+```
+
+As I know more about how to do things in `ggplot2`, I chose to use that package (if it wasn't obvious from the plot or other posts).
+
+## Starting Point
+[Cookbook R](http://www.cookbook-r.com/Graphs/Plotting_means_and_error_bars_(ggplot2)/) has a great starting point for making this graph.  The solution there is not sufficient for the desired graph, but that may not be clear why that is.  I will go through most of the steps of customization on how to get the desired plot.
+
+
+### Creating Data
+To illustrate this, I will create some sample dataset:
+
+```{r gen_data}
+N <- 30
+id <- as.character(1:N) # create ids
+sexes = c("male", "female")
+sex <- sample(sexes, size = N/2, replace = TRUE) # create a sample of sex
+diseases = c("low", "med", "high")
+disease <- rep(diseases, each = N/3) # disease severity 
+times = c("Pre", "0", "30", "60")
+time <- rep(times, times = N) # times measured 
+t <- 0:3
+ntimes = length(t)
+y1 <- c(replicate(N/2, rnorm(ntimes, mean = 10+2*t)), 
+        replicate(N/2, rnorm(ntimes, mean = 10+4*t)))
+y2 <- c(replicate(N/2, rnorm(ntimes, mean = 10-2*t)), 
+        replicate(N/2, rnorm(ntimes, mean = 10-4*t)))
+y3 <- c(replicate(N/2, rnorm(ntimes, mean = 10+t^2)), 
+        replicate(N/2, rnorm(ntimes, mean = 10-t^2)))
+
+data <- data.frame(id=rep(id, each=ntimes), sex=rep(sex, each=ntimes), 
+                   severity=rep(disease, each=ntimes), time=time, 
+                   Y1=c(y1), Y2=c(y2), Y3=c(y3)) # create data.frame
+#### factor the variables so in correct order
+data$sex = factor(data$sex, levels = sexes)
+data$time = factor(data$time, levels = times)
+data$severity = factor(data$severity, levels = diseases)
+head(data)
+```
+We have a longitudinal dataset with `r N` different people/units with different ID.  Each ID has a single sex and disease severity.  Each ID has 4 replicates, measuring 3 separate variables (`Y1`, `Y2`, and `Y3`) at each time point.  The 4 time points are previous (`Pre`)/baseline, time 0, 30, and 60, which represent follow-up.  
+
+### Reformatting Data
+In `ggplot2`, if you want to plot all 3 `Y` variables, you must have them in the same column, with another column indicating which variable you want plot.  Essentially, I need to make the data "longer".  For this, I will reshape the data using the [`reshape2`](http://cran.r-project.org/web/packages/reshape2/index.html) package and the function `melt`.  
+
+```{r reshape_data}
+library(reshape2)
+long = melt(data, measure.vars = c("Y1", "Y2", "Y3") )
+head(long)
+```
+
+It may not be clear what has been reshaped, but reordering the `data.frame` can illustrate that each `Y` variable is now a separate row:
+```{r reshape_data2}
+head(long[ order(long$id, long$time, long$variable),], 10)
+```
+
+## Creating Summarized data frame
+We will make a `data.frame` with the means and standard deviations for each group, for each sex, for each `Y` variable, for separate time points.  I will use `plyr` to create this `data.frame`, using `ddply` (first `d` representing I'm putting in a `data.frame`, and the second `d` representing I want `data.frame` out):
+
+```{r aggregate_data}
+library(plyr)
+agg = ddply(long, .(severity, sex, variable, time), function(x){
+  c(mean=mean(x$value), sd = sd(x$value))
+})
+head(agg)
+```
+
+There is nothing special about means/standard deviations.  It could be any summary measures you are interested in visualizing.
+
+We will also create the Mean + 1 standard deviation.  We could have done standard error or a confidence interval, etc.
+
+```{r create_limits}
+agg$lower = agg$mean + agg$sd
+agg$upper = agg$mean - agg$sd
+```
+
+Now, `agg` contains the data we wish to plot.  
+
+## Time is not on your side
+### Time as a factor
+If you look at the plot we wish to make, we want the lines to be connected for times 0, 30, 60, but not for the previous data.  Let's try using the `time` variable, which is a `factor`.   We create `pd`, which will be a `ggplot2` object, which tells that I wish to plot the means + error bars slightly next to each other. 
+
+```{r gbase}
+class(agg$time)
+pd <- position_dodge(width = 0.2) # move them .2 to the left and right
+
+gbase  = ggplot(agg, aes(y=mean, colour=severity)) + 
+  geom_errorbar(aes(ymin=lower, ymax=upper), width=.3, position=pd) +
+  geom_point(position=pd) + facet_grid(variable ~ sex)
+gline = gbase + geom_line(position=pd) 
+print(gline + aes(x=time))
+```
+
+None of the lines are connected!  This is because `time` is a `factor`.  We will use `gbase` and `gline` with different times to show how the end result can be achieved.  
+
+### Time as a numeric
+We can make `time` a numeric variable, and simply replace `Pre` with `-1` so that it can be plotted as well.  
+
+```{r create_time}
+agg$num_time = as.numeric(as.character(agg$time))
+agg$num_time[ is.na(agg$num_time) ] = -1
+unique(agg$num_time)
+```
+In [a previous post](https://hopstat.wordpress.com/2014/12/18/my-commonly-done-ggplot2-graphs-part-2/), I have discussed as an aside of creating a plot in `ggplot2` and then creating adding data to the `data.frame`.  You must use the `%+%` to update the data in the object.
+
+```{r plus}
+gline = gline %+% agg
+print(gline + aes(x=num_time))
+```
+
+If you look closely, you can see that `Pre` and time `0` are very close and not labeled, but also connected.  As the scale on the x-axis has changed, the width of the error bar (set to `0.3`), now is too small and should be changed if using this solution.  
+
+Although there can be a discussion if the `Pre` data should be even on the same plot or the same timeframe, I will leave that for you to dispute.  I don't think it's a terrible idea, and I think the plot works because the `Pre` and `0` time point data are not connected.  There was nothign special about `-1`, and here we use `-30` to make it evenly spaced:
+
+```{r create_time_neg}
+agg$num_time[ agg$num_time == -1 ] = -30
+gline = gline %+% agg
+print(gline + aes(x=num_time))
+```
+
+That looks similar to what we want.  Again, `Pre` is connected to the data, but we also now have a labeling problem with the x-axis somewhat.  We still must change the width of the error bar in this scenario as well. 
+
+### Time as a numeric, but not the actual time point
+In the next case, we simply use `as.numeric` to the factor to create a variable `new_time` that will be `1` for the first level of `time` (in this case `Pre`) to the number of time points, in this case `4`.  
+
+```{r new_time}
+agg$new_time = as.numeric(agg$time)
+unique(agg$new_time)
+gline = gline %+% agg
+print(gline + aes(x = new_time))
+```
+
+Here we have something similar with the spacing, but now the labels are not what we want.  Also, `Pre` is still connected.  The width of the error bars is now on a scale from 1-4, so they look appropriate.
+
+## Creating a Separate data.frame
+Here, we will create a separate `data.frame` for the data that we want to connect the points.  We want the times 0-60 to be connected and the `Pre` time point to be separate.
+
+```{r subset_data}
+sub_no_pre = agg[ agg$time != "Pre",]
+```
+
+### Mulitple data sets in plot function
+
+Note, previously we did:
+```{r prev, eval = FALSE}
+gline = gbase + geom_line(position=pd) 
+```
+
+This assumes that `geom_line` uses the same `data.frame` as the rest of the plot (`agg`).  We can fully specify the arguments in `geom_line` so that the line is only for the non-Pre data:
+
+```{r non_conn}
+gbase = gbase %+% agg
+gline = gbase + geom_line(data = sub_no_pre, position=pd, 
+                          aes(x = new_time, y = mean, colour=severity)) 
+print(gline + aes(x = new_time))
+```
+Note, the arguments in `aes` should match the rest of the plot for this to work smoothly and correctly.
+
+### Relabeling the axes
+Now, we simply need to re-label the x-axis so that it corresponds to the correct times:
+
+```{r relabel}
+g_final = gline + aes(x=new_time) +
+  scale_x_continuous(breaks=c(1:4), labels=c("Pre", "0", "30", "60"))
+```
+
+We could be more robust in this code, using the levels of the factor:
+```{r relabel2}
+time_levs = levels(agg$time)
+g_final = gline + aes(x=new_time) +
+  scale_x_continuous(
+    breaks= 1:length(time_levs), 
+    labels = time_levs)
+print(g_final)
+```
+
+### Give me a break
+My colleague also wanted to separate the panels a bit.  We will use the `panel.margin` arguments and use the `unit` function from the `grid` package to define how far apart we want the axes.
+
+```{r final}
+library(grid)
+g_final = g_final + theme(panel.margin.x = unit(1, "lines"), 
+                          panel.margin.y = unit(0.5, "lines"))
+print(g_final)
+```
+
+## Additional options and conclusoin
+I believe legends should be inside a plot for many reasons (I may write about that).  Colors can be changed (see [`scale_colour_manual`](http://docs.ggplot2.org/0.9.3.1/scale_manual.html)).  Axis labels should be changed, and the `Y` should be labeled to what they are (this is a toy example).
+
+Overall, this plot seems to be what they wanted and the default options work okay.  I hope this illustrates how to customize a `ggplot` to your needs and how you may need to use multiple `data.frame`s to achieve your desired result.
+
+

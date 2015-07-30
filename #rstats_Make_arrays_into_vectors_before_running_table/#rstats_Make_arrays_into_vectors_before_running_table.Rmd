@@ -1,0 +1,54 @@
+---
+title: "#rstats Make arrays into vectors before running table"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="")
+```
+
+## Setup of Problem
+
+While working with `nifti` objects from the `oro.nifti`, I tried to table the values of the image.  The table took a long time to compute.  I thought this was due to the added information about a medical image, but I found that the same sluggishness happened when coercing the `nifti` object to an `array` as well.  
+
+### Quick, illustrative simulation
+But, if I coerced the data to a `vector` using the `c` function, things were much faster.  Here's a simple example of the problem.  
+
+```{r}
+library(microbenchmark)
+dim1 = 30
+n = dim1 ^ 3
+vec = rbinom(n = n, size = 15, prob = 0.5)
+arr = array(vec, dim = c(dim1, dim1, dim1))
+microbenchmark(table(vec), table(arr), table(c(arr)), times = 100)
+```
+
+As you can see, it's much faster to run `table` on the vector than the array, and the coercion of an array to a vector doesn't take much time compared to the tabling and is comparable in speed.
+
+### Explanation of simulation
+If the code above is clear, you can skip this section.  I created an array that was 30 × 30 × 30 from random binomial variables with half probabily and 15 Bernoulli trials.  To keep things on the same playing field, the array (`arr`) and the vector (`vec`) have the same values in them.  The `microbenchmark` function (and package of the same name) will run the command 100 times and displays the statistics of the time component.  
+
+## Why, oh why?
+I've looked into the `table` function, but cannot seem to find where the bottleneck occurs.  Now, for and `array` of 30 × 30 × 30, it takes less than a tenth of a second to compute.  The problem is when the data is 512 × 512 × 30 (such as CT data), the tabulation using the array form can be very time consuming. 
+
+I reduced the replicates, but let's show see this in a reasonable image dimension example:
+
+```{r, cache=TRUE}
+library(microbenchmark)
+dims = c(512, 512, 30)
+n = prod(dims)
+vec = rbinom(n = n, size = 15, prob = 0.5)
+arr = array(vec, dim = dims)
+microbenchmark(table(vec), table(arr), table(c(arr)), times = 10)
+```
+
+## Conclusion
+I can't figure out why right now, but it seems that coercing an array (or nifti image) to a vector before running `table` can significantly speed up the procedure.  If anyone has any intuition why this is, I'd love to hear it.  Hope that helps your array tabulations!
+
+
+
+
+
+

@@ -1,0 +1,9 @@
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+On our cluster, we just updated from R 3.1 to 3.2, as many of users probably have.  When you update minor versions of R , but not build versions (like 3.1.1 to 3.1.2), the local repository of R packages will change.  You can see the new library path using the `.libPaths()` command.
+
+
+[R Updater](https://gist.github.com/muschellij2/c1a76a692e8e9b110ccd)
