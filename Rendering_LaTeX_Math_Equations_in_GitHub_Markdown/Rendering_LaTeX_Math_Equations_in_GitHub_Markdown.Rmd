@@ -1,0 +1,107 @@
+---
+title: "Rendering LaTeX Math Equations in GitHub Markdown"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+## The Problem: GitHub README.md won't render Markdown
+I have many times wondered about getting LaTeX math to render in a README file on GitHub. Apparently, many others ( [1](http://stackoverflow.com/questions/12502440/markdown-formula-display-in-github), [2](https://github.com/github/markup/issues/274), [3](http://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog) ), have asked the same question. 
+
+The common answers are:
+
+1.  It cannot (and in some cases, shouldn't) be done.  GitHub parsing is done by SunDown and is secure, therefore won't do LaTeX.
+2.  Use [http://latex.codecogs.com/](http://latex.codecogs.com/) or [iTex2Img](http://www.sciweavers.org/free-online-latex-equation-editor).  These are good options, but 1) they may go away at any time, and 2) require you to rewrite your md file.
+3.  Use unicode if possible.
+4.  Use [LaTeXIt](http://www.chachatelier.fr/latexit/) (for Mac OS) or other converter to make your equations and embed them.
+
+## A hackey, but working solution
+I opted to try a more generic solution for (4.) using some very hackey text parsing.  I have done a bit of parsing in the past, but I was either too lazy to think about the right regex to do, couldn't think of it easily, or thought my solution was sufficient even if not elegant.
+
+### Caveat
+Two main caveats abound:
+
+1.  This only works for inline equations marked with dollar signs (\$) or equations marked by double dollar signs (\$\$).  I could encorporate other delimiters such as \\[, but I did not.  I only had a bit of time on Wednesday.  
+2.  I assume any code that involves dollar signs be demarcated by chunks starting with three backticks (\`\`\`).  I wrote this for R code, which can use dollar signs for referencing and never has double dollar signs.  If your code does, no guarantees.
+3.  This generally assumes you have a GitHub repository (have no idea what others use), and that you're OK with the figures being located in that GitHub repository.  I didn't allow options for putting them in a sub-folder, but may incorporate that.  
+4.  Some text won't be sized correctly.
+
+## How do I do it already
+
+I wrote an R package that would parse a README.md (or README.rmd if it's RMarkdown).  The package is located at [https://github.com/muschellij2/latexreadme](https://github.com/muschellij2/latexreadme).  
+
+You can install the package using:
+```{r, eval=FALSE}
+library(devtools)
+install_github("muschellij2/latexreadme")
+```
+
+You would then load the package:
+
+```{r}
+library(latexreadme)
+```
+
+The main function is `parse_latex`.  It's not the best function name for what it does, but I don't really care.  Let's see it's arguments:
+
+```{r}
+args(parse_latex)
+```
+
+You must put in a README file as the `rmd` argument.  If the README has an `rmd` or `Rmd` extension, the README is first knitted using `knit(rmd)` and then the resultant `md` file is used.  This `md` is located in a temporary directory and won't write to the directory of the README.  The `new_md` is the filename for the output `md` file that you wish to create.   One example would be `rmd = "README_with_latex.md"` and `md = "README.md"`.  The `git_username` and `git_reponame` must be specified with your username and repository name, respectively.  The `git_branch` allows you to specify which branch you are on, if necessary.  If you don't know what that means, just leave as `master`.  
+
+The rest of the arguments are for inserting the LaTeX into the document.  The `text_height` is how large the LaTeX should be (this may be bad for your document), the `insert_string` is the HTML the LaTeX is subbed for, the `raw_git_site` uses [https://rawgit.com](https://rawgit.com) to reference the figures directly with proper content-type headers (so that they show up).  The `bad_string` is something I'm using in the code.  You only need to change `bad_string` if you happen to have text in your README that matches this (should be rare as they are a bunch of Z's, unless you write like someone sleeping).  I'll get to the `...` in a minute.
+
+### I still don't get it - show me an example
+
+I thought you'd never ask.  The `parse_latex` command has an example from one of my other repos and you can run it as follows (need `curl`):
+
+```{r example, cache=TRUE}
+rmd = file.path(tempdir(), "README_unparse.rmd")
+download.file(
+"https://raw.githubusercontent.com/muschellij2/Github_Markdown_LaTeX/master/README_unparse.rmd",
+destfile = rmd, method = "curl")
+new_md = file.path(tempdir(), "README.md")
+parse_latex(rmd,
+            new_md,
+            git_username = "muschellij2",
+            git_reponame = "Github_Markdown_LaTeX")
+library(knitr)
+new_html = pandoc(new_md, format = "html")
+```
+
+And you can view the html using `browseURL`:
+```{r showhtml, eval=FALSE}
+browseURL(new_html)
+```
+
+You can see the output of the example (only a little bit of LaTeX) at this repo: [https://github.com/muschellij2/Github_Markdown_LaTeX](https://github.com/muschellij2/Github_Markdown_LaTeX) or at [Kristin Linn](https://twitter.com/kristin_linn)'s README, which was used as an example here: [https://github.com/kalinn/IPW-SVM/blob/master/README_2.md](https://github.com/kalinn/IPW-SVM/blob/master/README_2.md)
+
+## What is the function actually doing
+So what is the function actually doing?  Something convoluted I can assure you.  The process is as follows:
+
+1.  Find the equations using (\$\$ and \$) parse them out, throwing out any code demarcated with backticks (\`\`\`).
+2.  Put this LaTeX into a simple LaTeX document with `\begin{document}`.  Note, the `...` argument can be a character vector of other packages to load in that document.  See `png_latex` documentation.
+3.  Run `pdflatex` on the document.  Note, this must be in your path.  This creates a PDF.
+4.  Run `knitr::plot_crop` on this document.  This will crop out anything that's not the LaTeX equation you wanted.
+5.  Convert the PDF to a PNG using `animation::im.convert`.  This is so that they will render in the README.  The file will be something like `eq_no_01.png` in the same folder as the `rmd` argument.
+6.  Replace all the LaTeX with the `insert_string`, which is raw HTML now.  
+7.  Write out the parsed `md` file, which was named using `new_md`.
+
+### Wow - that IS convoluted
+My best shot in one day.  If you have better solutions, please post in the comments.
+
+### Nothing shows up! Read this
+NB: The replacement looks for equations (noted by `eq_no`SOMETHING`.png`) in your *online GitHub repository*.  If you run this command and don't push these `png` files, then nothing will show up.
+
+
+## Conclusions
+You can have LaTeX "rendered" in a GitHub README file!  The sizes of the text may be weird.  This is due to the cropping.  I could probably use some bounding box or better way to get only the equations, but I didn't.  If you want to help, please sumbit a [Pull Request](https://github.com/muschellij2/latexreadme/pulls) to my repository and I'd gladly merge it if it works.  
+
+NB: GitHub may override a README.md if a README.rmd (or README.Rmd) exists.  I'm not 100% sure on that, but if that's the case, rename the Rmd and just have README.md.  
+
+Happy parsing!
