@@ -9,7 +9,7 @@ library(knitr)
 opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
 ```
 
-## The Problem: GitHub README.md won't render Markdown
+## The Problem: GitHub README.md won't render LaTeX
 I have many times wondered about getting LaTeX math to render in a README file on GitHub. Apparently, many others ( [1](http://stackoverflow.com/questions/12502440/markdown-formula-display-in-github), [2](https://github.com/github/markup/issues/274), [3](http://stackoverflow.com/questions/11256433/how-to-show-math-equations-in-general-githubs-markdownnot-githubs-blog) ), have asked the same question. 
 
 The common answers are:
