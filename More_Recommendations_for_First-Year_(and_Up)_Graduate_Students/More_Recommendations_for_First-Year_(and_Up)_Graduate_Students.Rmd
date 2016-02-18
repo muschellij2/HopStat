@@ -1,0 +1,37 @@
+---
+title: "More Recommendations for First-Year (and Up) Graduate Students"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+
+In my post [Recommendations for First Year Graduate Students](https://hopstat.wordpress.com/2015/10/13/recommendations-for-first-year-graduate-students/), I gave some of my general guidelines for our students.  
+
+## Learn Git
+
+## Comprehensive Exams
+
+First year students, it's October.  Stop worrying so much about the comprehesive exams.  One of [my fellow students](http://www.biostat.jhsph.edu/people/student/huang_e.shtml) summed it up very well on how you should view the comps:
+
+> I'd say the best preparation is do your best during the school year to understand the material. Then during fourth term, set aside a few hours a week to review.
+
+And stop calling them comprehensive exams if you're not calling them comps yet.  Now, our departmental comps are serious.  You can fail.  You can be asked to leave.  It's not necessarily a harsh one-and-done scenario and they will take all variables into account (such as grades - one of the times they are important) and the potential they see in you.  But, it is one of the few hard stops in your degree.  Take it seriously.  Some departmental comps are where "everyone passes", and that's fine.  Ours is not; stop being jealous of them, just have a schedule.  
+
+Also stop that nagging voice in your head with the whining bullshit of "Why do we even need comps?  Isn't classes and research enough? This is stupid".  Shut that down.  It is not helpful and will lead you to whining for hours with other students, who have more than enough sympathy to whine with you.  It's not productive, and personally annoys me, so stop.
+
+Here is my recommendation for comps:
+
+1.  Start studying after (or the very tail end) spring break.  You got some vacation (even if just from class), should be recharged, and you've 
+
+
+### No one has sympathy for you
+When I was studying for our 2 weeks pre-comps during my Master's, my advisor saw me in the hallway and said "Hey how's it going?".  In my mind I said "WHAT!? How's it going!? Terribly!? I've been studying for 2 weeks for the biggest test of my life so far and you don't even know!!!".  What I said was, "Eh, alright, comps you know".  I realized that although I was in this all-consuming world of comps, no one else was.  
+
+Older students don't care or have sympathy for you; they wen't through it and no one had it for them.  Actually, most will revel in the fact that they are "glad I'm not in your shoes".  This is natural. It's OK to temporarily hate them, you'll be like that next year.  Professors forget that comps even exist, unless they have to write a question or proctor it.  You have your cohort and other department's cohort to rely on.  It's only a short time and I want to just make sure you don't expect others to be treating you any different/better.  They won't.
+
+

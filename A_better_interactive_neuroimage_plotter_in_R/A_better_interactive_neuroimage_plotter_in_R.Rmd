@@ -1,0 +1,113 @@
+---
+title: "Better interactive neuroimage plotters using R"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="")
+```
+
+In a [previous post](https://hopstat.wordpress.com/2015/04/09/a-small-neuroimage-interactive-plotter/), I described how you can interactively explore a 3D `nifti` object in R.  I used the `manipulate` package, but the overall results were sluggish and not really usable. 
+
+I was introduced to a a good neuroimaging viewer called [Mango](http://ric.uthscsa.edu/mango/index.html), by a friend or two and use it somewhat inconsistently.  One major advantage of this software is that it has been converted to a pure JavaScript library called [Papaya](https://github.com/rii-mango/Papaya).  As such, you can create simple HTML files that have an embedded interactive image viewer. 
+
+# Papayar
+That's all fine and good, but I like my things in `R`.  I understand many can easily write bash scripts that perform the same operations and use the HTML builder provided by papaya. 
+
+I want the operation in R for the same reasons I make many things for R: 
+
+1. I use R
+2. Many statisticians like imaging but need tools they understand and they understand R
+3. I like writing pipelines and scripts in one language
+
+My answer: the [`papayar` package](https://github.com/muschellij2/papayar).  
+
+### Install papayar
+
+To install `papayar`, you can simply install from GitHub using the `devtools` package.  
+
+```{r, eval = FALSE}
+require(devtools)
+devtools::install_github("muschellij2/papayar")
+```
+
+## Papayar functions
+
+The main function is `papaya`.  Let's look at the arguments:
+
+```{r}
+library(papayar)
+formalArgs(papaya)
+```
+
+The `images` argument can be a list of `nifti` objects or a vector of character filenames.  The `outdir` is where the HTML file is written.  The default is to a temporary directory that will be trashed after the session is over.  The additional arguments are passed to the lower-level function `pass_papaya`, which in turn are passed to functions `httd` and `daemon_stop` in the [`servr` package]().  The `pass_papaya` function is useful, however, to open a blank papaya session by just invoking `pass_papaya()`
+
+## Papayar Example
+As the `httd` function starts a server, the images can be rendered (and will be by default) in the RStudio viewer!  In the terminal, it opens your default web browser. Here's a basic example: 
+
+```{r, eval=FALSE}
+library(oro.nifti)
+x = nifti(img = array(rnorm(100^3), dim= rep(100, 3)), dim=rep(100, 3), datatype=16)
+y = nifti(img = array(rbinom(100^3, prob = 0.5, size = 10), dim= rep(100, 3)), dim=rep(100, 3), datatype=16)
+index.file = papaya(list(x, y))
+```
+
+The first 3 lines make some random arrays, from a normal and binomial distribution and puts them into a `nifti` object.   The list of these `nifti` objects is passed in.  The first image is displayed in grayscale and the second image is overlaid using red-hot colors and the opacity of this image can be changed.  The object `index.file` will be a character filename where the HTML file is stored.  The data and this HTML file is written to `outdir` (which, again, is a temporary directory by default).  
+
+### Output
+
+Below is a series of screen shots I took from the code above.  You should be able to see this in RStudio or your browser:
+
+![Overlay](http://i.imgur.com/JEZ9WUz.png)
+
+The main reason to use this is that you can click different areas for the crosshairs and move to a different point in axial, coronal, and sagittal space.  Thus, this is truly interactive.  
+
+Here we can show there are limited (but useful) controls for the overlay.  You can change the mapping of the values in the image and the overlay and the opacity of the overlay.  
+![Overlay_controls](http://i.imgur.com/OpvKXen.png)
+
+## Brain Example
+The above data has been used since everyone could test it, but it's just random numbers and doesn't look very compelling.  Here I will show you the hyperintense voxels overlaid on the MNI 152 1mm T1 brain image [click here for description](http://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Atlases), which correspond mainly to the white matter:
+
+```{r, eval=FALSE, echo = FALSE}
+library(fslr)
+x = readNIfTI("MNI152_T1_1mm_brain.nii.gz", reorient = FALSE)
+brain = x > 0
+vals = x[x > 0]
+z = mask_img( (x- mean(vals))/ sd(vals), brain)
+y = mask_img(z^2, z > 0)
+index.file = papaya(list(x, y))
+```
+
+![Brain_Overlay](http://i.imgur.com/ROnKekN.png)
+
+Hopefully you can see how this can be useful for exploring data and results.  
+
+# ITK-SNAP and itksnapr
+Some of my colleagues are more partial to using ITK-SNAP for viewing images interactively.  I have bundled the executables for ITK-SNAP into the R package [`itksnapr`](https://github.com/muschellij2/itksnapr).  The main function is `itksnap`, which you can specify images to different options to ITK-SNAP. 
+
+### Install itksnapr
+
+To install `itksnapr`, you can simply install from GitHub using the `devtools` package.  
+
+```{r, eval = FALSE}
+require(devtools)
+devtools::install_github("muschellij2/itsnapr")
+```
+
+```{r, eval=FALSE}
+library(itksnapr)
+itksnap(grayscale = x, overlay = y)
+```
+
+I haven't used ITK-SNAP much, but hear many good things about it.  There are many better resources than this blog on how to use it and how to use it well.  If interested in a good image viewer, I implore you to google around for some of these resources.  If anyone has intense interest of image viewers and wants added functionality, don't hesitate to file an inssue on GitHub.
+
+# FSLView
+Although it was included in my [`fslr`](https://cran.r-project.org/web/packages/fslr/index.html) package by default and I never discussed it in detail, FSLView is included with the distribution of FSL and is a viewer I use heavily.  The `fslr` function is `fslview`.  One specific advantage of using FSLView is that it can pass through X11 forwarding, so you can remotely view image from a cluster, though it may be slow.
+
+![](http://i.imgur.com/laVnQo5.png)
+
+# Conclusion
+Although I use the `orthographic`,`image.nifti` and `overlay` functions from `oro.nifti` for many of my figures, for interactive exploring of results, these can be somewhat slow for getting a large-scale view, and not a specific slice view.  Therefore, a fully interactive neuroimaging plotter is necessary.  Here are 3 options that can be accessed "within" `R`.
