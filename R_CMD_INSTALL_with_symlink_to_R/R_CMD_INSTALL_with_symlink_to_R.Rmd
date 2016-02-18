@@ -1,0 +1,74 @@
+---
+title: "R CMD INSTALL with symlink to R"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+## Problems with R CMD INSTALL 
+
+I was trying to install a package ([ANTsR](https://github.com/stnava/ANTsR)) by running `R CMD INSTALL` as normal on the cloned github repository on a particular cluster.  I kept getting errors and could not understand why for the life of me. Note, I have not used this cluster much and wasn't sure how it was configured.  
+
+I was pretty sure that this was a configuration problem on the cluster because I had installed this repo on:
+
+1. My system
+2. A shiny server
+3. Another cluster
+
+## Finding the Error
+
+The build was using [`cmake`](https://cmake.org/), so I figured it was some flag.  Oddly enough, I was getting the error (I put `.` where thes are hard paths not relevant to you):
+
+```
+-- Check for working C compiler: ./cc -- broken
+CMake Error at . (message):
+  The C compiler "." is not able to compile a simple test program.
+```
+
+Whoa.  Now either the C compiler is broken (unlikely) or the configuration has an error/bug (much more likely).  I didn't write the config for this package (it's pretty complex), so I felt a bit at a loss.
+
+
+### Let's look at the error
+
+Well, the error did push me to the log for the error `CMakeFiles/CMakeError.log`, let's go there.  Looking at the result of `CMakeFiles/CMakeError.log`, I found the following areas that seemed like where things were problems:
+```bash
+Build flags: ;WARNING:;ignoring;environment;value;of;R_HOME
+```
+
+Hmm.  I see that these are words, not really building flags.  They also seem like R code.  I don't know how they got there, so I did some Googling.
+
+I got to a page of [someone having a similar issue: '"ignoring environment value of R_HOME" error when installing packages'](http://r.789695.n4.nabble.com/quot-ignoring-environment-value-of-R-HOME-quot-error-when-installing-packages-td856674.html).  That sounds like my problem.  OK their admin reset `R_HOME` and everything is great.  Good for him, not much help for me.
+
+I found a [bug report for R](https://bugs.r-project.org/bugzilla3/show_bug.cgi?id=15070) which discusses this, but there didn't seem to be any resolution.
+
+## Finding a Solution
+
+I went back to the simple R warning "WARNING: ignoring environment value of R_HOME" and found an old [StackOverflow Post](http://stackoverflow.com/questions/6395078/rscript-get-rid-of-warning-ignoring-environment-value-of-r-home) about it.  
+
+Now, one thing they discussed was 
+```bash
+unset R_HOME
+```
+I tried that, nothing worked.  
+
+OK, well what about `RHOME`, let's unset that too:
+```bash
+unset RHOME
+```
+
+Error, fail.  Moreover, these variables **were never set anyway**.  Oh! I realized if we reversed the error, that `R_HOME` was set **incorrectly**, then let's just set it before `R CMD INSTALL` and then it shouldn't error:
+
+```bash
+R_HOME=`R RHOME`;
+R CMD INSTALL ANTsR
+```
+
+That's not to say the package will install without a hitch, but this part of the build seems to be fixed.  (Note: I had to clean out the errors to rerun).
+
+## Why did this happen?
+
+I believe most of this happened by the configuration of `R` on the cluster and the linking of the `R` folder (try `which R`) to the true home for `R` (try `R RHOME`).  I don't know where (if anywhere) in the setup/.bashrc/.bash_profile scripts `R_HOME` is set, but it seems that this discrepancy caused a problem.  

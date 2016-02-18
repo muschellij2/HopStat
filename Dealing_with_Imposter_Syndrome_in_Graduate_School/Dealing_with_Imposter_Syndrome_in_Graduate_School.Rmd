@@ -1,0 +1,181 @@
+---
+title: "Dealing with Imposter Syndrome in Graduate School"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = FALSE, prompt = FALSE, message = FALSE, 
+               warning = FALSE, comment = "", results = 'hide')
+```
+
+In my [post of recommendations for first-year students](https://hopstat.wordpress.com/2015/10/13/recommendations-for-first-year-graduate-students/), I discussed some tips and viewpoints to help the practical, pragmatic aspects about being a first year student.  In this post, I'd like to discuss the common misconceptions/viewpoints that are destructive to new students.
+
+# The Dunning-Kruger effect 
+### I know something, so everyone else is dumb
+You just learn about p-values and their problems.  OMG someone over there uses them?  They are so dumb and don't understand anything.  Why can't everyone be as smart as you?  Whey can't people just "get it"?  Have you ever felt this or known someone who sounds like this?
+
+Let me introduce the [Dunning-Kruger effect](https://en.wikipedia.org/wiki/Dunning%E2%80%93Kruger_effect).  In short, it describes that the unskilled are unable to:
+
+> recognize their own ineptitude and evaluate their own ability accurately.
+
+Therefore, you learn something new about a field (e.g. statistics), and you feel pretty confident when talking to others.  I'm not saying you're unskilled, but you may not know what's common in practice or the merits/pitfalls of a method or other methods.  Many times new students will learn one thing, usually not that in-depth, and incorrectly think they've mastered that area.  Moreover, they usually cite the same piece of information over and over, as they have few pieces of information to draw upon.  This sometimes happens with newer students, but fades relatively quickly.
+
+### Everyone else is a genius
+The equally important converse to the Dunning-Kruger effect is that:
+
+> highly skilled individuals may underestimate their relative competence, erroneously assuming that tasks that are easy for them also are easy for others.
+
+After the first feeling fades, a student realizes how out of depth they were.  This is the more damaging effect because then you start to feel like...
+
+## You are an Imposter; So am I
+You are not good enough for your program.  Everyone is better prepared and smarter than you.  You don't deserve to be here.  You're stupid.  You are never going to get it.  You should quit.  Everyone is going to find you out.  Then they'll make you leave your program.  
+
+If you read all of these statements and some rang true, let me introduce you to [Imposter Syndrome](https://en.wikipedia.org/wiki/Impostor_syndrome).  Most students feel this way their first year.  I felt this way.  Many of my classmates felt this way.  Some of us may still feel this way.
+
+Why?  Many new students have done previous programs with relative ease.  They have been, or at least felt, like the smartest person in the room before.  Now, in this new and highly-selective program, you are not the smartest.  You may not even be close to the smartest.  
+
+Aside: when I say "smart", I mean whatever criteria you're using for self-worth with respect to intelligence.  I think work gets done by banging your head against the wall until something comes out.  Being talented is helpful, but hard work gets results.  But talent before may have been enough.
+
+Also, if you have tied your superior intelligence to your identity, you've now lost it.  If people are smarter than you, then who are you compared to them?  How can you combat this feeling?  Spoiler: stop comparing to the wrong people.
+
+## Comparing Yourself to the Correct Distribution
+Many times, people forget what got them there.  They worked hard (even relatively) to do the prerequisites, fill out the forms, do the undergraduate research, and make the move to the new department.  Much of that hard work is overlooked by new (and even some more senior) students.  They are much like Ricky Bobby: ["If you're not first your last"](https://www.youtube.com/watch?v=y4usE2RePqo).  But that's ridiculous ["you can be "second, third, fourth, hell, even fifth"](https://www.youtube.com/watch?v=20iio0wLpPA).
+
+### The wrong distribution
+I'm not saying to not strive for being the best.  Strive for that, but compare yourselves to the right distribution.  Many students compare themselves like this:
+
+```{r}
+start = xstart = 2
+xend = end = 5
+
+xend = end
+start = start + 1
+
+mids = seq(start,end,0.01)
+cord.x <- c(start,mids,end) 
+cord.y <- c(0,dnorm(mids),0) 
+plot(dnorm, from = xstart, to=xend, ylab = "", 
+     xlab = "", 
+     main = "Conditional Distribution of Knowledge\nin Your Field", 
+     xaxt = "n", yaxt = "n", bty= "n" )
+polygon(cord.x,cord.y,col='red')
+text(x = start + 0.25, y = dnorm(start) + 0.0025, "Faculty", col= "red")
+segments(x0 = xstart, x1 = xend, y0 = 0, y1 = 0)
+eps = .025
+segments( x0 = xstart + eps, x1 = xstart + eps, 
+          y0 = 0,
+          y1 = dnorm(xstart + eps), 
+          lty ="solid")
+text(x = xstart + eps, y = dnorm(xstart + eps) + 0.0025, "You")
+eps = 0.1
+segments( x0 = xstart + eps, x1 = xstart + eps, 
+          y0 = 0,
+          y1 = dnorm(xstart + eps),
+          col = "blue")
+text(x = xstart + eps + 0.3, 
+     y = dnorm(xstart + eps) + 0.0025, 
+     "Best First Year", col = "blue")
+eps = 0.5
+segments( x0 = xstart + eps, x1 = xstart + eps, 
+          y0 = 0,
+          y1 = dnorm(xstart + eps), 
+          col ="deeppink2")
+text(x = xstart + eps + 0.2, 
+     y = dnorm(xstart + eps) + 0.0025, 
+     "5th Year Student", col = "deeppink2")
+```
+
+As seen from this, you are at the low end of the distribution.  You are likely not the best first year, feel miles behind a 5th-year student, and a lifetime behind a faculty member.  How can you ever become like these people?  
+
+There's this saying "if you see it you can be it".  Conversely, if you can't see it, then you don't think you will be it.  This is important because if you want to be a faculty member, you must realize every year you are getting one step closer to that role.  You have to see yourself in that role.
+
+But right now, you feel like you don't know anything about your field.  But this is the **WRONG DISTRIBUTION** for comparison.  
+
+### The correct distribution
+
+As said above in the plot title, this is a **conditional** distribution of knowledge in your field.  This distribution compares you as a brand-new first-year student to those who have worked in the field for an entire undergrad degree (the top first-year students), at least 5 years of work and research (5th-year student), or for > 10 years/a lifetime of work (most faculty).   Of course you're going to feel inadequate.  By construction, you are near the lowest part of the distribution.  You're setting yourself up to be the worst.
+
+You should compare yourself to full distribution:
+
+```{r correct_distribution}
+start = xstart
+end = xend
+mids = seq(start,end,0.01)
+cord.x <- c(start,mids,end) 
+cord.y <- c(0,dnorm(mids),0) 
+
+plot(dnorm, from = -xend, to = xend, ylab = "", 
+     xlab = "", 
+     main = "Full Distribution of Knowledge\nin Your Field", 
+     xaxt = "n", yaxt = "n", bty= "n")
+polygon(cord.x, cord.y, col = 'skyblue', border = NA)
+segments(x0 = -xend, x1 = xend, y0 = 0, y1 = 0)
+text(x = xstart + eps + 1.1, 
+     y = dnorm(xstart + eps) + 0.1, 
+     "Conditional\nDistribution", col = "skyblue")
+eps = .025
+segments( x0 = xstart + eps, x1 = xstart + eps, 
+          y0 = 0,
+          y1 = dnorm(xstart + eps), 
+          lty = "solid")
+text(x = xstart + eps, 
+     y = dnorm(xstart + eps) + 0.025, 
+     "You")
+eps = .5
+segments( x0 = xstart - eps, x1 = xstart - eps, 
+          y0 = 0,
+          y1 = dnorm(xstart - eps), 
+          lty = "solid", 
+          col = "darkgreen")
+text(x = xstart - eps - 0.5, y = dnorm(xstart - eps) + 0.025, 
+     "Avg Grad Student", col = "darkgreen")
+
+text(x = start + 1.25, y = dnorm(start + 1) + 0.0025,
+     "Faculty", 
+     cex = 0.5,
+     col = "red")
+segments(x0 = xstart + 1, x1 = xend, y0 = 0, y1 = 0)
+```
+
+That's more like it!  This is more representative comparison of your skills.  The average graduate student likely knows a bit more about your field than everyone else, but notice where YOU are in this distribution.  Now yes, the faculty is still out there, but it's relatively closer.  With each year, you get closer to that upper tail of the distribution.  Also, most people keep concentrating on the right-hand tail whereas they forget about the **majority** of the distribution is to your left.  You know things about your field, more than the majority of people.  
+
+At the end of the day, you need to compare yourself to the full distribution, not the conditional one.  Just because you are not the smartest/best when you start, that's to be expected.  You can't know everything over night.  The most important message is to not get discouraged when you first start.  Things are confusing and hard, but they get better.  Just keep going.
+
+And remember one thing about this whole mental exercise of comparison:
+
+> It's not to make you feel better than others.  It's to make you feel adequate about yourself and your skills.
+
+Making others feel less worthy or make yourself feel as though you're "better" than another will inevitably cause this same crisis of self when that identity is challenged.  Stop doing that.  Just do you.
+
+
+# Adapt a different mindset
+Many of the issues above are discussed in the book  [Mindset: The New Psychology of Success](http://www.amazon.com/Mindset-The-New-Psychology-Success/dp/0345472322).  I have some copies of the book if you'd like to read it.  I highly recommend it.  
+
+The long and short of the book's message is that overcoming ideas such as imposter syndrome comes out of adapting a new mindset.  Here are some examples of how the mindsets differ: [link 1](http://thumbnails-visually.netdna-ssl.com/what-is-a-growth-mindset_5372df15ad4e5_w1500.jpg), [link 2](http://marketing.linkedin.com/blog/wp-content/uploads/2012/09/Mindset_Divide_Infographic.png) from [here](http://marketing.linkedin.com/blog/todays-mindset-divide/), and [link 3](https://mrmck.files.wordpress.com/2014/07/growthmindset.png?w=842)
+
+
+In a [fixed mindset](http://mindsetonline.com/whatisit/themindsets/index.html), someone believes that talents are fixed and unchangeable.  Either you are smart or your not.  If you aren't smart, then sucks for you because you can't change it.  The other, and recommended viewpoint of the author, is the [growth mindset](http://mindsetonline.com/whatisit/themindsets/index.html), where one believes:
+
+> their qualities as things that can be developed through their dedication and effort.
+
+You're not good at one area?  Well try hard and change it.  Stop worrying you're not good enough and get to work.  
+
+[Andrew Gelman had an interesting post recently about the book's replicability](http://andrewgelman.com/2015/10/07/mindset-interventions-are-a-scalable-treatment-for-academic-underachievement-or-not/), so I suggest reading over there for some details.  If the books helps you cognitively break down some walls I think that's great, but I always would like to see the evidence.  If you want to track your progress post reading, I'd love to hear it!
+
+
+# The battle is not only with new students
+Let me be clear that this is not an issue for only new students. Although older students get better at determining their position in the distribution, they then fall to the same issue comparing themselves to faculty in the tails.  
+
+I hear students claim many times that they're not ready to become professors.   I've spoken to many tenured professors and a lot of them say that a post-doc position is a great gig (at least in biostats).   The arguments are that you get the freedom that a assistant faculty has, but not as much of the responsibilites.  I agree with this sentiment, and think those are great reasons to do a post-doc.  
+ 
+But I feel as though some students do not think they can be a faculty member because of their CV and number of publications.  Not wanting to advise students, not ready to build a class, not ready to write grants, not sure about a new city for long-term - these are great reasons to not want to become a faculty member.  Not having "enough" publications is not necessarily a good one.  Yes, some places may not invite you to speak based on your CV.  Some will invite you but not give you an offer.  If there is a penalty for trying to get an interview, not getting it, doing a post-doc, and then re-applying in 2 years, then that system is broken.  The only penalty should be that there are no positions and the timing was no longer right.  (Assuming you didn't do something off the rails the first interview).  
+
+## Compare yourself to the correct distribution
+One of the reasons I feel that people say they do not have "enough" publications is either because they are 1) comparing themselves to people other than assistant professors, or 2) they are comparing themselves to assistant professors **NOW** compared to when they started.  
+
+Here's an exercise I like to go through.  Go to a website of a place you want to apply to, find some assistant professors.  Go to their CVs and look the year they graduated with their PhD.  Go to their publications and look at those that came out in that year + 1.  That's them when they graduated with their PhD, including published, in-press, and current work.  If you are greatly behind them, then yes, you may not have compared well against them.  But remember, that's them compared to you **on the same playing field**.  And remember, they were like you and they got the job.  So give it a shot if that's what you want, but don't let your incorrect comparison cripple you with feeling inadequate.  That's not what you do, that's some imposter.
+
+
+

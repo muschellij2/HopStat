@@ -1,0 +1,121 @@
+---
+title: "Recommendations for First Year Graduate Students"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo=TRUE, prompt=FALSE, message=FALSE, warning=FALSE, comment="", results='hide')
+```
+
+This blog post is a little late; I wanted to get it out sooner.
+
+As new students have flooded the halls for the new terms at [JHU Biostat](http://www.jhsph.edu/departments/biostatistics/), I figured I would give some recommendations to our new students, and biostatistics students in general.  Some of these things may be specific to our department, but others are general, so the title should be fitting.  Let's dive in!
+
+# First Term Things
+## Don't buy books
+Some books are good for a reference, many are not.  I say this because much of the information is available on Google or the internet and you will check that 98% of the time compared to going to a book.  That being said, many students have these good reference books and will be willing to let you borrow them.  Also, the library in your department or school will likely have them.
+
+### Recommendation
+The full recommendation for books is this:
+
+1.  Borrow books you need for class, especially from current (not new) students.  Sharing books with current students is good except if you both need it during crucial times (like exams/comprehensive exams). Everyone has Chung or Billingsley.
+2.  Of those you can't borrow, go to class for a week or two and see if you **actually** need it.  Some professors go straight off their lecture notes.  Your school bookstore doesn't just go and send back all their copies when school starts, so you can still get it.  Also, I heard this new website Amazon has books.
+3.  If you think a book is a really good reference, buy a copy.  Better yet, buy a digital copy so you can digitally search and annotate it.
+
+## Get new gear/electronics
+You will be spending the majority of your time on your laptop, so it better work and be fast.  Most new programs will have some money for books and a laptop.  If you read above, you saved some money on books, so use it to buy a new laptop.  If your laptop is less than 2 years old, you can save that money (if PhD) or buy other electronics such as an iPad for notetaking (if Master's).  
+
+Have the tools to make your work easy because nothing is worse than you not getting work done due to other factors than yourself. 
+
+### Recommendation
+Get a Unix-like machine (aka Mac).  Others say you can do stuff in Windows, but it's easier for some software in Unix.  Cluster computing (see below) will be easier as well.
+
+Side note: if you buy a new computer, do not open it until Friday afternoon/Saturday as you will likely spend a whole day playing with your new gear.
+
+## Learn who the staff is
+I find many students know who the faculty are and what research they do, but have no idea about who the staff is.  These people know almost **everything** you need to know for non-research help.  They schedule meetings with the chair, organize events, schedule rooms, and, very importantly, know how to get you paid/your stipend.  These people are the glue that makes everything run and are a great resource.  
+
+### Recommendation
+Go into the office and introduce yourself and ask what you should go to person X for. They will know you then when you email.
+
+# Research and Organizational Tips
+## Start doing research NOW
+If you want to learn what research is all about, get involved early.  Even if you don't feel like you know anything, waiting to get involved on a research project will not help.  It can hinder you.  I'm not saying work 10 hours per week on a project; you have classes.  
+
+### Recommendation: Visit all the working group meetings before choosing
+Attending research meetings of a few working groups can help you 1) get information on the group and how it's run, 2) meet the group members, 3) choose what you may want to focus on, and 4) get you a small-scale project to start on.
+
+This small project is not set in stone.  It is not your thesis.  The project contact doesn't have to be your thesis advisor.  You will likely be working on this "for free" (unless it's under a training grant mentor, technically).  Therefore, you don't "owe" anyone anything if you decide in a month you hate that field or project.  Don't take it lightly to abandon a project, but do use it as a feeler in that area.
+
+Let me reiterate (at least in our department): Your academic advisor doesn't need to be your research advisor.  
+
+
+### Recommendation: Learn how to code
+Learn how to program as soon as possible.  Some good resources are [codeschool](http://codeschool.com/) or [code academy](https://www.codecademy.com/).  If using R, I recommend first [Try R from Codeschool](http://tryr.codeschool.com/).  I would then move on to [Swirl](http://swirlstats.com/).  It will never be a waste of time getting up to speed or learning how to do something new with programming.  If you already feel great with R, you can [try Python](https://www.codecademy.com/tracks/python) or move [deeper into R](http://adv-r.had.co.nz/).
+
+### Learn how to use a computing cluster
+This may be necessary later in your program, but try to do it before it's "necessary".
+
+You are going to work on some project invariably that 1) will use simulations or 2) requires intense computation.  As such, a computing cluster is made specifically for these scenarios.  Learn how to use it.  If you're not going to use it now for research, at least get your login and try it briefly for a class project.
+
+## Learn Modern Note-Taking Utilities and Back up your work
+Condense your note-taking into one app.  I like using  [Evernote](https://evernote.com/) as it syncs with my phone and Mac.
+
+Use [Dropbox](https://www.dropbox.com/) or [Google Drive](https://www.google.com/drive/) to have a "hands-free" syncing service.  Also, think about investing in an [External Hard Drive](http://www.newegg.com/), maybe as your new gear, to doubly back-up your system/data.  Laptops can (and have been) stolen.  Although Google Drive/DropBox are likely to be around for some time, you always want something in your control (external HDD) in case something goes wrong on a server.  [GitHub](https://github.com/) is great for version control, and some people use it as a back up of sorts, but it's not really for that and not a "hands free" rsync-based solution.
+
+### Learn a Markdown/Markup Language
+Learn a Markdown language.  Yihui has a good description of [Markdown vs. LaTeX](http://yihui.name/en/2013/10/markdown-or-latex/).  You will need to know both. Think about learning some basics of HTML as well.    
+
+## Make a Webpage
+With your newfound HTML skills from above, build a webpage for yourself.  Some use GitHub or WordPress.  Many options exist, depending on your level of expertise, blogging capability, level of control.  
+
+Why do I need a webpage?  You work on a computer (after classes) like 98% of the day.  You should have a web presence.  
+
+What about my LinkedIn profile? That's good for a resume-like page, but not great for your opinions, picture uploads, general ideas.  Also, your webpage allows you to control completely what you put out there.  Remember, if you don't make the content, Google will pick what people see.  
+
+Check out [student websites](http://www.jhsph.edu/departments/biostatistics/directory/students/phd.html) and ask the student whose you like best how they did it.
+
+# Student Life
+## Ask other students questions
+One of my rules is to never be scared to ask a stupid question.  I ask questions all the time.  Some of them are stupid.  I know that I won't get an answer if I don't ask though.
+
+We have offices.  Students are in those offices.  Ask them questions.  It's that simple.  
+
+Many students say "well I don't want to bother them".  I learned how to code by bothering people.  I bothered them very much so.  I thought I was annoying, but I didn't care because I didn't know what the hell I was doing.  
+
+Does that mean I want questions all day by new students? No.  Read that again. No.  But I do try to pay forward information to new students just like others paid towards me.  If a student is curt or makes you feel stupid about asking a question, stop talking to them.  They forgot what it was like when they were lost and confused and are likely now severely delusional.   
+
+Your questions are usually not new.  We've asked them likely ourselves.  We either have the answer or know who does.  Ask.
+
+## Go to student-lead meetings
+No one in my office knows anything!!? Who do I ask now?  Well there are student-lead meetings.  These have a lot of information and ... other students!  Go there, ask questions.  If the topic is not what you need to know, wait until the end of the meeting when the structure breaks down and ask someone then.  
+
+Student-lead meetings have a lot less pressure to ask the "stupid questions" in a safer environment and will likely lead to answers that you understand.  Because they are from other students. 
+
+## Work with your cohort
+Get chummy with your cohorts.  You don't have to be best friends forever, but you will talk with them, have class with them, and likely work with them.  Stop doing things on your own, that's not leveraging other people's brain for you as well.  
+
+These are other smart people (they were smarter than me).  Why not work with them and grab some of that brainyness floating around.  You will feel dumb for a while, but you'll figure it out.  If you don't work with a group in the beginning, it may be too late later when people have grouped up.  
+
+They are not your competition, though many departments make it seem like that.  The next stage of your career will be mixed with projects on team and the rare projects where you are alone (aka thesis).  Learn how to play with, and more imporantly listen to, others.
+
+## Grades don't matter that much, learning the material does
+"I came to grad school to get a 4.0" said no one ever.   Grades are important for somewhat narrow things such as if the comprehensive exams go badly, are "an assessment" of your learning, or if you apply to a job with a Master's and they ask for your transcript (and for some reason care).  
+
+But good grades are not the goal of grad school.  It's learning.  Learn and understand the material.  Learn how to learn new material.  That's the goals.  Grades matter in the sense they will let you know quite glaringly when you **really** don't know something.  Remember learning is improving yourself and that should make it easier to do a project than just doing it "because someone told you to".
+
+**Update:** As pointed in the comments below, grades can matter greatly if you plan to apply to another program after your degree (e.g. PhD after doing your Master's).  If this may be in your future, make sure to keep an eye on your grades as well.
+
+# Life Recommendations
+## Take at least one day off per 7-day week
+You need rest.  Take it.  A day off can clarify things later.  Sometimes it's only when you stop hitting your head against the wall when you realize that what you're doing doesn't work.  That's not to say you still won't work like 60 hours a week for a while, but make sure you have some protected time for your banging head.  
+
+## Explore restaurants/food/night life
+One of the best pieces of advice I've ever gotten for grad school was: "find a place you want to spend the next 5 years of your life" in reference to your department **AND** city. Whatever city your in has fun things to do.  Find them.  Explore your city and area.  People tend to hate places they live in grad school if they don't associate anything with it other than working in a hole.  Which leads me to...
+
+## Don't work in a hole; Find a happy place to work
+Find a place where you are productive and like to go.  I like the office; others don't.  Find a coffee shop near you for days without class or when you are done classes.  Use the reading room or other areas as your go to.  Again, working somewhere you don't like is one more hurdle to getting things done.  Get rid of such hurdles, you will have enough of them to make your own.
+
