@@ -26,7 +26,7 @@ To break down what is going on, here is what R interprets (more or less):
 Implicitly, `ggplot2` notes that all 3 aesthetics are continuous, so maps them onto the plot using a  "continuous" scale (color bar).  If `stations` were a factor or character column, the plot would not have a color bar but a "discrete" scale.  
 
 
-Now, Jeff goes on to describe elemnts he believes required to make this plot "production ready":
+Now, Jeff goes on to describe elements he believes required to make this plot "production ready":
 
 1. make the axes bigger
 2. make the labels bigger
