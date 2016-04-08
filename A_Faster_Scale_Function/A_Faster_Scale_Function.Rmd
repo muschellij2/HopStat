@@ -1,0 +1,258 @@
+---
+title: "A Faster Scale Function"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+```{r label=opts, results="hide", echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+library(matrixStats)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide", cache = TRUE)
+```
+
+## Problem Setup
+
+In [recent question](https://www.linkedin.com/groups/77616/77616-6105465038766641152) on LinkedIn's R user group, a user asked "How to normalize by the row sums of the variable?".  Now first, we must define what we mean by "normalize" a matrix/data.frame.  
+
+One way to standardize/normalize a row is to subtract by the mean and divide by the max to put the data into the $[0, 1]$ domain.  Many times, however, users want to perform z-score normalization by doing:
+$$
+\frac{x - \mu}{\sigma}
+$$
+where $\mu/\sigma$ are the mean/standard deviation of the column (typically the column).  
+
+The answer on that forum eventually came down to using the `scale` command. The `scale` function is great.  It is simple and has 2 options other than passing in the matrix:
+
+1.  Center - should the columns have their mean subracted off?
+2.  Scale - should the columns have their standard deviation divided after/not centering?
+
+Overall, the function is fast, but it can always be faster.
+
+The `matrixStats` package has some **very** quick operations for row/column operations and computing statistics along these margins.  
+
+## Creating Some Data
+
+Here we will create a random normal matrix with each column having a mean of 14 and a standard deviation of 5.
+
+```{r data, cache=FALSE}
+set.seed(1)
+mat = matrix(rnorm(1e7, mean = 14, sd = 5), 
+    nrow = 1e5)
+dim(mat)
+```
+
+### How fast is scale?
+Let's see how fast the `scale` function is:
+```{r scale, cache = FALSE, results = "markup"}
+system.time({
+    sx = scale(mat)
+    })
+```
+That's pretty fast!  Overall, there is not much room for improvement in this case, but it may be relevant if you have a lot of matrices or ones bigger than the one defined here in `mat`.
+
+## Defining a new function
+
+First, we must load in the `matrixStats` package and the only function we really are using is the `colSds`.  
+```{r colScale}
+library(matrixStats)
+
+colScale = function(x, 
+    center = TRUE, 
+    scale = TRUE,
+    add_attr = TRUE, 
+    rows = NULL, 
+    cols = NULL) {
+    
+    if (!is.null(rows) && !is.null(cols)) {
+        x <- x[rows, cols, drop = FALSE]
+    } else if (!is.null(rows)) {
+        x <- x[rows, , drop = FALSE]
+    } else if (!is.null(cols)) {
+        x <- x[, cols, drop = FALSE]
+    }
+    
+  ################
+  # Get the column means
+  ################  
+    cm = colMeans(x, na.rm = TRUE)
+  ################
+  # Get the column sd
+  ################      
+    if (scale) {
+        csd = colSds(x, center = cm)
+    } else {
+        # just divide by 1 if not
+        csd = rep(1, length = length(cm))
+    }
+    if (!center) {
+        # just subtract 0
+        cm = rep(0, length = length(cm))
+    }
+    x = t( (t(x) - cm) / csd )
+    if (add_attr) {
+        if (center) {
+            attr(x, "scaled:center") <- cm
+        }
+        if (scale) {
+            attr(x, "scaled:scale") <- csd
+        } 
+    }   
+    return(x)
+}
+```
+
+Let's break down what the function is doing:
+
+1.  The function takes in a matrix `x` with options:
+    1.  subsetting `rows` or `cols`
+    2.  center each column (by the mean) or not
+    3.  scale each column (by the standard deviation) or not
+    4.  Add the attributes of center/scale, so they match the `scale` output.
+2.  The functions subsets the matrix if options are passed.
+3.  Column means are calculated
+4.  Column standard deviations are calculated (using the colmeans) if `scale = TRUE` or simply set to 1 if `scale = FALSE`.  
+5.  If the data is not to be centered, the centers are set to 0.
+6.  The data is transposed and the mean is subtracted then the result is divded by the standard deviation.  The data is transposed back.  
+    - The reason this is done is because `R` operates column-wise.  Let `p` be the number of columns.  The column means/sds are of length `p`.  If one simply subtracted the column means, `R` would try to do this to each individual column.  For instance, it would recycle the `p` numbers to get to length `n` (number of rows), and do that subtraction, which is not what we want. 
+7.  The attributes are added to the matrix to match `scale` output.
+
+### colScale timing
+Now we can see how fast the `colScale` command would take:
+```{r colscaler, cache = FALSE, results = "markup"}
+system.time({
+    csx = colScale(mat)
+})
+```
+
+This is a lot faster than the `scale` function.  First and foremost, let us make sure that these give the same results:
+
+```{r compare, results = "markup"}
+all.equal(sx, csx)
+```
+
+## Better benchmarking
+OK, we found that we can speed up this operation, but maybe this was a one-off event.  Let's use the `microbenchmark` package to 
+
+```{r bench, results = "markup"}
+library(microbenchmark)
+mb = microbenchmark(colScale(mat), scale(mat), times = 20, unit = "s")
+print(mb)
+```
+
+We can visualize the results using `ggplot2` and some violin plots.  
+```{r gg}
+library(ggplot2)
+g = ggplot(data = mb, aes(y = time / 1e9, x = expr)) + geom_violin() + theme_grey(base_size = 20) + xlab("Method") + ylab("Time (seconds)")
+print(g)
+```
+
+## What about scaling rows!
+
+If you note above, we did not standardize the matrix with respect to the rows, but rather the columns.  We can perform this simply by transposing the matrix, running scale and then transposing the matrix back:
+
+```{r scaled_row, results = "markup"}
+system.time({
+  scaled_row = t( scale(t(mat)) )
+})
+all(abs(rowMeans(scaled_row)) < 1e-15)
+```
+
+Again, we can do the same thing with `colScale`:
+```{r colscaled_row, results = "markup"}
+system.time({
+  colscaled_row = t( colScale(t(mat)) )
+})
+all(abs(rowMeans(colscaled_row)) < 1e-15)
+all.equal(colscaled_row, scaled_row)
+```
+
+And we see the results are identical
+
+### Creating rowScale
+The above results are good for what we would like to do.  We may want to define the `rowScale` function (as below), where we do not have to do the transposing and transposing back, as this takes may take some extra time.
+
+Again, if we're about improving speed, this may help.
+
+```{r rowScale}
+rowScale = function(x, 
+    center = TRUE, 
+    scale = TRUE,
+    add_attr = TRUE, 
+    rows = NULL, 
+    cols = NULL) {
+    
+    if (!is.null(rows) && !is.null(cols)) {
+        x <- x[rows, cols, drop = FALSE]
+    } else if (!is.null(rows)) {
+        x <- x[rows, , drop = FALSE]
+    } else if (!is.null(cols)) {
+        x <- x[, cols, drop = FALSE]
+    }
+    
+  ################
+  # Get the column means
+  ################  
+    cm = rowMeans(x, na.rm = TRUE)
+  ################
+  # Get the column sd
+  ################      
+    if (scale) {
+        csd = rowSds(x, center = cm)
+    } else {
+        # just divide by 1 if not
+        csd = rep(1, length = length(cm))
+    }
+    if (!center) {
+        # just subtract 0
+        cm = rep(0, length = length(cm))
+    }
+    x = (x - cm) / csd 
+    if (add_attr) {
+        if (center) {
+            attr(x, "scaled:center") <- cm
+        }
+        if (scale) {
+            attr(x, "scaled:scale") <- csd
+        } 
+    }   
+    return(x)
+}
+```
+
+Now let's see how we do with `rowScale`:
+```{r rowscaled_row, results = "markup"}
+system.time({
+  rowscaled_row = rowScale(mat)
+})
+all(abs(rowMeans(rowscaled_row)) < 1e-15)
+all.equal(rowscaled_row, scaled_row)
+```
+
+Let's look at the times for this breakdown using `microbenchmark`:
+```{r mb_row, results = "markup"}
+mb_row = microbenchmark(t( colScale(t(mat)) ),
+                        t( scale(t(mat)) ),
+                        rowScale(mat),
+                        times = 20, unit = "s")
+print(mb_row)
+```
+
+and visualize the results:
+
+```{r gg_row}
+g %+% mb_row
+```
+
+## Conclusions
+Overall, normalizing a matrix using a z-score transformation can be very fast and efficient.  The `scale` function is well suited for this purpose, but the `matrixStats` package allows for faster computation done in C.  The `scale` function will have different behavior as the code below from `base::scale.default`:
+
+```{r code, eval = FALSE}
+f <- function(v) {
+  v <- v[!is.na(v)]
+  sqrt(sum(v^2)/max(1, length(v) - 1L))
+}
+scale <- apply(x, 2L, f)
+```
+
+If the data is not centered and `center = FALSE`, the data will be divided by the squared sum of each column (divided by `n-1`).  This may be the desired behavior, but the user may want to divide by the standard deviation and not this squared sum and `colScale/rowScale` can do that if necessary.  I will talk to Henrik Bengtsson (`matrixStats` author/maintainer) about incorporating these into `matrixStats` for general use.  But for now, you can use the above code 
+
+

@@ -1,0 +1,54 @@
+---
+title: "Tips for First Year Comprehensive Exams"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+During our program, like most others, you have to take written comprehensive exams ("comps") at the end of your first year of coursework.  For many students it's a time of stress, which can be mitigated with some long-term planning.  I wanted to make some suggestions on how to go about this for our (and other) PhD students.
+
+## Start the week after spring break
+Again, comps are stressful.  You can be tested on anything from the material (ideally) from your first year.  Professors can throw in problems that seem from left field that you did not study or prep on.  How can you learn or study all the material?  
+
+The way to make comps more manageable is to have a long-term studying trajectory.  We have 2 weeks after the last exam to study and prep, and that is crunch time.  In my opinion, that time should be working on the topics you're struggling with, annotating books for crucial theorems (if you're allowed them in the exam), and doing a bunch of problems.  Those 2 weeks is not the time to cover everything from day one.  That time comes before that 2 weeks.
+
+The week after spring break (the week before this was published) is a good time to start your timeline.  That gives you about 10 weeks to study and prep.  You can start from the beginning of the year to the current time, or work backward.  If nothing else in the first week, make a timeline of what topics or terms you will cover over what time frame.  This will reduce stress so that it breaks the test into discrete chunks of time and discrete courses.
+
+## Get Past Exams
+What's the best preparation for the comprehensive exam?  A comprehensive exam.  This may be a bit self-evident, but I know I had the feeling of not knowing where to start.  Our department sends us the previous exams from the past 5-7 years.  Some are may not be equitable with respect to the difficulty or concepts covered, but I believe more questions are always better.  
+
+[Vanderbilt](http://www.vanderbilt.edu/biostatistics/graduate/current-program/comprehensive-examinations/sample-exams/) has some great exams, as does the [University of New Mexico](http://www.math.unm.edu/stat/exams/), and [Villanova](http://www07.homepage.villanova.edu/michael.posner/comp.htm).   You can go to the reference textbooks (Billingsley, Chung, Casella & Berger, Probability with Martingales (Williams)) to try some problems from the chapters you covered as well. 
+
+
+### Work from the back
+My strategy is to map each exam (or 2) to a specific week.  I worked on the older exams first and saved (e.g. did not look at) the ones from the previous 2 years until the 2 weeks before the test.  I also would set out blocks of time (2-3 hours) to try to an entire section of an exam, simulating the conditions for that portion of the test.  I think these are helpful at gauging how well your studying is going.
+
+
+## Make a study group
+How can you study or summarize all the material?  Well, it's much easier if you have a team.  You can also bounce ideas off each other.  Moreover, the exams you have don't have an answer key, they are just the problems.  It helps having others that can 1) check your work (swapping), 2) give you their solutions if you can't work out the problem, and 3) discuss different strategies for solving the problem.
+
+We had a group separately for each section of the exam (probability, theory, methods).  This separation helps because some students are retaking only parts of the exam and can help in some areas but don't want to be working on the sections they do not have to take.  It also helps segment time studying so you don't focus only on one area while leaving another area (likely the one you don't like and are not the best at) neglected.
+
+### Delegate Study Areas
+We separated different topics (letting people choose first) for each of the sections for that week.  Of those not chosen, the rest needs to be assigned.  The people/small team that was assigned to a topic needed to make concise (2-3 page) documents outlining the most important areas.  They would also do a 5 minute presentation to the group about why these are the most important areas.  That is the time to ask questions (and be prepared to get some when you present).  
+
+At the end of the school year, you have an organized study document  If you think your notes from the year are organized, you are likely mistaken.  Even if you're highly organized (many people are not), there is usually too much superfluous details relevant to the course/homework/etc and not the material.  Split it up and let others weed through different areas while you focus on those you were assigned.
+
+### Drop the weight
+If someone does not deliver on their delegated task, drop them.  If there was an understanding that they would get double next time, fine.  But if no discussion was made, they are out of the group.  That person is not holding up his/her end of the bargain, are getting help for free, while contributing nothing back.  All students are busy, and incorporating that is fine, but **must** be done before the session and at the time of delegation.  Otherwise, that non-delivery will likely become a pattern and hurt the entire group.  These are your friends and classmates, and it must be clear that any non-delivery is a direct negative to the group.  No excuses excuse that.
+
+## Do as many problems as possible
+Do problems.  Do more.  And then do some more.  The exam is a set of problems.  Knowing the material is essential, but the more comfortable you are with doing these difficult problems in a compressed time frame, the better you are.  Many tests up until now may have been collaborative, take home, and shorter.  Your comprehensive exam will be a bit different, so you have to prepare yourself.  We're talking about practice; it's important (sorry AI).
+
+
+## Conclusions
+Overall, the best way to perform well on the comprehensive exams is to learn the material as thoroughly as possible.  Ideally, that is done during the course.  Topics are forgotten and areas are always not fully understood the first time around.  Therefore, a methodical, long-term study plan should be made to tackle the year's worth of material.  I think a team is the best format for discussion and delegation, but you **MUST** do work alone (doing the problems), as the team does not collaboratively take the test.  If you follow your plan (while obviously learning the new concepts in class), then you should feel as prepared as you can be.  Best of luck.  I would like to leave you a [quote/clip](https://www.youtube.com/watch?v=yVZRVi-KNog) from the recent Bridge of Spies movie: 
+"Do you never worry?" 
+"Would it help?" 
+
+
