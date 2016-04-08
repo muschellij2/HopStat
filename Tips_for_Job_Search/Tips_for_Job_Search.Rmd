@@ -1,0 +1,68 @@
+---
+title: "Tips for Job Search"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+After going to a few interviews for this cycle for assistant professor positions, I figured I should write on some of the points that I found relevant and general.  Some of these were tips given to me, some of them are my own.  All these represent my opinions and mine alone.  At the time of writing this, I had not decided where I would end up, so take these with a grain of salt.
+
+## Step 0: Academic or Industry
+One of the first things you should think about or know is whether you are looking for academic or industry tech.  I chose to apply for academic positions as well as biotech/tech jobs.  Not all my peers chose this, but I will tell you why I did:
+
+1.  Academic and Industry turnaround time is different.
+    1.  Academic applications are due around November, but you should be applying around early or mid October as November is somewhat late for applications.
+    2.  Although November is late for applications, you have time as institutions will not get back to you until January through March.
+2.  Both are good jobs.  They have pros and cons (which I won't list here), but they both afford a solid lifestyle and usually some variety at work.
+3.  There were **a lot** of positions in academia open.
+
+Let's say you want to do academia, you should know if you are looking more for a teaching gig or research gig.  They have vastly different responsibilities and soft/hard money ratios.  No one has defined FTE (full time effort) explicitly for me, but I have heard it range from 50-60 hours/week for an assistant professor.  
+
+From what I have seen, a "soft" money department requires 70-80% of your salary (FTE) to be covered by grants and the rest from the department (20-30%).  These tend to be 12-month appointments.  Many biostatistics departments, especially those in a school of public health, fall into this category.  
+
+A "hard" money department can range from 50-100% FTE covered from the school, which generally comes from teaching more courses.  These are generally a 9-month appointment, where the 25% of the remaining salary (in the summer) comes from grants.  Statistics departments and biostatistics departments in schools of medicine can fall into these categories.
+
+Each type of department has their own pros and cons and each department is different.  
+
+
+## Step 1: Your Packet
+Let's assume you are applying to academia.  First thing you need to do is make your packet.  Here's what you'll need:
+
+### Curriculum Vitae.  
+This is the most important part.  This is your "abstract" or your first impression on a committee most times.  It **must** be updated, formatted well, and have all the relevant information. Let's look at the items.
+
+1.  Name, website, email, phone number (optional but recommended).  Any blog/social media (Twitter)/GitHub pages.  You may want to include preferred communication (phone vs. email).
+2.  Eduation: What school and department your are attending.  Include advisor(s), expected graduation date and if you have defended (people will ask), areas of research, dates attended.  I have seen people include GPAs and others have not.  
+3.  Previous education: Master's/Bachelor's - same as above but I have seen GPAs more commonly here.
+4. Relevant (Research) Experience - not cutting grass in 11th grade.  Also, usually limit to the last 10 years unless you have done a lot before that.  Put pointed deliverables in the text about what you did/how you added value/why it matters to the reader.
+5. Teaching Experience.  Classes you've taught, TA-ed, helped create.  Include the professor you worked with (people love talking about mutual acquaintences) and your role.  Include short courses/tutorials/workshops you lead, created, or participated as a teacher.  
+6. Published Publications.  Generally descending/ascending by year.  Make sure you highlight your name in the author order -- people are looking for it.  You may want to number them; mine are grouped by year but not numbered.  These include in-press publications without the full citation.  Make sure you update the citation when the article does get published.
+7.  Submitted Publications - these are submitted or under review but not accepted yet.  These give people an idea of what you are currently working on and how many projects you work on at a time, though it may be a bad measure of that.
+8.  Talks/Presentations/Posters.  Include all the talks you have given, **including those at your own institution**.  Gave a talk at a conference? Include it.  Working group? Include it. Journal club? Computing club?  If it's a presentation in front of others the projector is on, include it.  Some separate posters and talks, but I included them together.  Include the conference name or event.
+8.  Working Groups.  Maybe you work with a group or are on a training grant, but you don't have publications from it - still add it.  People many times know your group
+9.  Honors/Awards.  Win an award for a comprehensive exam or paper in your department? Put it down!  ENAR poster award - umm yeah, that's awesome to put down.  If someone shook your hand and you got anything from a shout out in a room, certificate, to money, put it down.
+10.  Software.  Do you release software - make that clear!  Put links, say what it does.  This includes web (Shiny) applications or any type of apps.  Was it in undergrad? So what - put it down.  I have had discussions with faculty the entire time allotted just about a web application I did one random weekend not related to my main research.
+11.  Skills - everyone knows Microsoft Word. Programming languages or other spoken/written languages.  Write 1-2 scripts in Python?  You're a beginner not an intermediate.  Can you read someone else's code and know what it does, you're an intermediate at least (there are other criteria, it's not set).  Do you feel like this i your language and you can speak in it as well as your native verbal language?  You're an expert.
+11.  Academic Service - I volunteer and I put that stuff down.  Any academic job requires "service" (usually of a different sort), but showing you do service outside of reviewing papers, it fits in line with many university missions.  Moreover, if you start a club or run a club in your department that is full blown academic service. 
+12.  Additional Experience - things that don't fit above.  Do a hackathon? Put it down here.  Say the cool project you did and link to it.  
+
+There may be other sections for a CV, but those are mine, save for one.  I have a "Research Interests" section at the top that says what I'm interested in/want to do research in.  This may be good or bad depending on your view.  It may become an reason to put you in the no pile before reading, but I think it's useful.
+
+Remember, academic search committees are looking for someone who can 1) do research, 2) teach, and 3) perform academic service, e.g. mentoring students, serving on thesis committees, serving on other committees (seminar committee, student recruitment, job search commmittee). 
+
+### Research Statement
+Depending on the position you are interviewing for, the teaching statement or research statement 
+
+
+### Research Statement
+
+
+## Set your outfits
+
+This seems a bit small, but I find that fixing the outfits for the interview is helpful.  You generally 
+##
