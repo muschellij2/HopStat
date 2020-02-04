@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>HopStat Hack: a Hopkins Biostat Hackathon</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+
+
+
+
+</head>
+
+<body>
+<p>So I&#39;ve been toying with the idea of organizing a <a href="http://en.wikipedia.org/wiki/Hackathon">Hackathon</a> in our department for a while.  Wikipedia states a hackathon is:</p>
+
+<blockquote>
+<p>An event in which computer programmers and others involved in software development, including graphic designers, interface designers and project managers, collaborate intensively on software projects.</p>
+</blockquote>
+
+<p>I knew JHU had one at <a href="http://hophacks.com/">Hopkins: HopHacks</a> recently, which I was excited about but could not participate in.  After Googling recently, I found a <a href="http://matthewforr.com/baltimorehackathon/">Baltimore Hackathon</a>. The office of the mayor is all about getting some hackathons going on in <a href="http://technical.ly/baltimore/2013/10/03/moit-hackathons-city-of-baltimore/">Baltimore</a> (I love the comment &ldquo;City funds will not be used for the purchase of alcoholic beverages&rdquo;).  I love this idea: a hackathon on city data will be hugely impactful, and it&#39;s a one-time chance to get access to it without government red tape!!&ldquo; </p>
+
+<h3>HopStat Hack: a Hopkins Biostat Hackathon</h3>
+
+<p>The type of hackathon I want to do is a coding event, not producing prototypes or anything &quot;physical&rdquo; like doing soldering or programming circuit boards.  While that sounds awesome, I don&#39;t want to burn down our department since I don&#39;t know what I&#39;m doing.   Now, what <strong>exactly</strong> am I talking about with a Hackathon?  </p>
+
+<p>I&#39;m talking about getting a bunch of coders in a room, a bunch of food/drinks (and later some alcoholic drinks, to take advantage of the <a href="http://xkcd.com/323/">Ballmer Peak</a>), and charge them with a problem at hand and a general guideline how to solve it.  The guideline will be flexible, as unexpected problems always come up.  There may be data available to solve the problem, but the data may be scraped or hacked from somewhere.  </p>
+
+<h3>Why do a hackathon?</h3>
+
+<p>Why can&#39;t you do the project over time like other projects?  I would like to list some reasons:</p>
+
+<ul>
+<li>There is a deadline.  Whether it be 1 day or 3 days, there is an end, and it&#39;s soon.  In academia, that is not always common, but I feel like it helps push people in a positive way (especially if the deadline is not met there nothing terrible happens)</li>
+<li>People are busy.  If you ask someone to be a on a project, they will likely say no.  Asking them for one day (and providing food), they&#39;d be more open.</li>
+<li>It&#39;s hard to get a large number of people together for longer than a day.  It&#39;s sometimes hard to even get them for a 1 hour meeting.</li>
+</ul>
+
+<h3>Project Ideas</h3>
+
+<p>Here are some ideas we have toyed around at <a href="http://hopstat.wordpress.com/2013/10/30/graduate-students-start-a-tea-time-at-your-institution/">tea time</a>:</p>
+
+<ul>
+<li>Make a fantasy football-type of system for an academic department.  Metrics would be like: citations, grant money, years, tenure.  I think it&#39;d be interesting to think of metrics people choose to grade departments.</li>
+<li>Calculate <a href="https://www.lib.umn.edu/researchsupport/impact/department">Group h-indices</a>.  I don&#39;t know how they calculate the <a href="http://grad-schools.usnews.rankingsandreviews.com/best-graduate-schools/top-science-schools/statistics-rankings">rankings</a>, but it&#39;s a comparative tool.  Even if you don&#39;t believe in h-indices.</li>
+<li>Create a longitudinal wordcloud.  In that sense, it&#39;s a &ldquo;3D wordcloud&rdquo;, but that&#39;s reserved usually for <a href="http://wordpress.org/plugins/cardoza-3d-tag-cloud/">this</a>.</li>
+<li>Use <a href="http://open311.org/">Open 311</a> data to create statistical maps based on call data. For example: &ldquo;Where&#39;s the most reported litter in the Baltimore?&rdquo;</li>
+<li>Clean a large dataset (maybe with a data manager) for a specific outcome.  I&#39;m looking at you claims data.</li>
+</ul>
+
+<h3>Conclusions</h3>
+
+<p>Overall, I like the idea of &ldquo;borrowing strength&rdquo; from your fellow coders to get something done and get it done in one day.  Also, I like the name hackathon. It&#39;s like a workshop where you get to dictate the outcome, be part of a team, and learn from fellow coders.  Now, I&#39;m going to work on getting the department to fund it.</p>
+
+</body>
+
+</html>
+
