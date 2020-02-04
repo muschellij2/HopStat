@@ -1,0 +1,28 @@
+
+---
+title: "Tips for Job Search (Part 2)"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+
+## Step 1: Your Packet: Industry
+
+### Resume
+
+If you're applying to an industry position, you should widdle down your CV to a more-condensed 2-page (ish) resume.  As you are going to be doing or responsible with multiple projects, make sure how your resume illustrates **how you made a difference** not just the **tasks you did**.  
+
+You should be able to answer the question: "How can I make a difference at your company/in your group?"
+
+### GitHub Page
+I'll be referring to GitHub a lot here, but sub in Bitbucket or other repository hosting services if that's your flavor.
+
+Make sure you have 1-2 projects on GitHub that are yours and that you can show an interviewer/recruiter.  If you don't have a GitHub account, then open one now.  Install git on your machine, find those projects you have in your Dropbox/home grown system/Please god tell me you back up your stuff folder and initialize a git repository, make a `README.md` file, and push that to the cloud.  It'd be nice if you made some commits, but don't make a bunch of fake stuff to make it look like you use GitHub.  Just be clear with the interviewers that you haven't used it much in the past, but you're starting to.
+
+
+
+## Set your outfits
+
+This seems a bit small, but I find that fixing the outfits for the interview is helpful.  You generally have 
+##

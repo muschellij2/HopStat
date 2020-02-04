@@ -1,0 +1,41 @@
+---
+title: "The way people use AI is ruining Reproducible Science Again"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+The basic premise of this article is this: "Would you accept a paper that did a logistic regression, but did not publish the weights due to intellectual property?".  If you answer yes, then I do not think you will agree with some of the following statements.  If so, I thank you for your reviewing service and will let the authors for which I review know who you are to send to you.
+
+If you answered no, my question to you is, why do we accept this for artificial intelligence (AI) models?  Here I'm using AI in the broad sense, including machine learning, deep learning, and neural networks.  In many of these cases, the model itself is only useful as an object.  For example, for a random forest, the combination of the individual trees are necessary to do prediction.  It is extremely difficult (likely impossible) to reduce this to a reduced representation that would be useful in a paper to do prediction.  In a regression framework, even penalized regression, the model can be shown by a series of weights or beta coefficients.  For deep learning models, the number of parameters can explode given the complexity, depth, and representation of the network.  When using a convolutional neural network (CNN) to segment or classify images, there can be millions of weights for different areas of an image to get a final result.  These weights are impractical to print out in a PDF, text file, or supplemental material as it would take a researcher hours to reconstruct this into the network.  Thus, the model weights should be released if the results are to be reproducible or useful on an external data set.  I will yield that a CNN can be represented in a figure to some degree and be reproduced, but many times other processing, normalization, augmentation, or other non-shown steps are required for reproducibility.
+
+
+# Why is this Happening?
+
+Frameworks such as Tensorflow, Keras, Theano, and PyTorch make deep learning more usable for all researchers.  Fitting these models or predicting output (also called inference) can be done on a number of platforms, including mobile, which makes it highly attractive.  Moreover, container solutions such as Docker and Singularity allow the entire system to be preserved on which the model was used.  So what's the issue?  The growing issue is the use of AI, especially in applications of medical data, is that people are **not** releasing 1) their data, 2) their code, or 3) the model weights.  
+	
+# Release the Data?
+Let us tackle the easiest first: **the data**.  Some data was collected without consent to be released, has protected health information (PHI) that cannot be released under protections such as HIPAA (Health Insurance Portability and Accountability Act).  It is completely reasonable for researchers to not be able to release the data.  Thus, this is totally valid.  I will say if they can release the data, many times it is stated it is "available upon request", but adherence to this policy is not enforced by many journals as the paper is already published (https://science.sciencemag.org/content/354/6317/1242.1, https://twitter.com/gershbrain/status/1207677210221527045) .  If authors simply ignore these requests, there can be little ramifications.  This may be understandable, because the downsides to the researcher of releasing data, as 1) users could find issues (may be a benefit), 2) it may require maintaining data usage agreements, or 3) many think of this as "intellectual property", which I will address now.
+
+# Release the Code?
+
+Many people, seeing how well AI is working in their application, think that their method could be turned into a commercial product.  This may be valid, but must not be used as a shield against reproducible research.  Let's turn to **releasing the code**.  If there is no novelty in the framework they used, such as an off-the-shelf VNET, then the code should be released as nothing is "secret".  Even with slight adaptations, unless large and completely new, the code should be released.  Many state that if it is off-the-shelf, why would code need to be released?  The reason is that although most off-the-shelf methods are used, getting the data into the correct way before running them, including data processing and checks, need to be available.  Thus, these "ancillary" scripts are actually crucial for research and reproduction.  Even if the architecture is completely novel, it will likely be described in detail in the publication, and thus potentially could be released.  Let's assume though that you cannot release the data or the code. 
+# Release the Model?
+
+Lastly, releasing **the model**.  Again, the "model" in this setting can be a complex set of trees or weights, amongst other things.  It's uncertain as to whether PHI can be recovered from these models, which is a valid concern given the data cannot be released.  I assert that after many discussions that many don't release the model because it is "proprietary" or has potential "intellectual property" that can be commercializable, which I don't disagree with.  What I disagree with is that many applications will not fit the requirements for a patent, as slight changes to an algorithm can classify it as a different algorithm.  Using these models in a software-as-a-service (SaaS) framework could potentially be profitable, but it's doubtful this will ever happen.  Moreover, there is no time limit on these commercializations.  Therefore, you claim this can be commercialized, but after 5 years no progress is made, then is it really going to be commercialized or simply an impediment to reproducible and progressive science.  If a model fits in the cloud but never comes down, is it a model really at all?
+
+# Any Solution?
+
+So what's the answer?  I don't know.  But here's some help in reviewing. 
+Personally, I have been putting in boilerplate concerns with a number of medical imaging AI projects, which hopefully you may be able to use:
+
+- Overall, the other main concerns are 1) the data is not available to determine quality, 2) no software is available to test or apply this methodology to another data set, and 3) the segmentation/detection results were not directly compared to any of the methodology for segmentation previously published.  
+- Releasing the code for processing and modeling, including the final model weights would greatly increase the impact for this paper is highly encouraged.
+- Are the data released anywhere?  Will it be made public?  Will the segmentations/classifications?
+
+I've had authors and editors give the concerns above, which I have yielded to in some cases.  I don't think these are 100% necessary for publication, but I would like to know the reasons that I cannot reproduce this analysis or use it to learn how to do better science.  Until journals make clearer guidance about these policies (instead of omitting them in many cases), I guess I'll just be ice-skating uphill. 
