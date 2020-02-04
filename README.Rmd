@@ -1,0 +1,53 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# Hopstat Blog
+Here are the posts of the RMD files from my website.  Hopefully it's a good idea.  So if you wnat to run anything, just tangle out the code using `knitr`.
+
+```{r, echo = FALSE, message = FALSE}
+library(tibble)
+library(dplyr)
+library(yaml)
+x = list.files(pattern = "index.html", recursive = TRUE)
+df = tibble::tibble(
+  link = x,
+  dn = dirname(x),
+  rmd = file.path(dn, paste0(dn, ".Rmd"))
+)
+titles = sapply(df$rmd, function(x) {
+  if (file.exists(x)) {
+    input_lines = readLines(x, warn = FALSE)
+    title = rmarkdown:::parse_yaml_front_matter(input_lines)
+    title = title$title
+    if (!is.null(title)) {
+      x = title
+    } else {
+      x = gsub("_", " ", dirname(x))
+    }
+  } else {
+    x = gsub("_", " ", dirname(x))
+  }
+  x
+})
+df$title = titles
+df = df %>% 
+  mutate(link = paste0("[", title, "](", link, ")"),
+         rmd = paste0("[Rmd](", rmd, ")")) %>% 
+  select(-title, -dn)
+df %>% 
+  knitr::kable(escape = FALSE)
+```
+
+
