@@ -1,0 +1,43 @@
+---
+title: "R projects may make large files"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+## Introduction 
+I have an "old" MacBook, it's a late 2013 MacBook Pro.  I haven't upgraded because I wasn't a fan of the butterfly keyboards and the top row bar.  I'm glad to hear you can now get new MacBooks with the "old" keyboards.  Also I don't see large advances in the specs of the machine, but I'll stay with Mac because I love the OS and integration.
+
+That being said, one of the downsides to having an old MacBook is that I'm struggling with space at times.  I offload a lot of things to the cloud and my external drive, but I like having things locally.  Also, I am a **huge** fan of the RStudio Packages framework.  I would say the RStudio IDE is a must for using R nowadays; at least if you're a new user.  RStudio Projects alleviates a lot of the problems of working outside of an IDE, such as switching directories (opening an `.Rproj` file opens to the root directory and `here::here` uses this), multiple unrelated scripts open (each has its own session/window), and has additional build tools for package development. 
+
+## How the RStudio IDE integrates with Package Development
+Using the RStudio Projects for Package development is great.  The tools integrate with `devtools`, which changed the game with making a package.  RStudio additionally wrapped this functionality to keyboard shortcuts and GUI clicks, along with integration to Git.  WHen you are compiling and building a package, the RStudio IDE knows that you should restart the `R` session because all the packages (and `options`) you previously loaded should to be reset.  Now it doesn't want you losing any saved work, so all the objects are cached, the session is restarted, and the cache is restored.  
+
+## The issue
+One of the downsides with this strategy is that I'm impatient.  Sometimes, especially with large packages or objects, the RStudio IDE will freeze.  I will wait and get annoyed and kill the process.  The overall issue is that the cached data is not cleared away.  The data is stored in `.Rproj.user` folder and can be quite big (100s of Mb) depending on what you had in memory.  A **lot** of other files are located in there that are related to your user state (think the 10 `Untitled` files you just haven't saved yet, what scripts were open, what was in the `Viewer`).  Most of the time for projects that are packages, I don't need this information so I delete the folder.  Don't worry, it'll get regenerated when you open that project again.
+
+## What's the point
+If you're doing some house cleaning for hard drive space, take a look at the `.Rproj.user` hidden folders and see how large they are.  They shouldn't be much more than 1Mb, and that's even pretty big depending on how much code you have.  Either way, hope it gives you some "free" space.  I guess I could buy another MacBook but this one works perfectly well still.   
+
+Here's a simple script allowing you to see the overall size of the directory.  There are some things I couldn't find using `file.size` or `file.info` after recursively listing the files, so I just used `du`. 
+```{r, eval = FALSE}
+x = list.files(
+  pattern = "[.]Rproj[.]user",
+  all.files = TRUE, 
+  include.dirs = TRUE, 
+  recursive = TRUE,
+  no.. = TRUE)
+dir.size = function(path) {
+  res = system(paste0("du ", shQuote(path)), intern = TRUE)
+  ss = strsplit(res, "\t")
+  ss = sapply(ss, function(x) as.numeric(x[1]))
+  sum(ss)
+}
+sizes = sapply(x, dir.size)
+```
+

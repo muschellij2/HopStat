@@ -1,5 +1,5 @@
 ---
-title: "Tips for Job Search"
+title: "Tips for a Job Search"
 author: "John Muschelli"
 date: '`r Sys.Date()`'
 output: html_document
@@ -10,18 +10,28 @@ library(knitr)
 opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
 ```
 
-After going to a few interviews for this cycle for assistant professor positions, I figured I should write on some of the points that I found relevant and general.  Some of these were tips given to me, some of them are my own.  All these represent my opinions and mine alone.  At the time of writing this, I had not decided where I would end up, so take these with a grain of salt.
+After going to a few interviews last cycle for assistant professor positions, I figured I should write on some of the points that I found relevant and general.  Some of these were tips given to me, some of them are my own.  All these represent my opinions and mine alone.  
 
-## Step 0: Academic or Industry
+This will be a least a 2-part series, so I will have an update in the coming week or so.
+
+Full disclosure, I did not receive a tenure-track position offer, so take these with a grain of salt. Most of the materials I had sent out are located on my GitHub and website.   I found that most people ask previous applicants/students of your advisor/fellow graduate students for copies of their statements, but I feel like these should be more open and editable, so I published them online for our (and other) students.
+
+# My Packets/Materials
+My CV is located [here](https://github.com/muschellij2/CV) and my research/teaching statements and my cover letter for academia is located [here](https://github.com/muschellij2/JHUPhD).
+
+# Step 0: Academic or Industry
 One of the first things you should think about or know is whether you are looking for academic or industry tech.  I chose to apply for academic positions as well as biotech/tech jobs.  Not all my peers chose this, but I will tell you why I did:
 
 1.  Academic and Industry turnaround time is different.
-    1.  Academic applications are due around November, but you should be applying around early or mid October as November is somewhat late for applications.
-    2.  Although November is late for applications, you have time as institutions will not get back to you until January through March.
-2.  Both are good jobs.  They have pros and cons (which I won't list here), but they both afford a solid lifestyle and usually some variety at work.
-3.  There were **a lot** of positions in academia open.
+    1.  Academic applications are due around November (get them done in October), but you should be applying around early or mid October as November is somewhat late for applications.
+    2.  Although you apply in November for these jobs, you have time as institutions will not get back to you until January through March.
+2.  Both academic and industry offer good jobs.  They have pros and cons (which I won't list here), but they both afford a solid lifestyle and usually some variety at work.
+3.  There were **a lot** of positions in academia open (2016).
 
-Let's say you want to do academia, you should know if you are looking more for a teaching gig or research gig.  They have vastly different responsibilities and soft/hard money ratios.  No one has defined FTE (full time effort) explicitly for me, but I have heard it range from 50-60 hours/week for an assistant professor.  
+
+Let's say you want to apply for academia.  The rest of this post will be discussing an academic job search and future posts will be on industry searches and also aspects of an interview.
+
+Now you've kept the door open for academia, you should know if you are looking more for a teaching gig or research gig.  They have vastly different responsibilities and soft/hard money ratios.  No one has defined FTE (full time effort) explicitly for me, but I have heard it range from 50-60 hours/week for an assistant professor.  
 
 From what I have seen, a "soft" money department requires 70-80% of your salary (FTE) to be covered by grants and the rest from the department (20-30%).  These tend to be 12-month appointments.  Many biostatistics departments, especially those in a school of public health, fall into this category.  
 
@@ -29,15 +39,23 @@ A "hard" money department can range from 50-100% FTE covered from the school, wh
 
 Each type of department has their own pros and cons and each department is different.  
 
+## Timeline
 
-## Step 1: Your Packet
-Let's assume you are applying to academia.  First thing you need to do is make your packet.  Here's what you'll need:
+You should probably get applying to many academic institutions around mid-October to early November.  Mid-November (although they will not likely be reviewed for quite some time) is a little late in the game.  A lot of planning for visits goes on and you want a to be invited and it's hard for a place to invite you if they've filled a lot of "yes" invitations in the future.
+
+# Step 1: Your Packet: Academia
+Let's assume you are applying to academia.  First thing you need to do is make your packet.  
+
+
+Here's what you'll need:
 
 ### Curriculum Vitae.  
-This is the most important part.  This is your "abstract" or your first impression on a committee most times.  It **must** be updated, formatted well, and have all the relevant information. Let's look at the items.
+This is the most important part.  This is your "abstract" or your first impression on a committee most times.  It **must** be updated, formatted well, and have all the relevant information.  I remember a professor noting "Someone is going to take 2-3 minutes on a CV. They will go through 20-30 in a session. You need yours to be top-notch."
+
+Let's look at the items.
 
 1.  Name, website, email, phone number (optional but recommended).  Any blog/social media (Twitter)/GitHub pages.  You may want to include preferred communication (phone vs. email).
-2.  Eduation: What school and department your are attending.  Include advisor(s), expected graduation date and if you have defended (people will ask), areas of research, dates attended.  I have seen people include GPAs and others have not.  
+2.  Eduation: What school and department your are attending.  Include advisor(s), **expected graduation date** and if you have defended (people will ask), areas of research, dates attended.  I have seen people include GPAs and others have not.  
 3.  Previous education: Master's/Bachelor's - same as above but I have seen GPAs more commonly here.
 4. Relevant (Research) Experience - not cutting grass in 11th grade.  Also, usually limit to the last 10 years unless you have done a lot before that.  Put pointed deliverables in the text about what you did/how you added value/why it matters to the reader.
 5. Teaching Experience.  Classes you've taught, TA-ed, helped create.  Include the professor you worked with (people love talking about mutual acquaintences) and your role.  Include short courses/tutorials/workshops you lead, created, or participated as a teacher.  
@@ -56,13 +74,95 @@ There may be other sections for a CV, but those are mine, save for one.  I have 
 Remember, academic search committees are looking for someone who can 1) do research, 2) teach, and 3) perform academic service, e.g. mentoring students, serving on thesis committees, serving on other committees (seminar committee, student recruitment, job search commmittee). 
 
 ### Research Statement
-Depending on the position you are interviewing for, the teaching statement or research statement 
+Depending on the position you are interviewing for, the teaching statement or research statement is likely to be the first thing read after your CV.  That means you should spend a bit of time on it.  Like grants, I hear the best way to write one is to get someone else's who has been successful.  Ask previous post docs, your advisor (though it may be dated), and previous students who have graduated for their statements.
+I do not think I have been overwhelmingly successful in getting job offers, but I put my research and teaching statement [on GitHub](https://github.com/muschellij2/JHUPhD).  
+
+I have a few guidelines for what I would include in your research statement:
+
+1.  Your philosophy on research.
+2.  What you want to do in the next 5 years.
+3.  Why institution X and position Y is the place to do it.
+
+"The Professor is in" has some good points in [this](http://theprofessorisin.com/2012/08/30/dr-karens-rules-of-the-research-statement/) and [this](http://theprofessorisin.com/2011/10/21/the-golden-rule-of-the-research-statement/).  Check it out.
 
 
-### Research Statement
+### Teaching Statement
+
+In an academic tenure-track job (and most research-track), you will teach.  Teaching can afford you discretionary money in research track and is expected in tenure-track as a portion of your salary generally comes from you teaching.  If you haven't taught a course, were you a graduate assistant or design something for high school students? Put that down.  You should highlight any teaching awards you have had in the past and how they have helped you or what led you to receiving them.
+
+Overall, you should have a philosophy for teaching (at least loosely).  As a biostatistician who works with a lot of colleagues who are not statisticians or biostatisticians, I (like to) think that I have the skills to bring the material "down a level" into more understanding terms.  I believe there should be transparency in grading and an up-front level of expectation on each side of the classroom.  Although I don't find myself to be the most organized while teaching, I feel that it is an important fact because without it the goals of the class can become out of reach or unclear.  Anecdotes may be OK, but used only when **directly** relevant.
+
+It seemed to me that many research institutions "assume" you are a good teacher and they focus more on discussing your research.  There are zero places that will say that consistently good teaching is not essential to their program and your success. 
+
+If you don't have any experience teaching, you should 1) consider getting some and 2) consider again that your job is going to require you to do this.  Also, although conferences and presentations are not exactly teaching, you can **maybe** pepper something in there about you feeling comfortable in front of a room of your (1-year-junior) peers. 
+
+### Cover Letter
+
+Not all places require a cover letter, but some do and it's a nice touchpoint to start your packet.  Some professors have told me they don't read them (if they don't require them) and others do.  
+
+I think it's good to include:
+
+1. Be clear which position you are applying for (most places have multiple)
+2. Where you are graduating from.
+3. Why are you applying **there**?
+4. How are you qualified.
 
 
-## Set your outfits
 
-This seems a bit small, but I find that fixing the outfits for the interview is helpful.  You generally 
-##
+### Letters of Reference/Recommendation
+
+For the people you choose to write you letters of recommendation/reference (I'll refer to as "letters"), there are no hard and fast guidelines.  Except that your advisor should be one of them.  This person is the person you (presumably) worked the closest with in the past 4-5 years and they know your strengths and weaknesses best.  Moreover, they have likely sat on a committee to hire a new person like you and know how to present your strengths (truthfully) in the best light. 
+
+Overall, the goal is ask people early.  If a number of students in your department are graduating, they may have too many requests than they can handle in a reasonable timeframe.  Some may ask you which places you plan on applying to so that they can maybe make some specific remarks (or a call or 2).  Others may ask to see your CV to talk a little bit more about specifics (or to remember exactly what you did).  
+
+I worked closely with an non-biostatistician collaborator and I applied to many departments where I'd be working with non-biostatistician collaborators, so I thought he was crucial for a letter.  I chose a previous advisor and professors whom I did an extensive project with.  You should know who you've done work with.  If not, check your defense committee again.
+
+Most places you will need 3-4 letters, but have about 5 people you have asked as some places will ask for 5 and some will "allow up to 5".  Make sure you have a file of their full name, email, address, phone number, position, and relation to you (aka advisor/collaborator/etc.).
+
+
+# Step 2: Figure out where the jobs are
+
+For Biostatistics and Statistics, there are some great places to look for jobs online:
+
+- [University of Florida](http://www.stat.ufl.edu/jobs/)
+- [University of Washington](https://www.stat.washington.edu/jobs/)
+- [Purdue](http://www.stat.purdue.edu/resources/jobs/listings/jobs/)
+- [AMStat](http://jobs.amstat.org/jobs)
+- [SIAM](http://www.siam.org/careers/)
+- Email from AMStat Sections - sign up for them or ask your advisor/friend/colleague to set up a forwarding filter
+
+If you have a place in mind, check out the website for the department.  They will have it advertised.  Does your membership organization have a magazine?  It sounds dated, but a lot of universities still advertise there.  
+
+You can also email any of your previous colleagues to ask if their department is hiring.  This person should be a persons you would feel comfortable emailing for other reasons.  
+
+Check Twitter and social media.  Some departments have these and use them to disseminate information.  Check them out. 
+
+
+# Step 3: Where do you want to live for the next 6 years?
+
+<h3>The number one question you should be able to answer is "Why do you want to work here"</h3>
+
+You should have a solid answer for that question.  Period.  Everything else is ancillary to that point.
+
+In many tenure-track positions, it's 6 years to tenure.  If you're doing well, that is.  Leaving a position after 3 years is reasonable, but may not reflect well on you and you will inevitably get asked "Why?".  Moreover, it may seem as though you hadn't thought thoroughly through on the position.  While most of these may be ridiculous because people move jobs for a multitude of reasons (such as partners/family/area/weather/...life), the thoughts will exist.  
+
+So ask yourself: "Would I be comfortable/happy living in this town for the next 6 years?"  Yes, great. Geographic location and a type of living (city vs. suburb vs. rural) are real things in making your decision.  It's also something that goes into offering someone a job.  If the applicant seems great on paper and the interview, but seems to hate the surrounding area or "could never see themself living there", that may be a thing that puts the decision over to a "no".  You're not a robot and you have preferences, remember that.
+
+After that question is answered, you more importantly need to answer: "Would I be comfortable/happy working in this place for the next 6 years?" - that's a bit harder to know, but if there is a "No" creeping around there for some reason, that's not a great sign.  That's not a dealbreaker for not applying, but remember one thing: interviews are draining.  You don't want to put all your eggs in one basket, but you don't want a big basket of slightly-cracked eggs.  Eggs in this metaphor are your "best self" and cracked eggs are OK, but not so great.  
+
+
+# Step 4: Filling out an Unholy amount of forms/Sending Emails
+
+Applications are about dotting i's and crossingt t's.  They have some automation, but a lot of it is still very manual in its entry.  You will have to write and copy and paste many documents over and over.  Some will have optical character recognition (OCR) to determine information from your CV.  If you have a "standard" CV, this will work.  Otherwise, you'll likely get a bunch of misformatted text you need to delete.
+
+You will need to have accounts for each different university separately as they do not share across for information.  Even though most of them use Taleo as a backend.  More are using LinkedIn as a resource, which may be a good reason to update your LinkedIn to look like your CV.  Many of these systems have places for you to put information about your references so remember to have that text file open with each reference's information.
+
+If the university you are applying to doesn't have an automated system set up, you may have to send your packet to a search committee chair or an administrator who is listed on the posting.  So you'll email them and you'll likely forget something, format something wrong, or forget to say what position you're applying for, so you'll get to answer a lot of emails.
+
+Regardless, after the packet is signed off and in, you should (in like 3 weeks) send an email just confirming that everything is there.  This is especially important if you don't get confirmation when your letters of reference are submitted.  Applications do fall through the cracks and emails do get overlooked.  Do not trust any system in place and always double check your confirmation.  
+
+# Conclusions
+
+This is one post in hopefully a few on some of my (hopefully useful) insights on the process of applying and interviewing for academic and industry positions for a quant/data scientist/data analyst/research professor.  Overall, there is a lot of prep you need to do (**now** it's October 5).  Some of it will be out of your hands (like letters of reference), which is why it's so important to be ahead of schedule. Much of it is writing and revising, writing and revising, which you should be good at now.  The one takehome message is: 
+
+> Don't sell yourself short.  You just finished a long, grueling process which at times you probably thought you'd fail at.  But you didn't.  Maybe not all the things you've done is glamorous or earth-shattering, but you did interesting things.  You did things that mattered.  Remember that and not make others see that and believe it.
