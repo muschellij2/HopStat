@@ -1,0 +1,79 @@
+---
+title: "The 3 'Times' of a Project"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+
+During a conversation with [Sean Kross](http://seankross.com/about/) about projects, particularly data science projects, I tried to explain how things can go right and wrong with a project.  I was explaining things with respect to being the data scientist on academic projects, but I think these issues are cross-cutting so figured I'd post them here. 
+
+I thought back to when projects did not go well or someone was left frustrated or angry during or at the end of the interaction.  To me, the issues usually come down to the 3 "time"s of a project: time, time**line**, and time**line***ss*.  
+
+Before talking about these "time"s, I think it's important to note that most of the frustration **really** comes down to miscommunication.  The miscommunication or differing expectations, in my opinion usually fits into one of these time buckets.
+
+# Time
+Time represents how long you estimate to do something.  Particularly, this relates to how many hours a week you can work on a project, or percent effort, also called %FTE (percent full time equivalent).  "Time" also means there should be a discussion of whether you have the space in your schedule to commit to something.  Many instances you may not have space but you've been "strongly urged" to do the work.  
+
+Helpful things to do:
+
+1.  Do not say how many hours you **have available**.  Tell them 80% of that or tell them how many **you want** to work on this.  Time is a fluid - it fills the space provided.
+2.  Sometimes work out 1-2 "hypotheticals", such as what if the data is in terrible shape.  Even better, wait to give a yes or a no for accepting a project until after you get some of the data, but most people assume you are a "yes" once you get the data.
+3.  Estimate (or overestimate) how long the first set of tasks will take.
+  - this sets the precedent for the project.
+
+It's fine to deliver this a bit quicker than projected.  It excites people ("That was fast!!"), but you can still lag on sending it exactly when it's done.  This time slack allows you to think if the results are right, but more importantly makes it so that when things go wrong (**WTH is that data point!?**) the expectation of a quick turnaround is mitigated ab it.
+
+One of the main issues is that novelty is a cruel mistress.  New and shiny things are exciting.  Most projects sound like they can change the world or practice or our understanding of an area.  Some can, not all do.  Think of a project you're on right now and try to answer the question that if it dropped right now and someone came back in a week and asked what time you could dedicate to that project again.  Would it be the same?  How much less?  Think of your good and not-so-good projects, and averaging that might give you an idea on how you'll feel about this new project in 3 months.
+
+# Timeline
+I know you're saying "3 months from now!? I get all my projects done quickly!".  That brings us to timeline.  The full timeline of the project is the how long the overall goal or set of goals for a project is going to take.  This discussion usually is more overarching than the time discussion for a specific task.  Is the project one paper? Developing an entire suite of work?  Multiple clinical trials?
+
+But let's focus on one analysis, that (hopefully) results in a paper.  
+
+A few questions that could be helpful are:
+
+1.  When do you plan on submiting the paper?
+2.  Are all the patients/subjects enrolled followed up?
+3.  Is someone (student/intern/visitor) leaving soon and this needs to be done by then?
+
+Many times you're not privvy to the internal workings of a group, including the fact that the data they're about to give you may have be stopped and started 3 different time with different analyses.
+
+Many people think once the paper gets thrown down the ravine to the wolves of review, it's out of sight and mind and never thought of again.  But then, it crawls up, bloodied and beaten, back from the land of reviews into you line of sight: REVISION!
+
+You need to ask:  When will reviews likely get back from this journal, what's the turnaround time on those usually (2 weeks to 1 month), who will take lead?
+
+Other important timeline questions:
+
+1.  What other projects will start once project 1 is done?
+2.  What if I need to move my time around after this project is done, who can take over?
+3.  What if things significantly change?  Examples: you're grant gets funded!  Your main collaborator's big grant gets funded!  You are planning in changing jobs?
+
+# Timeliness
+
+Although it may be a bit of an abuse of the term, the last time is timeliness.  I consider timeliness similar to responsiveness.  Many projects have long or short-term explicit goals, like a paper or book, but many have implicit deliverables along the way, like short presentations.   The discussion here is something like "If you send me a question about this project, how fast do you expect me to respond?  Same hour? Same day?".  This discussion sets up the ability to use keywords such as *URGENT* or *NON-URGENT*.  These can be abused, but at least you know what one party believes is important so that they don't come back later and indicate you shrugged off something for another day that was pertinent.
+Also, effective email writing techniques such as putting in an estimate of how long you think a task would take (could be way off - again good to know what people think) or putting a TL;DR (too long; didn't read) synopsis at the beginning of a long-worded email.  
+
+We're all battling the evil dragon of email back daily, trying to rescue the prize of "free time".  These little things allow people to prioritize tasks for a project and not open a 2-page email, be overwhelmed and close it, putting it off until later.  A little TL;DR can make things a tad easier.  Remember that people use email in very different ways; that long email may be a stream of consciousness mess or a well-itemized TODO list that people should refer back to.  Now *many*, and I mean *many*, different project management solutions exist for this type of work, but 1) I can't find anyone who agrees on which one to use, 2) some are unwilling to pay for these solutions, and 3) if you're a data scientist you're usually not able to force the use of these.  Even if you can force using this solution, the next project may say no.  
+
+Although most don't use "project management" tools per se, there are services that most are amenable to that can help these issues.  For example, shared folders such as DropBox, OneDrive, and Box provide a one stop shop where materials should be created.  Writing a paper?  Use Google Docs, or for the LaTeX crowd, [Overleaf](https://www.overleaf.com/).  As an aside, Overleaf is a great product, that you can even use [knitr in](https://www.overleaf.com/learn/latex/Knitr)!  Once they make a way to use this with Rmarkdown (I'm looking at you RStudio), I will throw down the gauntlet and try to only use this service, as it incorporates LaTeX/PDF, dynamic documents, can output DOCX, PPTX, slide decks.  ANNND Back to other tools like GitHub for a shared space for code.  At the end of the day, you're trying to end the torment of an email with an attachment of `Manuscript_FINAL_2020May15_JM3_REALFINAL_willThisEverEnd?.docx`.  Many of these tools are painless replacements for the email song and dance, have version history and track changes.  Push or them.
+
+I have had horror stories of timeliness.  I have had emails that said **WE NEED THIS RIGHT NOW**.  Long into the night, breaking my back (but probably neck because ergonomics is hard) for this project, I'd send off my finished product.  Then I'd wait.  And wait.  And forget.  Then remember and get mad that I hadn't heard anything.   Then ping the email and get nothing.  Then I'd look up, 6 months had gone by, and I had realized my beard looked like Tom Hanks in Castaway, and feel the serene closure of letting a dead project die.  Then a week later I'd get an email saying **Thanks for that! WE NEED THIS OTHER THING RIGHT NOW**.  Don't do this for your mental health, the health of your facial hair (or lack thereof), and for the stress balls that may explode otherwise.
+
+# Conclusion
+Time is a fickle thing that we think we have none of (today), a world of (*I'LL NEVER DIE!*), or some (let's have a quick chat).  For projects, time discussions and expectations are vital to a good collaboration.  Like an awkward first date, sometimes you need to get some of the cards on the table otherwise you end up down the line as a depressed John Cusack as he has played in so many movies  Talk about your 3 times of a project, be happy, and collaborations will hopefully flourish!
+
+
+
+
+
+
+
+
+
+
