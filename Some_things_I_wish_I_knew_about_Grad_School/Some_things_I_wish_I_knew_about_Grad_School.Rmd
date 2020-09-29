@@ -1,0 +1,163 @@
+---
+title: "Some things I wish I knew about Grad School"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+
+# A little about me
+I am from a middle-class family from Southeast PA.  We never had any serious money issues when I grew up that I remember, but I would not say we were flush.  I did go to a Catholic grades school until 6th grade, then I went to public school.  I had an IEP (Individualized Education Program) and was involved in "gifted" classes.  My high school was a good school with a number of advanced placement (AP) credits.  We had guidance counselors and administrators that knew your name.
+
+Both of my parents held full-time jobs my entire life and are tremendously hard working.  Neither graduated from college, but my mother did work in admissions at a University, so she had a wealth of knowledge to navigate applying for school, finding scholarships, and also had the benefit of tuition benefits from her job for her institution and a number of reciprocating institutions.  
+
+
+# The goal
+The goal of this is to discuss some of the things that I wish I knew about graduate school, especially the application process.  I only went to one place for grad school, both my Master's and PhD, so these points may not be generalizable to all graduate school.  Also, Johns Hopkins was a **tremendously supportive** institution with respect to money and people's time in grad school.  Blind spots still exist for all institutions.  I hope to add comments on what institutions could make this easier.
+
+Many of these blind spots are not intentional, but due to not thinking about it (see [Hanlon's razor](https://en.wikipedia.org/wiki/Hanlon%27s_razor)).   You'll realize that when you ask questions (which I promote throughout) and will hear a lot of "Oh, I've never thought of that.  No one's ever asked that before, let me check" responses.
+
+
+# Immense Disclaimer
+I'm talking about my one, singular graduate school experience.  I'm a white, cis-gender male with a generic first name.  There are a number of hurdles I've never encountered.   I focus a lot on money and resources throughout this post, but there are a number things I too would say "Oh, I've never thought of that".  Please feel free to tell me some things you wish you knew about grad school on Twitter [\@StrictlyStat](https://twitter.com/StrictlyStat). 
+
+
+# Network
+It's OK not to have an extensive network of connections starting out.  Talking to your undergraduate advisor or another faculty member and leaning on their network is a great strategy.  If you don't have those, reach out to faculty/students at other institutions.  Most people are happy to spare some time or impart some wisdom (or at least assumed wisdom).
+
+
+## Reaching out to Faculty/Students
+Before you apply or enroll somewhere, you should feel free to reach out to current faculty and students.  Note, many faculty get *a lot* of requests like this.  Be explicit and as clear as possible.  I might say something like:
+
+> Dear Dr. XXX,
+
+> My name is John Muschelli - I am a prospective student for your department.  Would it be possible to have a **30 minute call to discuss your research**?  I would like to know if YOUR DEPARTMENT is a good fit. I'm happy to converse via email if you do not have time.  
+
+> Specifically, I'd like to know about YYY research and what students you advise?
+
+> Thank you,
+
+> John Muschelli
+> Phone: 555-800-8000
+
+where you can leave off the "Specifically" line.  This indicates that you don't want anything other than information, as opposed to a job, a position in the lab, a recommendation, etc.
+
+
+## Social Media
+It's a digital age.  Your social media can be used immensely for networking in a professional setting.  If so, make sure it's professional.  Use privacy settings in all applications.  Reaching out to faculty/students on some platforms can provide a better interaction than email.  It can be hit or miss with people, but another avenue.
+
+
+
+# Money
+The #1 thing I'd say I did not understand starting grad school was Money.  And as the great Wu-Tang Clan: [C.R.E.A.M.](https://en.wikipedia.org/wiki/C.R.E.A.M.).  
+
+I didn't know what my value was with respect to getting paid.  I didn't understand how to identify payroll issues.  I didn't understand taxes.  I also didn't know how to handle money, but that was a moot point because my budget was exactly "I need X dollars to live and let's get X+c dollars", where c was some number where I could eat out a few times a month if I wanted to, while taking out loans for my Master's.  Probably most importantly, I didn't understand *professional expenses*.   
+
+## Applying to a program - waiver??
+But before we get there, let's start with first things first: applying to programs cost money.  This cost includes the application fee, taking the GRE, maybe some GRE prep book, and maybe taking the exams multiple times.  For the application fee, look on the website and see if there are any waivers.  The waiver will likely be school-wide, less likely department-specific.  If you can't find the waivers, ask the graduate program director (Google them), a departmental administrator, or the registrar.  Also, ask the program director if you not qualify, but believe you still should be eligible for one.  Even low-cost application fees add up over applying to a number of schools.
+
+**How to make this easier** - put on every application page where to apply for a waiver (don't bury it), including department website areas for prospective students, including explicit information about the process.  
+
+
+For example, simply adding:
+> Please apply for our program by December 1, 11:59PM.  Here is the link to the application and a link to the application fee waiver.  If you don't qualify, but have need that is not forseen in the application fee waiver, please contact this.person@institution.edu.  
+
+
+## You visiting a program - paid or not
+You got a visit to a program, great!  You should ask the graduate program director if travel and lodging is included.  I have found that this commonly happens in PhD programs in Biostatistics/Statistics, but not really Master's programs.  Many departments will book travel for you.  Understand that a department *should* have funding for this, as recruitment is an essential function of a department, and without providing these costs will likely gate-keep for many lower income applicants or those without disposable income from their support. 
+
+Again, ask questions.  Ask if this is provided if not clear on their website.  Ask if you stay an extra day to see the city, is that on you or the department.
+
+
+**How to make this easier** - For example, simply adding the following could clarify many questions before an email is ever drafted:
+> By Mid-January, you will get an email from us.  That is sometimes February. If you don't hear back from February 1, please email this.person@institution.edu.  There will be a few phone calls with faculty.  We will then get back to you if you are being asked to visit by February 9.  If you are asked to visit, we will pay for lodging and travel, scheduled for March 1.  You will spend 1.5 days on campus, visiting faculty and students, seeing the campus, and then will have breakfast/brunch the next day followed by a tour of SOME AREA.
+
+Many times these things exist, but behind some firewall, intranet, or are not indexed by search engines.  I'm unsure if there are policy issues why sharing this would be an issue, but I think this is helpful for most students.
+
+
+## Professional Expenses
+The example of travel/lodging being paid by the institution was something I would have never considered before.  I'm not indicating academia is a "business" in the same sense as other corporations, but it is a profession, and therefore has professional expenses.  Many departments have recruitment budgets, either for recruitment of faculty or students.  Also, many times in your career in graduate school you'll need something for your research to go forward.  
+
+Things like, books for class, computers, computing costs, printing costs (it's real), software costs (Adobe Acrobat anyone?), etc.  Some of these costs **should** be explicitly discussed with you.  Others may be discussed only after you accept the program, but you can always ask about them.
+
+Probably the most important message for this whole post is:
+> Asking for things is not only OK, but is expected
+
+This message is for anyone in academia, including faculty.  A colleague of mine encapsulated it well: ask yourself  "Am I supposed to pay for this or should this be paid for by someone else", where that someone else may be an advisor, a grant, the department, or the school.  You'll never know without asking.
+
+One of the first expenses is usually a new computer (if necessary) and books.  Ask more senior students or faculty to borrow their books.  You'll eventually want to buy the standard reference texts, but many books can be borrowed.  For biostatistics, we are on our computers **a lot** of the day, and our program provided funds for a computer and books the first year.  These funds were **essential** for first year success.
+
+One of the most expensive costs are travel, usually for a conference.  Ask if your institution pays for a conference a year, and if that includes travel and/or lodging.  Does the institution book this for your or do you do it on your own?  This distinction is **crucial**: if the institution has you book the travel and reimburses it, what is the timeline for reimbursement?  You will have to float that money (interest free) until you're reimbursed, which can take a long time in some places.  I didn't have a credit card coming into graduate school and realized that I needed one because I couldn't loan out these amounts out of pocket.  See [Get a Credit Card](#get-a-credit-card) below for more discussion.
+
+Similarly, does the school reimburse conference registration, which can be > \$500, even for students, only after the conference has been attended?  Again, ask your advisor/graduate program director what funds are available for this.  Many student paper awards exist, but may not cover everything - who (if anyone) can fill the gap in costs?  Also, does the institution have a per diem pay for food (which is destination-dependent) or do you submit receipts?  Again, this fact can change how you do meals with colleagues from other institutions. 
+
+
+
+Although I recommend to apply to departments/work with advisors where the research interests are aligned and personality allows for good collaboration, asking about what percentage of your students in your department/lab go to 1 conference a year?  What percentage go to more than 1 conference throughout their graduate school?  Conferences are a huge networking tool depending on your career trajectory; you should know if departments value and support them for students (or if they do not).
+
+
+**How to make this easier** - discuss these issues with visiting students and put a simple document (behind a firewall/intranet) for students as a reference:
+
+> Here are student award options: link, link, link, etc.
+
+> Students get $XXX first year for books/computers.  You can/cannot buy tablets with this.  If this is not sued by year one that does/does not roll over.
+
+> When buying supplies for research, make sure you talk to XXX to be able to use the institutions tax-exemption. We cannot reimburse tax.
+
+> Conferences are typically paid out for students by advisors.  Please ask your advisor their policy.  
+
+> Reimbursements can take multiple weeks to be paid out.  There is a department card you can use, please ask XX before applying
+
+or 
+
+> Reimbursements can take multiple weeks to be paid out.  Costs of travel and registration can be burdensome, please determine if a credit card.
+
+The last one get sticky because credit card debt can be devastating if it gets out of control.  
+
+### Get a credit card
+I recommend getting a credit card for professional expenses.  The reason is that many times you'll have known costs for the future, they will be outside of your budget, and you'll get reimbursed.  That mix makes it possible to apply for many fee-free credit cards with sign up bonuses.  These bonuses get applied when you pay a certain amount (\$1000-\$3000) in a certain time, such as 3 months.  With conferences and travel (if you're booking), you'll almost surely pass that milestone, especially if you use it for other costs.  
+
+If you do not use credit cards or do not think you will use them wisely, I'd recommend only using it for travel.  Credit card debt can cause financial issues long-term and I don't want to say that they are universal for people.  I would only recommend a credit card if you know you can pay it off **in full** by the end of the month.  Thus, asking the time for a reimbursement to go through should be known beforehand.  Also, timing when you make the purchase, such as right after the last credit card statement, can maximize your time to get reimbursed.
+
+The perk is that you don't need to float hundreds of dollars for months in advance (conference registration is well in advance).  If you cannot withstand this financial strain, **talk to someone**.  I had situations where I said to an advisor or administrator "I don't have the money to front that" and I was accommodated.  If accommodations are not available, and you do not want to borrow money (you should not have to), then I personally would withdraw my registration and submission.  This scenario is probably the worst case, but if this ever happens, you should reach out to graduate program directors and the chair because small (relative to the department) financial issues are hurting the research and science, which people take very seriously.  
+ 
+## Moving Expenses
+I haven't heard any graduate students getting moving costs covered by a department, but those costs can be significant.  I would highly recommend discussing this with the program director if you will be struggling to get to the new city/place.  I echo this **especially for post-docs**: ask your advisor.  Negotiation is usually possible.  
+These expenses are also relevant for new faculty (who may be a newly-minted PhD or post-doc).  In many industry positions, moving costs are covered or are bundled into your signing bonus.  
+
+**How to make this easier** - I don't know how to rectify this blind spot without setting out departmental funds. If you're a joining faculty, negotiate it in your offer.
+
+
+## Dinners with Faculty
+Many times you will go out to dinner with faculty, usually with seminar speakers.   These dinners should be provided by the department.  These are amazing networking opportunities, especially when you're applying for a job on the market, and a way to explore the food scene in your area.  I didn't know this, and I remember feeling uncomfortable going to my first seminar dinner because it was expensive and I got a small plate for dinner and said I wasn't hungry.  I was relieved to see a faculty pick up the tab, and didn't know until later that students were not expected to pay.  There will be situations where faculty ask you out to dinner and usually etiquette will dictate they pay, notably if they choose a place out of your price range.  If they don't, my vote is to swallow that bill and then politely decline future invitations.
+
+
+# Mental issues
+A lot of people who go to graduate school have mental issues, especially burdensome is the exacerbation of stress.  There are a number of view points of this, but mine is that graduate school is hard.  It's supposed to be hard because research and trying to push on the limits of a field is hard.  Stress, unfortunately is usually a byproduct of this.  I'm not trying to be insensitive and I'm not saying that stress can't be lessened or reduced, but I do not believe a stress-free graduate school experience is possible.  A low-stress one is maybe possible, but rare.  I do believe however, that increased organization and structure could mitigate this stress.
+
+The biggest changes for me were that 1) you will feel like an imposter, 2) you don't have a "boss", and 3) there is not *right* answer.
+
+### You are (not) an imposter
+I wrote a full post about imposter syndrome at https://hopstat.wordpress.com/2015/10/14/dealing-with-imposter-syndrome-in-graduate-school/.  Essentially, my argument is that you are likely comparing yourselves to your more-advanced peers or, even worse, faculty based on skill and accomplishments.  This comparison will make you feel inadequate.  Also, let me say this again, **graduate school is hard**.  I felt I was academically-inclined for most of my career and being the one that "didn't get it" was a change.  I had to learn how to ask about 1000 more questions than I was used to.  It took a lot of confidence reinforcement for me, but I came to the conclusion that I hated not knowing what I was doing than any embarrassment by feeling like I was asking obvious questions.  One of my life mottos is "Never feel too stupid to ask a dumb question".
+
+I ask obvious questions all the time.  It's to make sure me and the person presenting (or getting presented to) are on the same first page.  If we're not, then there's no point in discussing things more.  Also, as someone who teaches, many instructors **yearn** for engagement.  Ask questions.  
+
+### You don't have **a** boss
+When I say "you don't have a boss" I mean it 2 ways: you don't have a "boss" and you don't have **A** boss.  The first way indicates to me that you will not have someone asking where you are from 9-5 and checking your office.  You may have to log hours, but maybe not.  Some weeks you'll get a lot of work done, beating down imposter.  Now many advisors do regular check-ins, lab meetings, or are in the same physical space as you (as in a lab).  But most times everyone is concerned with their own work and research.  This lack of checking in is many times **intentional** - graduate school is a time to learn **independent** research.  At this point in your life, you're an adult and will likely be treated accordingly or as an employee.  The flip side of this is that you have immense control over your schedule and flexibility.  This flexibility can be a curse if you're disorganized (such as me) or sometimes struggle with discipline in work (also sometimes me).  I'm still learning that motivation is fleeting, organization wins championships.
+
+Now, as you don't have one person checking in your work, but you may have **several** people checking in, or who are your "boss".  For example, you have an advisor, but also a chair.  You have teachers for work, but also the graduate program director for overall progress.  You have an advisor you work with, but maybe a number of collaborators with different projects, all asking for their results.  Thus, again, graduate school is a time to learn what organizational schemes work for you and what you can do **independently**.  I will say that there isn't any hand-holding here in many cases.  
+
+Efficient communication and asking a lot of questions is one of the things I have found to help.  For example, asking "What would you prioritize over X and Y" or emailing "I have another project that is my top priority due to a deadline, could I get you X by Y date?" can go miles.  Communication is only half the battle though, sometimes both people say "yes I want it now". You either need to clear some weekend or night plans and plow through things (WHILE STILL SLEEPING) or you need to have your advisor do some time-protection work if possible.  Also, I have found that people can easily say "yes I need that NOW" via email but those things change during a phone, Zoom, or face-to-face discussion of your priorities (including **other priorities of their projects**).
+
+# Random
+
+# Dress code
+I came to grad school wearing hats every day, sandals, plaid shorts, and t-shirts to class and meet with faculty.  While my dress has slowly navigated back towards that, luckily ditching the plaid shorts, that's likely because I'm a faculty member.  I remember taking classes with medical students, who dress in professional garb, including ties, for the first few weeks and feeling immensely under-dressed the first class or two.  I'd recommend dressing semi-professional, ties are not necessary, but shoes, pants, dress/skirt, or something of the like would probably be a good first try at first days of class or meetings with faculty.  You will get the hang of what you can wear that fits with your style over time, but probably go more professional to start.  Also, dress professionally when meeting individually with the chair, dean, or any administrator you don't know personally.
+
+## Graduation 
+You need a cap and gown (regalia), just like in undergraduate ceremonies.  One key difference is that if you're getting a PhD and going into academia, you may need that regalia for ceremonies with your students. These are not particularly cheap (https://academicregalia.herffjones.com/category/detail/categoryID/3291), and can be upwards of $1000.  I recommend buy them after you are in your position for some time and likely more financially stable.
