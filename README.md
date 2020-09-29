@@ -1,14 +1,15 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Hopstat Blog
+Hopstat Blog
+============
 
 Here are the posts of the RMD files from my website. Hopefully it’s a
 good idea. So if you wnat to run anything, just tangle out the code
 using `knitr`.
 
 | link                                                                                                                                  | rmd                                                                                                                                |
-| :------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------- |
+|:--------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------|
 | [\#rstats Make arrays into vectors before running table](#rstats_Make_arrays_into_vectors_before_running_table/index.html)            | [Rmd](#rstats_Make_arrays_into_vectors_before_running_table/#rstats_Make_arrays_into_vectors_before_running_table.Rmd)             |
 | [Better interactive neuroimage plotters using R](A_better_interactive_neuroimage_plotter_in_R/index.html)                             | [Rmd](A_better_interactive_neuroimage_plotter_in_R/A_better_interactive_neuroimage_plotter_in_R.Rmd)                               |
 | [A Faster Scale Function](A_Faster_Scale_Function/index.html)                                                                         | [Rmd](A_Faster_Scale_Function/A_Faster_Scale_Function.Rmd)                                                                         |
@@ -72,6 +73,6 @@ using `knitr`.
 | [Weather and CIs](Weather_and_CIs/index.html)                                                                                         | [Rmd](Weather_and_CIs/Weather_and_CIs.Rmd)                                                                                         |
 | [White Matter Segmentation in R](White_Matter_Segmentation_in_R/index.html)                                                           | [Rmd](White_Matter_Segmentation_in_R/White_Matter_Segmentation_in_R.Rmd)                                                           |
 | [Working with NIfTI images in R](Working_with_NIfTI_images_in_R/index.html)                                                           | [Rmd](Working_with_NIfTI_images_in_R/Working_with_NIfTI_images_in_R.Rmd)                                                           |
-| [Writing Accountability Groups (WAGs)](Writing_Accountability_Groups_\(WAGs\)/index.html)                                             | [Rmd](Writing_Accountability_Groups_\(WAGs\)/Writing_Accountability_Groups_\(WAGs\).Rmd)                                           |
+| [Writing Accountability Groups (WAGs)](Writing_Accountability_Groups_(WAGs)/index.html)                                               | [Rmd](Writing_Accountability_Groups_(WAGs)/Writing_Accountability_Groups_(WAGs).Rmd)                                               |
 | [XML to Stata](XML_to_Stata/index.html)                                                                                               | [Rmd](XML_to_Stata/XML_to_Stata.Rmd)                                                                                               |
 | [Your Research is a Pain-in-the-ass Unicorn](Your_Research_is_a_Pain-in-the-ass_Unicorn/index.html)                                   | [Rmd](Your_Research_is_a_Pain-in-the-ass_Unicorn/Your_Research_is_a_Pain-in-the-ass_Unicorn.Rmd)                                   |
