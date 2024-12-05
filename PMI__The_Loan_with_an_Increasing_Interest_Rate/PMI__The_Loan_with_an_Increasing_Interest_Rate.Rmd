@@ -1,0 +1,231 @@
+---
+title: "PMI: The Loan with an Increasing Interest Rate"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+library(dplyr)
+library(ggplot2)
+opts_chunk$set(echo = TRUE, prompt = FALSE, 
+               message = FALSE, warning = FALSE, 
+               comment = "")
+```
+
+# Disclaimer
+This is my opinion and not financial advice.  Don't use any of this information to make decisions.
+
+# Why post this?
+This post is a little different than previous posts in the past, which have focused mainly on data science.  I'm trying to get back into blogging a bit in 2024, and I wanted to write about something I don't need data or really code for.  We bought a house a few years ago and I thought PMI was interesting from a financial perspective and so wanted to share how I thought about it and why I tried to pay it off ASAP.
+
+# TL;DR
+Separate your loan into 2 parts: amount required to remove PMI (PMI balance) and the rest.  Looking at the interest + PMI as the total cost of the PMI balance shows that the effective APR for the PMI balance of the loan is much higher than your APR and you should pay it off over almost all other debts (even credit cards, but that may be a larger decision).
+
+# PMI: Mortgage Interest
+What is PMI (Private Mortgage Insurance)?  When you buy a house, if you don't have a set % of the down payment (usually 20%), the bank will require you to have PMI, which is almost always a fixed cost amount that you will pay on top of any interest on the loan.  You can have PMI for the life of the loan, but in many cases you carry (e.g. pay) PMI until you get to that fixed percentage, usually the loan is at 80% loan of the home value.
+
+Note that the initial amount is 20% of the value of the home/loan (20% down payment), but you can remove it when you have 80% of the value of the home left on the loan (80% left).  If housing prices stay relatively flat or moderately increase, 20% down payment or 80% left are the the same or very close.  If housing prices increase dramatically, you can potentially get a reappraisal and your loan amount, which hasn't changed, may be a smaller percentage of the home value.  Some lenders do not allow you to remove PMI based on reappraisals, or limit the amount of time from purchase you can remove PMI for, such as within 3 years.  This restriction won't allow you to eject PMI if the housing market goes up dramatically, like in the past few years.  Regardless, depending on your restrictions or how long you own your home, it's important to know when you can get rid of your PMI so you know the target you're aiming for.
+
+# Why is PMI bad?
+PMI isn't bad per se, as it is necessary to get the loan if you do not have a 20% down payment, which can be a lot of money.  Also, even if you have 20% to put down, you may want that money in an emergency fund, need it for home improvements, or need that money to furnish your new home.  The reason I'm writing about PMI is because when you consider it more of a **removable fixed fee** than **part of a loan**, which makes it somewhat unique in how the math works out on paying it off faster or slower.  To demonstrate this, let's look at how interest rates work on the loan and then show how PMI is very different.
+
+## Normal APR
+For many loans, the relevant number is the annualized percentage rate or APR.  In finance, building wealth in its simplest terms is taking all your assets (things that generate value or keep value) and your liabilities (things that cost value or depreciate) and trying to maximize the APR for the assets and minimize APR on the liabilities.  This largely is due to the wonder of compound interest.  Easily understood liabilities are loans, such as car loans, credit card debt, and student loans.  Easily understood assets are brokerage/stock market accounts, savings accounts, and homes.  We're only going to talk about things in direct money amounts to simplify things, so we're not going to go into house appreciation/depreciation and assume it is worth the same over time.
+
+# Your Home Loan
+For simplicity sake, let's say your home loan is \$100,000 and you have to put \$20,000 (20%) down to have a loan with PMI, but you are only going to put down 10% (\$10,000).  Let's also assume your rate (APR) for your mortgage is 5%.  Let's say the PMI is \$50/month, which is a small/moderate PMI in many cases.  In some cases, PMI is > $100/month.  Thus, we're paying \$600/year for PMI.  We're assuming a fixed rate loan (commonly 30 years), so the APR on the loan does not change.  
+
+We're going to discuss mortgage payments without any other costs such as homeowners insurance or property taxes.
+
+## Amortization
+
+Amortization is the gradually writing off the initial cost of an asset, or in this case, gradually paying down the whole mortgage.  Let's look at the amortization schedule for this 30-year loan without PMI, and then we can break down how much PMI costs as an APR.  Any payment to principal with PMI is inherently going to the PMI part and not the rest.
+
+To calculate the monthly payment, we'll use the formula:
+
+$$
+\text{Monthly Payment} = P \times \frac{i \times (1+i)^n}{(1+i)^n - 1}
+$$
+where $i$ is our **monthly** interest rate: 0.4167% (5%/12 months), $n$ is our total number of months (360 months for 30-year), and $P$ is the principal amount.  We will look at putting in 3 different amounts for principal: \$80K (20% down), \$90K (10% down), and \$100K (0% down).
+
+Here we can calculate the monthly cost (without PMI) for each scenario:
+```{r}
+i = monthly_interest_rate = 0.05/12
+p = c(80000, 90000, 100000)
+# n = 1:(30*12)
+n = 30*12
+pmi_cutoff = 80000
+get_monthly = function(p) {
+  round(p * (i * (1+i)^n)/{(1+i)^n -1}, digits = 2)
+}
+a = get_monthly(p)
+names(a) = sprintf("%4.0f", p)
+a
+```
+
+Although we see that there is a \$`r (a["90000"] - a["80000"])` difference between the \$80K and \$90K bank notes, we haven't taken into account the PMI.  The reason I bring this up is that I heard "It's only $50/month, that's like 1 fewer dinner out a month", which I think is technically correct, but not the way I'd see this in the lens of assets and liabilities.  Even accounting for PMI, it's about \$100 difference in payments, but it may be clear when we separate the mortgage balances below how this thinking can lead to a very expensive liability.
+
+## Amortization/Paydown Schedule
+Let's create an amortization schedule.  We will take the last months balance, multiply it by the interest rate to get the additional interest accrual, and deduct the monthly payment.  Then we look at the the last 6 months of payment in years 2-3:
+
+```{r}
+schedule = matrix(ncol = 3, nrow = n+1)
+schedule[1,] = p
+colnames(schedule) = paste0("base_", p/1000)
+for (irow in 2:(n+1)) {
+  schedule[irow,] = schedule[irow-1,] - a + 
+    round(schedule[irow-1, ] * monthly_interest_rate, 2)
+}
+schedule = as.data.frame(schedule)
+schedule = schedule %>% 
+  mutate(month = 0:(nrow(schedule)-1)) %>% 
+  select(month, everything())
+gt::gt(schedule %>% filter(month > 30 & month <= 36))
+```
+
+After 3 years of payments, we can see how the balance difference of almost \$10K or \$20K remains even after 3 years of payments, for the \$10K or $0 down payments, respectively.
+ 
+
+Let's wrap this into a simple function that takes in the principal, the monthly interest rate, the value at which the PMI is removed and the PMI cost per month:
+
+```{r}
+make_schedule = function(p, 
+                         monthly_interest_rate = 0.05/12,
+                         pmi_cutoff = 80000, 
+                         pmi_value = 50) {
+  schedule = as.data.frame(matrix(ncol = 3, nrow = n+1))
+  colnames(schedule) = c("balance", "payment", "interest")
+  schedule$balance[1] = p
+  a = get_monthly(p)
+  schedule = schedule %>% 
+    dplyr::mutate(payment = a,
+                  interest = 0L)
+  # fill in the amortization schedule
+  for (irow in 2:(n+1)) {
+    schedule$interest[irow-1] = round(schedule$balance[irow-1] * monthly_interest_rate, 2)
+    schedule$balance[irow] = schedule$balance[irow-1] - 
+      a +
+      schedule$interest[irow-1]
+  }
+  # add columns for the month, principal paid, indicator of PMI and PMI cost
+  schedule = schedule %>% 
+    dplyr::mutate(
+      month = 0:(dplyr::n()-1),
+      principal = payment - interest
+    )
+  schedule = schedule %>% 
+    dplyr::mutate(
+      has_pmi = balance > pmi_cutoff,
+      pmi = ifelse(has_pmi, pmi_value, 0),
+      total_cost = interest + pmi,
+      effective_interest_rate = total_cost / balance, n = 1L)
+  # schedule$effective_interest_rate[1] = schedule$effective_interest_rate[2]
+  # We can see the effective APR (PMI + interest)
+  schedule = schedule %>% 
+    dplyr::mutate(
+      effective_apr = scales::percent(effective_interest_rate * 12, 
+                                      accuracy = 0.01),
+      effective_interest_rate = scales::percent(effective_interest_rate,
+                                                accuracy = 0.001),
+    )
+  # remove the last which happens due to rounding
+  schedule = schedule %>% 
+    filter(balance > 0)
+  schedule = tibble::as_tibble(schedule)
+  schedule
+}
+```
+
+To show how the PMI affects the interest rate of the total loan over time, we will use a 10\% down (\$10K), so the principal is \$90K:
+
+```{r}
+m = make_schedule(90000, monthly_interest_rate = monthly_interest_rate)
+gt::gt(head(m))
+```
+Here we can see the effective APR over time:
+```{r}
+m %>% 
+  ggplot(aes(x = month, y = effective_apr)) + 
+  geom_step() + 
+  labs(x = "Month", y = "Effective APR (including PMI)")
+```
+
+We see that the APR levels out after the PMI is taken off and doesn't really change much compared to the total balance of the loan, but does increase in the 3rd decimal of the percentage.  This increase is small compared to the total balance of the loan, but I argue is incorrect to look at things this way.  Regardless, an effective APR of 5% vs 5.75% but can still change decisions of where to allocate money: people may decide on paying the mortgage more compared to stocking away money in a savings account, bond, or other asset. 
+
+The issue with this thinking is that the PMI isn't **really** on the whole loan, but only a portion of it, which dramatically changes how to think of it as a liability. 
+
+
+# How to (correctly) think of PMI
+The trick, at least for me, was to think of the whole mortgage broken up into 2 parts: the amount of the mortgage left that if I paid off it would remove PMI (PMI balance), and the rest of the mortgage (other balance/rest).  In our example, the PMI balance would be \$10,000 and the other balance would be \$80,000.  On the other balance of the mortgage, the APR on that $80K is 5%.  On the PMI part, however, the APR is 5% + the rate induced by PMI.  
+
+When breaking the balances this way, which I believe is more accurate, we see the PMI balance as a **considerably worse** liability.  This fact should not be surprising as the numerator of the APR (the total cost) has a fixed amount/fee (the PMI), but the denominator (PMI balance) shrinks each month.  
+
+Let's look at the first few months and the effective APR on the PMI balance:
+
+```{r}
+m = m %>% 
+  mutate(pmi_balance = balance - pmi_cutoff,
+         pmi_balance = ifelse(pmi_balance < 0, 0, pmi_balance),
+         other_balance = balance - pmi_balance)
+m = m %>% 
+  mutate(pmi_balance_interest = round(pmi_balance / balance * interest,2),
+         other_balance_interest = interest - pmi_balance_interest)
+m = m %>% 
+  mutate(
+    pmi_balance_total_cost = pmi_balance_interest + pmi,
+    effective_pmi_balance_apr = pmi_balance_total_cost/pmi_balance * 12,
+    effective_other_apr = other_balance_interest/other_balance * 12,
+    effective_pmi_balance_apr = scales::percent(effective_pmi_balance_apr),
+    effective_other_apr = scales::percent(effective_other_apr))
+data = m %>% 
+  filter(has_pmi) %>% 
+  select(balance, month, pmi_balance,
+         effective_pmi_balance_apr, pmi_balance_interest, 
+         pmi_balance_total_cost, effective_apr)
+gt::gt(head(data))
+```
+
+We see on that \$10K the APR is effectively over 11%!  Now, even with a great APR (such as 3%), with PMI, the rate is likely high enough that if you have the cash to remove it, it's a better to remove the liability than to keep the \$10K asset, unless you can beat 11% (and tell me how). 
+
+
+Looking after 3 years of payments can give you a better idea of the effective APR on the remaining PMI balance (spoiler, it's > 15%!): 
+
+```{r, echo = FALSE}
+gt::gt(data %>% filter(month == 36))
+```
+
+We can see this effective APR for the PMI balance during the first 6 years:
+```{r}
+data %>% 
+  filter(month <= 72) %>% 
+  mutate(effective_pmi_balance_apr = 
+           as.numeric(sub("%", "", effective_pmi_balance_apr))/100) %>% 
+  ggplot(aes(x = month, y = effective_pmi_balance_apr)) + 
+  scale_y_continuous(label =  scales::percent) +
+  geom_step() + 
+  labs(x = "Month", y = "PMI Balance Effective APR")
+```
+
+This APR increase isn't shocking if you think of the majority of the numerator getting larger in light of compounding interest being reduced by payment of the balance, but still shocking when your APR goes like that.
+
+And, most drastically, let's look at towards the remaining balance after we've made almost all of payments:
+
+```{r, echo = FALSE}
+gt::gt(tail(data))
+```
+
+The effective APR is > 100%.  I don't care what asset you have, you're never going to beat that.  In many cases, when looking at the small balance needed to remove PMI, it's a clear cut case to pay additional money to remove it, but it's hard to see that affect as strongly towards the beginning of the loan.
+
+## Conclusion
+Obviously, if you have enough money to get a mortgage without PMI, then do it.  Many can't, hence why they have PMI in the first place.  I think the message of "have more money" is silly and unhelpful. 
+
+I think the interesting part of this is seeing the balance left to remove PMI and the additional remaining balance of the mortgage as 2 separate loans.  Mentally and practically, I think it makes it clear that PMI is a **really bad** liability.  Most surprisingly, it can be even a higher effective APR compared to **credit cards**!  The big difference compared to credit cards and other APR-based products, however, is that PMI is not interest and does not compound per month.  But that same fact that PMI is fixed makes for an interesting interest vehicle and warrants a closer inspection other than "it's just another $50/month". Though true, when looking at it through the lens of asset and liability interest rates, it should have a high priority for removal in your debt profile and increased priority over time, especially after you have saved up after the initial home purchase.  
+
+
+
+
+
+
+
