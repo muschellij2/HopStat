@@ -2,7 +2,10 @@
 title: "Getting the EPA Walkability Index in R"
 author: "John Muschelli"
 date: '`r Sys.Date()`'
-output: html_document
+output: 
+  html_document:
+    self_contained: yes
+    mode: selfcontained
 ---
 
 ```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
@@ -204,7 +207,7 @@ Although the focus was on the national walk, ability index, the smart location d
 
 The MapServer endpoint (https://geodata.epa.gov/arcgis/rest/services/OA/SmartLocationDatabase/MapServer) has a number of metrics and data sets that may be useful:
 
-```{r}
+```{r, results='markup'}
 knitr::include_graphics("smart_location_database_layers.png")
 ```
 

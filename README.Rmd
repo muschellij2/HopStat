@@ -13,8 +13,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+# To Run
+Need to go to ~/Dropbox/MY_Website/WordPresser.R
+
 # Hopstat Blog
-Here are the posts of the RMD files from my website.  Hopefully it's a good idea.  So if you wnat to run anything, just tangle out the code using `knitr`.
+Here are the posts of the RMD files from my website.  Hopefully it's a good idea.  So if you want to run anything, just tangle out the code using `knitr`.
 
 ```{r, echo = FALSE, message = FALSE}
 library(tibble)

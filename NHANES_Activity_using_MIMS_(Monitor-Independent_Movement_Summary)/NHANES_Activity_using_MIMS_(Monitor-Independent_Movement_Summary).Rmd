@@ -1,0 +1,248 @@
+---
+title: "NHANES Activity using MIMS (Monitor-Independent Movement Summary)"
+author: "John Muschelli"
+date: '`r Sys.Date()`'
+output: html_document
+bibliography: refs.bib
+---
+
+```{r label=opts, results='hide', echo=FALSE, message = FALSE, warning=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE, prompt = FALSE, message = FALSE, warning = FALSE, comment = "", results = "hide")
+```
+
+# MIMS was introduced in the NHANES Study
+A lot the accelerometry data from ActiGraph devices is summarized using ActiLife software into ActiGraph Activity Counts (AC).  The [NHANES (National Health and Nutrition Examination Survey)](https://wwwn.cdc.gov/nchs/nhanes/continuousnhanes/default.aspx?BeginYear=2011) used ActiGraph devices, collecting data on over 14000 people in a nationally representative survey.   The NHANES introduced MIMS, a Monitor-Independent Movement Summary for activity data [@mims] instead of AC.  The NHANES study released these summaries in large (over 7Gb) SAS XPORT files (XPTs).    The MIMSunit package in R implements this method.  Below we show how to download the raw data from NHANES, process it using MIMSunit, and compare it to the released MIMS data from NHANES.
+
+
+```{r setup}
+library(MIMSunit)
+library(curl)
+library(haven)
+library(curl)
+library(dplyr)
+library(readr)
+options(digits.secs = 3)
+```
+
+
+# Set up a Directory
+The code below can do all of this in a temporary directory.  I used a hard-coded directory since some of these files are big and take a while to download/convert/run.
+
+```{r setup_tdir_show, eval = TRUE, echo = FALSE}
+tdir = tempfile()
+dir.create(tdir)
+```
+
+
+```{r setup_tdir_eval, eval = TRUE, echo = FALSE}
+tdir = "~/Dropbox/Projects/nhanes_80hz/data/reprex"
+```
+
+
+```{r pick_id}
+id = "71917"
+```
+
+
+```{r download_80hz_function}
+# Download tarball
+download_80hz = function(id, version, exdir = tempdir(), ...) {
+  files = id
+  tarball_ending = grepl("[.]tar[.]bz2", id)
+  files[!tarball_ending] = paste0(files[!tarball_ending], ".tar.bz2")
+  urls = paste0("https://ftp.cdc.gov/pub/", version, "/", files)
+  outfiles = sapply(urls, function(x) {
+    destfile = file.path(exdir, basename(x))
+    if (!file.exists(destfile)) {
+      curl::curl_download(x, destfile = destfile, ...)
+    }
+    destfile
+  })
+  outfiles
+}
+```
+
+# Downloading the data
+Here we download the tarball for the data (about 130Mb)
+
+```{r download_execute}
+raw = download_80hz(id, "pax_y", quiet = FALSE, exdir = tdir)
+```
+
+# Reading in the Raw data
+Here we read the data and write it out as a CSV (so we do not have to re-run)
+
+```{r create_csv}
+file_data = file.path(tdir, paste0(id, ".csv"))
+if (!file.exists(file_data)) {
+  files = untar(raw, verbose = TRUE, exdir = tdir, list = TRUE)
+  files = file.path(tdir, files)
+  if (!all(file.exists(files))) {
+    untar(raw, verbose = TRUE, exdir = tdir)
+  }
+  log_file = files[grepl("_log", files, ignore.case = TRUE)]
+  #' Getting only the data files
+  csv_files = files[!grepl("_log", files, ignore.case = TRUE)]
+
+  df = readr::read_csv(
+    csv_files,
+    col_types = readr::cols(
+      HEADER_TIMESTAMP = readr::col_datetime(),
+      X = readr::col_double(),
+      Y = readr::col_double(),
+      Z = readr::col_double()
+    )
+  )
+  readr::write_csv(df, file_data)
+} else {
+  df = readr::read_csv(
+    file_data,
+    col_types = readr::cols(
+      HEADER_TIMESTAMP = readr::col_datetime(),
+      X = readr::col_double(),
+      Y = readr::col_double(),
+      Z = readr::col_double()
+    )
+  )
+}
+```
+
+
+```{r print_df}
+#' Here we can pritn out the data to see what it looks like
+df
+```
+
+
+```{r make_mims}
+file_mims = file.path(tdir, paste0(id, "_MIMS.csv"))
+if (!file.exists(file_mims)) {
+  # MIMSunit is very picky with naming
+  run_df = df %>%
+    dplyr::rename(HEADER_TIME_STAMP = HEADER_TIMESTAMP)
+  mims = MIMSunit::mims_unit(df, epoch = "1 min", dynamic_range = c(-6L, 6L),
+                             output_mims_per_axis = TRUE)
+  # for printing
+  mims = as_tibble(mims)
+  readr::write_csv(mims, file_mims)
+} else {
+  mims = readr::read_csv(
+    file_mims,
+    col_types = readr::cols(
+      HEADER_TIME_STAMP = readr::col_datetime(),
+      .default = readr::col_double()
+    )
+  )
+}
+
+mims
+```
+
+
+```{r make_mims_notrunc}
+file_mims_notrunc = file.path(tdir, paste0(id, "_MIMS_notrunc.csv"))
+if (!file.exists(file_mims_notrunc)) {
+  # MIMSunit is very picky with naming
+  run_df = df %>%
+    dplyr::rename(HEADER_TIME_STAMP = HEADER_TIMESTAMP)
+
+  # no allowing truncation
+  mims_notrunc = MIMSunit::custom_mims_unit(
+    run_df, epoch = "1 min",
+    dynamic_range = c(-6L, 6L),
+    output_mims_per_axis = TRUE,
+    allow_truncation = FALSE)
+  # for printing
+  mims_notrunc = as_tibble(mims_notrunc)
+  readr::write_csv(mims_notrunc, file_mims_notrunc)
+} else {
+  mims_notrunc = readr::read_csv(
+    file_mims_notrunc,
+    col_types = readr::cols(
+      HEADER_TIME_STAMP = readr::col_datetime(),
+      .default = readr::col_double()
+    )
+  )
+}
+```
+
+
+```{r print_mims_notrunc}
+mims_notrunc
+```
+
+
+```{r make_mims_xpt}
+#' # Download Released MIMS
+#' Here we download the MIMS data from the XPT (1.6Gb -Large!)
+file_mims_xpt = file.path(tdir, paste0(id, "_MIMS_XPT.csv"))
+if (!file.exists(file_mims_xpt)) {
+  url = "https://wwwn.cdc.gov/Nchs/Data/Nnyfs/Public/2012/DataFiles/Y_PAXMIN.xpt"
+  destfile = file.path(tdir, basename(url))
+  if (!file.exists(destfile)) {
+    curl::curl_download(url, destfile = destfile, quiet = FALSE)
+  }
+
+  #' We can read in the XPT using `haven` and then subset the ID we need.  We chose the first ID
+  pax = haven::read_xpt(destfile, n_max = 50000)
+  stopifnot(id %in% pax$SEQN)
+  #' Keep only the ids we need from above
+  paxmims = pax %>%
+    filter(SEQN %in% id) %>%
+    select(SEQN, PAXDAYM, PAXDAYWM, PAXSSNMP, PAXTSM, PAXAISMM, PAXMTSM, PAXMXM, PAXMYM, PAXMZM)
+  readr::write_csv(paxmims, file_mims_xpt)
+} else {
+  paxmims = readr::read_csv(
+    file_mims_xpt,
+    col_types = readr::cols(
+      SEQN = col_character(),
+      PAXDAYM = col_character(),
+      PAXDAYWM = col_character(),
+      .default = readr::col_double()
+    )
+  )
+}
+```
+
+
+This data doesn't have any times in it so we can check to make sure they have the same rows and simply bind them.  This would likely need more checking for other data, but here we see these agree.  Aside:  A mapping from this to the date/time data would be helpful.
+
+```{r print_mims_xpt}
+head(paxmims)
+```
+
+
+```{r check_mims}
+stopifnot(nrow(paxmims) == nrow(mims))
+
+head(paxmims)
+head(mims)
+
+max(abs(mims$MIMS_UNIT - paxmims$PAXMTSM))
+hist(abs(mims$MIMS_UNIT - paxmims$PAXMTSM))
+
+max(abs(mims_notrunc$MIMS_UNIT - paxmims$PAXMTSM))
+hist(abs(mims_notrunc$MIMS_UNIT - paxmims$PAXMTSM))
+# using a cutoff of 0.2
+paxmims$diff = abs(mims$MIMS_UNIT - paxmims$PAXMTSM) >= 0.2
+paxmims$diff_notrunc = abs(mims_notrunc$MIMS_UNIT - paxmims$PAXMTSM) >= 0.2
+
+# 25 % of the data
+mean(paxmims$diff)
+mean(paxmims$diff_notrunc)
+
+paxmims$MIMS_UNIT = mims$MIMS_UNIT
+paxmims$MIMS_UNIT_notrunc = mims_notrunc$MIMS_UNIT
+diff = paxmims %>%
+  select(PAXDAYM, PAXSSNMP, PAXTSM, PAXMTSM, MIMS_UNIT, MIMS_UNIT_notrunc, diff, diff_notrunc)
+diff
+diff %>% filter(PAXDAYM == 1 & PAXSSNMP>= 1742400)
+
+diff %>%
+  mutate(d = abs(MIMS_UNIT_notrunc- PAXMTSM)) %>%
+  arrange(desc(d)) %>%
+  select(PAXMTSM, MIMS_UNIT_notrunc) %>%
+  mutate(PAXMTSM = as.character(PAXMTSM),
+         MIMS_UNIT_notrunc = as.character(MIMS_UNIT_notrunc))
+```
